@@ -74,7 +74,7 @@ def get_main_menu() -> InlineKeyboardMarkup:
          InlineKeyboardButton("🗑 Delete", callback_data="menu_delete")],
         [InlineKeyboardButton("📢 Announce", callback_data="menu_announce"),
          InlineKeyboardButton("👤 Leads", callback_data="menu_leads")],
-        [InlineKeyboardButton("💬 Inbox (Mini App)", url="https://readyco-market.vercel.app"),
+        [InlineKeyboardButton("💬 Inbox (Mini App)", url="https://readyco.vercel.app/inbox"),
          InlineKeyboardButton("⚙️ Manage", callback_data="menu_manage")],
     ])
 
@@ -122,7 +122,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Non-admin: welcome + inquiry
+    # Non-admin: client flow
     offer_ref = None
     if args and args[0].startswith("inquiry_"):
         offer_ref = args[0].replace("inquiry_", "")
@@ -133,6 +133,8 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if offer_ref:
         offer = await db_get_offer(offer_ref)
         if offer:
+            # Save offer_ref in session so we know context for messages
+            sessions[user.id] = {"action": "client_inquiry", "data": {"offer_ref": offer_ref, "lead_id": lead_id}}
             await update.message.reply_text(
                 f"👋 Hi! You asked about *{offer_ref}* — {offer.get('jurisdiction', '')} {offer.get('license_type', '')}.\n\n"
                 f"📊 Price: {offer.get('price', 'On request')}\n\n"
@@ -145,16 +147,33 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"Send your question here — our team will respond privately."
             )
     else:
-        await update.message.reply_text(
-            "👋 Welcome to ReadyCo Market!\n\n"
-            "We help you buy and sell licensed companies:\n"
-            "🏦 FinTech (EMI, PI, PSP)\n"
-            "₿ Crypto (VASP, CASP, Exchanges)\n"
-            "♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\n"
-            "What are you interested in?\n"
-            "• Buy or sell?\n• What jurisdiction?\n• What license type?\n• Budget range?\n\n"
-            "Send your question here — our team will respond privately."
-        )
+        # No specific offer — show available offers as buttons
+        offers = await db_get_offers_by_status("live")
+        if offers:
+            keyboard = []
+            for o in offers:
+                keyboard.append([InlineKeyboardButton(
+                    f"{o['ref']} | {o.get('jurisdiction', '?')} | {o.get('license_type', '')} | {o.get('price', '?')}",
+                    callback_data=f"client_offer_{o['ref']}"
+                )])
+            await update.message.reply_text(
+                "👋 Welcome to ReadyCo Market!\n\n"
+                "We help you buy and sell licensed companies:\n"
+                "🏦 FinTech (EMI, PI, PSP)\n"
+                "₿ Crypto (VASP, CASP, Exchanges)\n"
+                "♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\n"
+                "Select an offer to ask about it 👇",
+                reply_markup=InlineKeyboardMarkup(keyboard),
+            )
+        else:
+            await update.message.reply_text(
+                "👋 Welcome to ReadyCo Market!\n\n"
+                "We help you buy and sell licensed companies:\n"
+                "🏦 FinTech (EMI, PI, PSP)\n"
+                "₿ Crypto (VASP, CASP, Exchanges)\n"
+                "♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\n"
+                "No offers available yet. Send your question here — our team will respond privately."
+            )
 
 
 async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -358,9 +377,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _handle_reply_step(update, text)
         return
 
-    # Non-admin messages — forward to admins with history + [💬 Reply] button
+    # Non-admin messages — forward to admins with offer context + history + [💬 Reply]
     if not is_admin(user_id):
-        lead_id = await db_create_lead(user.id, user.username, None)
+        # Get offer_ref from session if exists
+        session = sessions.get(user_id, {})
+        offer_ref = session.get("data", {}).get("offer_ref")
+        
+        lead_id = await db_create_lead(user.id, user.username, offer_ref)
         await db_store_message(lead_id, text, "client_to_admin")
 
         # Get history and lead info
@@ -380,10 +403,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             finally:
                 await db.close()
 
-        # Build admin notification with history
+        # Build admin notification with history (HTML mode to avoid Markdown issues)
         if user.username:
             user_link = f"t.me/{user.username}"
-            user_display = f"@{md_escape(user.username)}"
+            user_display = f"@{user.username}"
         else:
             user_link = f"tg://user?id={user.id}"
             user_display = f"ID: {user.id}"
@@ -391,18 +414,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         history_text = ""
         if len(history) > 1:
             history_lines = []
-            for msg in history[:-1]:  # exclude current message (already shown)
+            for msg in history[:-1]:
                 direction = "Client" if msg["direction"] == "client_to_admin" else "Admin"
                 ts = msg["sent_at"][:16] if msg["sent_at"] else ""
-                history_lines.append(f"[{ts}] {direction}: {md_escape(msg['text'][:80])}")
-            history_text = "\n\n📜 History:\n" + "\n".join(history_lines[-5:])  # last 5
+                safe_text = msg['text'][:80].replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
+                history_lines.append(f"[{ts}] {direction}: {safe_text}")
+            history_text = "\n\n📜 History:\n" + "\n".join(history_lines[-5:])
+
+        # Escape offer_info for HTML
+        safe_offer_info = ""
+        if offer_info:
+            safe_offer_info = offer_info.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
+
+        safe_first_name = (user.first_name or "").replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
+        safe_text = text.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
 
         admin_text = (
-            f"👤 *New inquiry*\n"
+            f"👤 <b>New inquiry</b>\n"
             f"From: {user_display}\n"
-            f"Name: {md_escape(user.first_name)}"
-            f"{offer_info}\n\n"
-            f"💬 {md_escape(text)}"
+            f"Name: {safe_first_name}"
+            f"{safe_offer_info}\n\n"
+            f"💬 {safe_text}"
             f"{history_text}\n\n"
             f"Reply: {user_link}"
         )
@@ -413,7 +445,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         for admin_id in settings.admin_allowlist:
             try:
-                await context.bot.send_message(chat_id=admin_id, text=admin_text, parse_mode="Markdown", reply_markup=keyboard)
+                await context.bot.send_message(chat_id=admin_id, text=admin_text, parse_mode="HTML", reply_markup=keyboard)
             except Exception as e:
                 logger.error(f"Failed to forward to admin {admin_id}: {e}")
 
@@ -512,7 +544,22 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
 
     if not is_admin(user_id):
-        await query.edit_message_text("⛔ Not authorized.")
+        # Client selecting an offer from the list
+        if data.startswith("client_offer_"):
+            ref = data.replace("client_offer_", "")
+            offer = await db_get_offer(ref)
+            if not offer:
+                await query.edit_message_text(f"Offer {ref} is no longer available.")
+                return
+            lead_id = await db_create_lead(user_id, query.from_user.username, ref)
+            sessions[user_id] = {"action": "client_inquiry", "data": {"offer_ref": ref, "lead_id": lead_id}}
+            await query.edit_message_text(
+                f"📋 *{ref}* — {offer.get('jurisdiction', '')} {offer.get('license_type', '')}\n"
+                f"📊 Price: {offer.get('price', 'On request')}\n\n"
+                f"Send your question about this offer here 👇\n"
+                f"Our team will respond privately.",
+                parse_mode="Markdown",
+            )
         return
 
     if data == "cancel_action":

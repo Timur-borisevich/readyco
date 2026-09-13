@@ -1,7 +1,8 @@
-"""ReadyCo Market — Vercel Serverless API (single file)"""
+"""ReadyCo Market — Vercel Serverless API (single file, includes bot webhook)"""
 import json
 import os
 import asyncio
+import aiohttp
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
@@ -10,12 +11,8 @@ import aiosqlite
 
 app = FastAPI(title="ReadyCo Market API")
 
-app.add_middleware(
-    __import__("fastapi.middleware.cors", fromlist=["CORSMiddleware"]).CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # === CONFIG ===
 BOT_TOKEN = "8817038916:AAH3G9vxsqcptcNkZEBmDIHEIA_JevEXXpk"
@@ -25,6 +22,8 @@ DB_PATH = "/tmp/readyco.db"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+ADMIN_NAMES = {8339164180: "Timur", 143629845: "Yaroslav", 8585498778: "CompliChain", 6277380476: "Mikhail"}
 
 # === DB ===
 SCHEMA = """
@@ -45,7 +44,7 @@ CREATE TABLE IF NOT EXISTS offer_versions (
     changed_by INTEGER NOT NULL, changed_at TEXT DEFAULT (datetime('now')));
 CREATE TABLE IF NOT EXISTS leads (
     id INTEGER PRIMARY KEY AUTOINCREMENT, telegram_user_id INTEGER NOT NULL, telegram_username TEXT,
-    offer_id INTEGER, status TEXT DEFAULT 'new', last_contact_at TEXT,
+    offer_ref TEXT, offer_id INTEGER, status TEXT DEFAULT 'new', last_contact_at TEXT,
     created_at TEXT DEFAULT (datetime('now')));
 CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT, lead_id INTEGER NOT NULL, direction TEXT NOT NULL,
@@ -70,6 +69,11 @@ async def get_db():
 
 def is_admin(uid): return uid in ADMIN_IDS
 
+def esc(text):
+    if not text: return ""
+    return text.replace("<","&lt;").replace(">","&gt;").replace("&","&amp;")
+
+# === DB OPS ===
 async def db_next_ref():
     db = await get_db()
     try:
@@ -133,15 +137,19 @@ async def db_update_field(ref, field, value):
     try: await db.execute(f"UPDATE offers SET {field}=?, updated_at=datetime('now') WHERE ref=?", (value, ref)); await db.commit()
     finally: await db.close()
 
-async def db_create_lead(uid, username):
+async def db_create_lead(uid, username, offer_ref=None):
     db = await get_db()
     try:
+        offer_id = None
+        if offer_ref:
+            o = await db_get_offer(offer_ref)
+            if o: offer_id = o["id"]
         async with db.execute("SELECT id FROM leads WHERE telegram_user_id=? ORDER BY created_at DESC LIMIT 1", (uid,)) as c:
             r = await c.fetchone()
         if r:
-            await db.execute("UPDATE leads SET last_contact_at=datetime('now'), telegram_username=? WHERE id=?", (username, r[0]))
+            await db.execute("UPDATE leads SET last_contact_at=datetime('now'), telegram_username=?, offer_ref=? WHERE id=?", (username, offer_ref, r[0]))
             await db.commit(); return r[0]
-        async with db.execute("INSERT INTO leads (telegram_user_id, telegram_username, status, last_contact_at) VALUES (?, ?, 'new', datetime('now')) RETURNING id", (uid, username)) as c:
+        async with db.execute("INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, offer_id, status, last_contact_at) VALUES (?, ?, ?, ?, 'new', datetime('now')) RETURNING id", (uid, username, offer_ref, offer_id)) as c:
             lid = (await c.fetchone())[0]
         await db.commit(); return lid
     finally: await db.close()
@@ -239,6 +247,38 @@ def inquiry_keyboard(ref):
         {"text": "🌐 View on website", "url": f"https://readyco.market/offers/{ref.lower()}"},
     ]]}
 
+# === TG API ===
+async def tg_send(chat_id, text, reply_markup=None, parse_mode=None):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": chat_id, "text": text}
+    if parse_mode: payload["parse_mode"] = parse_mode
+    if reply_markup: payload["reply_markup"] = reply_markup
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json=payload) as r:
+            return await r.json()
+
+async def tg_edit(chat_id, msg_id, text, reply_markup=None):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
+    payload = {"chat_id": chat_id, "message_id": msg_id, "text": text}
+    if reply_markup: payload["reply_markup"] = reply_markup
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json=payload) as r:
+            return await r.json()
+
+async def tg_delete(chat_id, msg_id):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json={"chat_id": chat_id, "message_id": msg_id}) as r:
+            return await r.json()
+
+async def tg_set_commands(commands, scope=None):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/setMyCommands"
+    payload = {"commands": commands}
+    if scope: payload["scope"] = scope
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json=payload) as r:
+            return await r.json()
+
 # === AUTH ===
 async def verify_admin(request):
     auth = request.headers.get("Authorization", "")
@@ -257,32 +297,6 @@ async def verify_admin(request):
             if uid and is_admin(uid): return uid
             raise HTTPException(403, "Not an admin")
     raise HTTPException(401, "Invalid auth")
-
-# === TG API ===
-async def tg_send(chat_id, text, reply_markup=None):
-    import aiohttp
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": chat_id, "text": text}
-    if reply_markup: payload["reply_markup"] = reply_markup
-    async with aiohttp.ClientSession() as s:
-        async with s.post(url, json=payload) as r:
-            return await r.json()
-
-async def tg_edit(chat_id, msg_id, text, reply_markup=None):
-    import aiohttp
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
-    payload = {"chat_id": chat_id, "message_id": msg_id, "text": text}
-    if reply_markup: payload["reply_markup"] = reply_markup
-    async with aiohttp.ClientSession() as s:
-        async with s.post(url, json=payload) as r:
-            return await r.json()
-
-async def tg_delete(chat_id, msg_id):
-    import aiohttp
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
-    async with aiohttp.ClientSession() as s:
-        async with s.post(url, json={"chat_id": chat_id, "message_id": msg_id}) as r:
-            return await r.json()
 
 # === MODELS ===
 class ReplyReq(BaseModel):
@@ -321,6 +335,104 @@ class OfferUpdate(BaseModel):
 
 class AnnounceReq(BaseModel):
     text: str
+
+# === BOT WEBHOOK ===
+@app.post("/api/webhook")
+async def bot_webhook(request: Request):
+    """Handle Telegram bot updates via webhook."""
+    data = await request.json()
+    
+    # Handle callback queries
+    if "callback_query" in data:
+        return {"ok": True}
+    
+    # Handle messages
+    msg = data.get("message") or data.get("edited_message")
+    if not msg:
+        return {"ok": True}
+    
+    user = msg.get("from", {})
+    user_id = user.get("id")
+    username = user.get("username", "")
+    first_name = user.get("first_name", "")
+    text = msg.get("text", "")
+    
+    # /start command
+    if text.startswith("/start"):
+        args = text.split()[1:] if len(text.split()) > 1 else []
+        offer_ref = None
+        if args and args[0].startswith("inquiry_"):
+            offer_ref = args[0].replace("inquiry_", "")
+        
+        if is_admin(user_id):
+            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nUse Mini App: https://readyco.vercel.app/inbox")
+            return {"ok": True}
+        
+        lead_id = await db_create_lead(user_id, username, offer_ref)
+        if offer_ref:
+            offer = await db_get_offer(offer_ref)
+            if offer:
+                await tg_send(user_id, f"👋 Hi! You asked about {offer_ref} — {offer.get('jurisdiction', '')} {offer.get('license_type', '')}.\n\n📊 Price: {offer.get('price', 'On request')}\n\nSend your question here — our team will respond privately.")
+            else:
+                await tg_send(user_id, f"👋 Hi! Offer {offer_ref} may no longer be available.\n\nSend your question here — our team will respond privately.")
+        else:
+            offers = await db_get_offers("live")
+            if offers:
+                kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('license_type','')} | {o.get('price','?')}", "callback_data": f"client_offer_{o['ref']}"}] for o in offers]}
+                await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies:\n🏦 FinTech (EMI, PI, PSP)\n₿ Crypto (VASP, CASP, Exchanges)\n♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\nSelect an offer to ask about it 👇", kb)
+            else:
+                await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies.\n\nNo offers available yet. Send your question here — our team will respond privately.")
+        return {"ok": True}
+    
+    # Regular message from non-admin = client inquiry
+    if not is_admin(user_id) and text:
+        lead_id = await db_create_lead(user_id, username)
+        await db_store_message(lead_id, text, "client_to_admin")
+        
+        # Get offer info
+        lead = await db_get_lead(lead_id)
+        offer_info = ""
+        if lead and lead.get("offer_ref"):
+            offer = await db_get_offer(lead["offer_ref"])
+            if offer:
+                offer_info = f"\n📊 Offer: {offer['ref']} — {offer.get('jurisdiction','')} {offer.get('license_type','') or ''} | {offer.get('price','?')}"
+        
+        # Get history
+        history = await db_get_messages(lead_id)
+        history_text = ""
+        if len(history) > 1:
+            lines = []
+            for m in history[:-1]:
+                d = "Client" if m["direction"] == "client_to_admin" else "Admin"
+                ts = m["sent_at"][:16] if m["sent_at"] else ""
+                lines.append(f"[{ts}] {d}: {esc(m['text'][:80])}")
+            history_text = "\n\n📜 History:\n" + "\n".join(lines[-5:])
+        
+        user_link = f"t.me/{username}" if username else f"tg://user?id={user_id}"
+        user_disp = f"@{username}" if username else f"ID: {user_id}"
+        
+        admin_text = (
+            f"👤 <b>New inquiry</b>\n"
+            f"From: {user_disp}\n"
+            f"Name: {esc(first_name)}"
+            f"{offer_info}\n\n"
+            f"💬 {esc(text)}"
+            f"{history_text}\n\n"
+            f"Reply: {user_link}"
+        )
+        
+        kb = {"inline_keyboard": [[{"text": "💬 Reply", "callback_data": f"reply_{lead_id}"}]]}
+        
+        for admin_id in ADMIN_IDS:
+            try:
+                await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
+            except:
+                pass
+        
+        await tg_send(user_id, "✅ Thank you! Our team will respond shortly.")
+        return {"ok": True}
+    
+    return {"ok": True}
 
 # === PUBLIC ENDPOINTS ===
 @app.get("/api/health")
