@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReadyCo Market — Buy & Sell Licensed Companies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Poppins', sans-serif; background: #081220; color: #fff; }
+  
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #081220 0%, #0f1a30 100%); padding: 80px 20px; text-align: center; }
+  .hero h1 { font-size: 36px; font-weight: 700; color: #FFD400; }
+  .hero p { font-size: 18px; color: #6b7a99; margin-top: 12px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .hero .tags { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+  .hero .tag { background: #0f1a30; border: 1px solid #1a2540; padding: 6px 16px; border-radius: 20px; font-size: 14px; }
+  
+  /* Offers */
+  .offers { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+  .offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .offer-card { background: #0f1a30; border-radius: 16px; padding: 24px; border: 1px solid #1a2540; transition: transform 0.2s; }
+  .offer-card:hover { transform: translateY(-2px); border-color: #FFD400; }
+  .offer-card.sold { opacity: 0.6; }
+  .offer-ref { font-size: 12px; color: #FFD400; font-weight: 600; }
+  .offer-title { font-size: 20px; font-weight: 600; margin-top: 8px; }
+  .offer-license { font-size: 14px; color: #00CB53; margin-top: 4px; }
+  .offer-details { font-size: 13px; color: #6b7a99; margin-top: 12px; }
+  .offer-details div { margin-top: 4px; }
+  .offer-price { font-size: 24px; font-weight: 700; color: #FFD400; margin-top: 16px; }
+  .offer-sold-badge { display: inline-block; background: #FF8A00; color: #081220; font-weight: 700; font-size: 12px; padding: 4px 12px; border-radius: 8px; }
+  .offer-btn { display: inline-block; margin-top: 16px; background: #FFD400; color: #081220; text-decoration: none; padding: 10px 24px; border-radius: 24px; font-weight: 600; }
+  .offer-btn:hover { background: #FFE54D; }
+  
+  /* Footer */
+  .footer { text-align: center; padding: 40px 20px; color: #4a5a7a; font-size: 13px; border-top: 1px solid #1a2540; }
+  .footer a { color: #FFD400; text-decoration: none; }
+  
+  /* Loading */
+  .loading { text-align: center; padding: 60px; color: #6b7a99; }
+  
+  /* Empty */
+  .empty { text-align: center; padding: 60px 20px; }
+  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+  
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 28px; }
+    .offer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>ReadyCo Market</h1>
+  <p>Buy and sell licensed companies — VASP, CASP, EMI, PI, iGaming licenses worldwide</p>
+  <div class="tags">
+    <span class="tag">🏦 FinTech</span>
+    <span class="tag">₿ Crypto</span>
+    <span class="tag">♠️ iGaming</span>
+    <span class="tag">🌍 Worldwide</span>
+  </div>
+</div>
+
+<div class="offers">
+  <div id="offerGrid" class="offer-grid">
+    <div class="loading">Loading offers...</div>
+  </div>
+</div>
+
+<div class="footer">
+  ReadyCo Market — <a href="https://t.me/readyco">@readyco</a> | <a href="https://t.me/ReadyCoAdminBot">@ReadyCoAdminBot</a>
+</div>
+
+<script>
+async function loadOffers() {
+  try {
+    const res = await fetch('/api/offers?status=live');
+    const data = await res.json();
+    const grid = document.getElementById('offerGrid');
+    
+    if (!data.offers.length) {
+      grid.innerHTML = '<div class="empty"><div class="icon">📋</div><h3>No offers available yet</h3><p style="color:#6b7a99;margin-top:8px">Follow @readyco for new listings</p></div>';
+      return;
+    }
+    
+    grid.innerHTML = data.offers.map(o => {
+      const sold = o.status === 'sold';
+      return `
+        <div class="offer-card ${sold ? 'sold' : ''}">
+          <div class="offer-ref">${o.ref}</div>
+          <div class="offer-title">${o.jurisdiction || ''}</div>
+          ${o.license_type ? `<div class="offer-license">${o.license_type}</div>` : ''}
+          <div class="offer-details">
+            ${o.company_type ? `<div>📦 ${o.company_type}</div>` : ''}
+            ${o.year_established ? `<div>📅 Established: ${o.year_established}</div>` : ''}
+            ${o.bank_emi_account ? `<div>🏦 Bank/EMI: ${o.bank_emi_account}</div>` : ''}
+            ${o.vat_status ? `<div>📋 VAT: ${o.vat_status}</div>` : ''}
+            ${o.transfer_time ? `<div>⏱️ Transfer: ${o.transfer_time}</div>` : ''}
+          </div>
+          <div class="offer-price">${o.price || 'On request'}</div>
+          ${sold ? '<span class="offer-sold-badge">✅ SOLD</span>' : `<a class="offer-btn" href="https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}">💬 Inquire</a>`}
+        </div>
+      `;
+    }).join('');
+  } catch(e) {
+    document.getElementById('offerGrid').innerHTML = `<div class="empty"><div class="icon">⚠️</div>Error loading offers</div>`;
+  }
+}
+
+loadOffers();
+</script>
+</body>
+</html>

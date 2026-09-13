@@ -1,0 +1,10 @@
+{
+  "name": "readyco-market",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {},
+  "scripts": {
+    "dev": "python3.11 -m api.server",
+    "start": "python3.11 -m api.server"
+  }
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ReadyCo Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@telegram-apps/sdk@2.0.0/dist/index.iife.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #081220; color: #fff; }
+  #app { max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+  
+  /* Header */
+  .header { padding: 16px; background: #081220; border-bottom: 1px solid #1a2540; position: sticky; top: 0; z-index: 10; }
+  .header h1 { font-size: 18px; font-weight: 600; }
+  .header .subtitle { font-size: 12px; color: #6b7a99; margin-top: 2px; }
+  
+  /* Tabs */
+  .tabs { display: flex; border-bottom: 1px solid #1a2540; }
+  .tab { flex: 1; padding: 12px 4px; text-align: center; font-size: 13px; font-weight: 600; color: #6b7a99; cursor: pointer; border-bottom: 2px solid transparent; }
+  .tab.active { color: #FFD400; border-bottom-color: #FFD400; }
+  
+  /* Lists */
+  .list { flex: 1; overflow-y: auto; }
+  .list-item { padding: 14px 16px; border-bottom: 1px solid #1a2540; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .list-item:active { background: #0f1a30; }
+  .item-avatar { width: 44px; height: 44px; border-radius: 50%; background: #FFD400; color: #081220; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-title { font-size: 15px; font-weight: 600; }
+  .item-sub { font-size: 13px; color: #6b7a99; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-meta { font-size: 11px; color: #4a5a7a; margin-top: 2px; }
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+  .badge.new { background: #FF8A00; color: #081220; }
+  .badge.live { background: #00CB53; color: #081220; }
+  .badge.sold { background: #FF8A00; color: #081220; }
+  
+  /* Chat */
+  .chat-view { flex: 1; display: flex; flex-direction: column; }
+  .chat-header { padding: 12px 16px; border-bottom: 1px solid #1a2540; display: flex; align-items: center; gap: 12px; }
+  .chat-back { font-size: 22px; cursor: pointer; color: #FFD400; }
+  .chat-header-info { flex: 1; }
+  .chat-header-name { font-size: 16px; font-weight: 600; }
+  .chat-header-sub { font-size: 12px; color: #6b7a99; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+  .msg.client { align-self: flex-start; background: #1a2540; border-bottom-left-radius: 4px; }
+  .msg.admin { align-self: flex-end; background: #FFD400; color: #081220; border-bottom-right-radius: 4px; }
+  .msg .time { font-size: 10px; opacity: 0.5; margin-top: 4px; }
+  .msg .sender { font-size: 11px; font-weight: 700; opacity: 0.7; margin-bottom: 2px; }
+  .chat-input-bar { padding: 10px 16px; border-top: 1px solid #1a2540; display: flex; gap: 8px; align-items: flex-end; }
+  .chat-input { flex: 1; background: #0f1a30; border: 1px solid #1a2540; border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 14px; resize: none; max-height: 100px; outline: none; }
+  .chat-send { width: 40px; height: 40px; border-radius: 50%; background: #FFD400; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #081220; flex-shrink: 0; }
+  
+  /* Stats */
+  .stats-bar { display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap; }
+  .stat-card { background: #0f1a30; border-radius: 12px; padding: 10px 14px; min-width: 90px; }
+  .stat-card .num { font-size: 20px; font-weight: 700; color: #FFD400; }
+  .stat-card .label { font-size: 11px; color: #6b7a99; margin-top: 2px; }
+  
+  /* Offer cards */
+  .offer-card { background: #0f1a30; margin: 8px 16px; border-radius: 12px; padding: 14px; }
+  .offer-ref { font-size: 12px; color: #FFD400; font-weight: 700; }
+  .offer-title { font-size: 15px; font-weight: 600; margin-top: 4px; }
+  .offer-price { font-size: 14px; color: #00CB53; margin-top: 4px; }
+  .offer-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .offer-btn { padding: 6px 14px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .offer-btn.edit { background: #1a2540; color: #FFD400; }
+  .offer-btn.sold { background: #00CB53; color: #081220; }
+  .offer-btn.delete { background: #FF8A00; color: #081220; }
+  
+  /* Add offer form */
+  .form { padding: 16px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 13px; color: #6b7a99; margin-bottom: 4px; }
+  .form-input { width: 100%; background: #0f1a30; border: 1px solid #1a2540; border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; outline: none; }
+  .form-input:focus { border-color: #FFD400; }
+  .form-submit { width: 100%; padding: 14px; background: #FFD400; color: #081220; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+  .form-cancel { width: 100%; padding: 12px; background: transparent; color: #6b7a99; border: none; font-size: 14px; cursor: pointer; margin-top: 4px; }
+  
+  /* Announce */
+  .announce-area { width: 100%; min-height: 100px; background: #0f1a30; border: 1px solid #1a2540; border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; outline: none; resize: vertical; }
+  
+  /* Empty / loading / error */
+  .empty { text-align: center; padding: 60px 20px; color: #4a5a7a; }
+  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+  .loading { text-align: center; padding: 40px; color: #6b7a99; }
+  .error { text-align: center; padding: 40px; color: #FF8A00; }
+  
+  /* FAB */
+  .fab { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: #FFD400; color: #081220; border: none; font-size: 24px; cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(255,212,0,0.4); }
+  
+  /* Confirm modal */
+  .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; }
+  .modal { background: #0f1a30; border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; }
+  .modal h3 { font-size: 18px; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: #6b7a99; margin-bottom: 16px; }
+  .modal-btns { display: flex; gap: 8px; }
+  .modal-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .modal-btn.confirm { background: #FFD400; color: #081220; }
+  .modal-btn.danger { background: #FF8A00; color: #081220; }
+  .modal-btn.cancel { background: #1a2540; color: #6b7a99; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const API = window.location.origin + '/api';
+let tgUser = null;
+if (window.telegram) {
+  const tg = window.telegram.WebApp;
+  tg.ready();
+  tg.expand();
+  tgUser = tg.initDataUnsafe?.user || null;
+}
+
+// State
+let view = 'leads';
+let currentLeadId = null;
+let leads = [];
+let offers = [];
+let stats = {};
+let editingOffer = null;
+
+const FIELDS = [
+  { key: 'jurisdiction', label: 'Jurisdiction', placeholder: 'Poland' },
+  { key: 'company_type', label: 'Company type', placeholder: 'Sp. z o.o.' },
+  { key: 'year_established', label: 'Year', placeholder: '2023' },
+  { key: 'license_type', label: 'License type', placeholder: 'VASP / CASP / EMI / PI / iGaming' },
+  { key: 'license_status', label: 'License status', placeholder: 'Active' },
+  { key: 'regulator', label: 'Regulator', placeholder: 'KNF' },
+  { key: 'bank_emi_account', label: 'Bank / EMI account', placeholder: 'Yes / No' },
+  { key: 'vat_status', label: 'VAT status', placeholder: 'Active / None' },
+  { key: 'turnover_history', label: 'Turnover history', placeholder: 'Yes / No' },
+  { key: 'employees', label: 'Employees', placeholder: 'Yes / No / number' },
+  { key: 'transfer_time', label: 'Transfer time', placeholder: '5-10 business days' },
+  { key: 'price', label: 'Price', placeholder: '€45,000' },
+  { key: 'short_description', label: 'Description', placeholder: 'Short description' },
+];
+
+// === API ===
+async function api(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  headers['X-Telegram-Init-Data'] = tgUser ? tgUser.id.toString() : '8339164180';
+  const res = await fetch(API + path, { ...options, headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function esc(text) { const d = document.createElement('div'); d.textContent = text || ''; return d.innerHTML; }
+
+// === Render ===
+function render() {
+  const app = document.getElementById('app');
+  if (view === 'chat') return renderChat(app);
+  if (view === 'add') return renderAddForm(app);
+  if (view === 'announce') return renderAnnounce(app);
+  if (view === 'edit') return renderEditForm(app);
+  renderMain(app);
+}
+
+function renderMain(app) {
+  const tabs = ['leads', 'offers', 'stats', 'manage'];
+  const labels = ['👤 Leads', '📋 Offers', '📊 Stats', '⚙️ Manage'];
+  app.innerHTML = `
+    <div class="header"><h1>ReadyCo Admin</h1><div class="subtitle">Channel: @readyco</div></div>
+    <div class="tabs">${tabs.map((t,i) => `<div class="tab ${view===t?'active':''}" onclick="switchView('${t}')">${labels[i]}</div>`).join('')}</div>
+    <div id="content" class="list"></div>
+    ${view === 'offers' ? '<button class="fab" onclick="switchView(\'add\')">+</button>' : ''}
+  `;
+  const c = document.getElementById('content');
+  if (view === 'leads') renderLeads(c);
+  else if (view === 'offers') renderOffers(c);
+  else if (view === 'stats') renderStats(c);
+  else if (view === 'manage') renderManage(c);
+}
+
+function renderLeads(c) {
+  if (!leads.length) { c.innerHTML = '<div class="empty"><div class="icon">👤</div>No leads yet</div>'; return; }
+  c.innerHTML = leads.map(l => {
+    const name = l.telegram_username || `ID:${l.telegram_user_id}`;
+    const badge = l.status === 'new' ? '<span class="badge new">NEW</span>' : '';
+    return `<div class="list-item" onclick="openLead(${l.id})">
+      <div class="item-avatar">${esc(name[0]?.toUpperCase())}</div>
+      <div class="item-info">
+        <div class="item-title">${esc(name)} ${badge}</div>
+        <div class="item-sub">${esc((l.last_msg||'').substring(0,50))}</div>
+        <div class="item-meta">${l.msg_count||0} messages</div>
+      </div></div>`;
+  }).join('');
+}
+
+function renderOffers(c) {
+  if (!offers.length) { c.innerHTML = '<div class="empty"><div class="icon">📋</div>No offers yet. Tap + to add.</div>'; return; }
+  c.innerHTML = offers.map(o => `
+    <div class="offer-card">
+      <div class="offer-ref">${o.ref}</div>
+      <div class="offer-title">${esc(o.jurisdiction)} ${esc(o.license_type||'')}</div>
+      <div class="offer-price">${esc(o.price)}</div>
+      <span class="badge ${o.status}">${o.status}</span>
+      <div class="offer-actions">
+        <button class="offer-btn edit" onclick="editOffer('${o.ref}')">✏️ Edit</button>
+        ${o.status === 'live' ? `<button class="offer-btn sold" onclick="markSold('${o.ref}')">✅ Sold</button>` : ''}
+        <button class="offer-btn delete" onclick="deleteOffer('${o.ref}')">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderStats(c) {
+  api('/admin/stats').then(d => {
+    c.innerHTML = `<div class="stats-bar">
+      <div class="stat-card"><div class="num">${d.live_offers}</div><div class="label">Live offers</div></div>
+      <div class="stat-card"><div class="num">${d.sold_offers}</div><div class="label">Sold</div></div>
+      <div class="stat-card"><div class="num">${d.total_leads}</div><div class="label">Total leads</div></div>
+      <div class="stat-card"><div class="num" style="color:#FF8A00">${d.new_leads}</div><div class="label">New leads</div></div>
+      <div class="stat-card"><div class="num" style="color:#00CB53">${d.responded_leads}</div><div class="label">Responded</div></div>
+      <div class="stat-card"><div class="num" style="color:#7A3CFF">${d.announcements}</div><div class="label">Announcements</div></div>
+    </div>`;
+  }).catch(e => { c.innerHTML = `<div class="error">${e.message}</div>`; });
+}
+
+function renderManage(c) {
+  c.innerHTML = `
+    <div class="list-item" onclick="switchView('add')"><div class="item-avatar">📝</div><div class="item-info"><div class="item-title">Add offer</div><div class="item-sub">Create new listing</div></div></div>
+    <div class="list-item" onclick="switchView('announce')"><div class="item-avatar">📢</div><div class="item-info"><div class="item-title">Announcement</div><div class="item-sub">Post to channel</div></div></div>
+    <div class="list-item" onclick="loadLeads();switchView('leads')"><div class="item-avatar">👤</div><div class="item-info"><div class="item-title">Leads</div><div class="item-sub">Client inquiries</div></div></div>
+    <div class="list-item" onclick="window.open('https://t.me/readyco','_blank')"><div class="item-avatar">📺</div><div class="item-info"><div class="item-title">Channel</div><div class="item-sub">@readyco</div></div></div>
+  `;
+}
+
+function renderChat(app) {
+  const lead = leads.find(l => l.id === currentLeadId);
+  const name = lead?.telegram_username || `ID:${lead?.telegram_user_id}`;
+  app.innerHTML = `
+    <div class="chat-view">
+      <div class="chat-header">
+        <div class="chat-back" onclick="backToMain()">‹</div>
+        <div class="chat-header-info"><div class="chat-header-name">${esc(name)}</div><div class="chat-header-sub">${lead?.offer_id?'Offer inquiry':'General'}</div></div>
+      </div>
+      <div class="chat-messages" id="chatMsgs"><div class="loading">Loading...</div></div>
+      <div class="chat-input-bar">
+        <textarea class="chat-input" id="replyInput" rows="1" placeholder="Type reply..."></textarea>
+        <button class="chat-send" onclick="sendReply()">➤</button>
+      </div>
+    </div>`;
+  loadMessages();
+}
+
+function renderAddForm(app) {
+  app.innerHTML = `
+    <div class="header"><div class="chat-back" onclick="backToMain()">‹</div><h1>📝 Add offer</h1></div>
+    <div class="form">
+      ${FIELDS.map(f => `<div class="form-group"><div class="form-label">${f.label}</div><input class="form-input" id="f_${f.key}" placeholder="${f.placeholder}"></div>`).join('')}
+      <button class="form-submit" onclick="submitOffer()">✅ Publish</button>
+      <button class="form-cancel" onclick="backToMain()">Cancel</button>
+    </div>`;
+}
+
+function renderEditForm(app) {
+  const o = editingOffer;
+  app.innerHTML = `
+    <div class="header"><div class="chat-back" onclick="switchView('offers')">‹</div><h1>✏️ Edit ${o.ref}</h1></div>
+    <div class="form">
+      ${FIELDS.map(f => `<div class="form-group"><div class="form-label">${f.label}</div><input class="form-input" id="f_${f.key}" placeholder="${f.placeholder}" value="${esc(o[f.key]||'')}"></div>`).join('')}
+      <button class="form-submit" onclick="submitEdit('${o.ref}')">✅ Save</button>
+      <button class="form-cancel" onclick="switchView('offers')">Cancel</button>
+    </div>`;
+}
+
+function renderAnnounce(app) {
+  app.innerHTML = `
+    <div class="header"><div class="chat-back" onclick="backToMain()">‹</div><h1>📢 Announcement</h1></div>
+    <div class="form">
+      <div class="form-group"><div class="form-label">Announcement text</div><textarea class="announce-area" id="annText" placeholder="New arrivals, special offers, updates..."></textarea></div>
+      <button class="form-submit" onclick="submitAnnounce()">✅ Publish to channel</button>
+      <button class="form-cancel" onclick="backToMain()">Cancel</button>
+    </div>`;
+}
+
+// === Actions ===
+function switchView(v) { view = v; render(); }
+function backToMain() { view = 'leads'; currentLeadId = null; editingOffer = null; loadLeads(); render(); }
+
+async function openLead(id) { currentLeadId = id; view = 'chat'; render(); }
+async function loadMessages() {
+  try { const d = await api(`/admin/leads/${currentLeadId}`); renderMsgs(d.messages); }
+  catch(e) { document.getElementById('chatMsgs').innerHTML = `<div class="error">${e.message}</div>`; }
+}
+function renderMsgs(msgs) {
+  const c = document.getElementById('chatMsgs');
+  if (!msgs.length) { c.innerHTML = '<div class="empty"><div class="icon">💬</div>No messages</div>'; return; }
+  c.innerHTML = msgs.map(m => {
+    const cl = m.direction === 'client_to_admin' ? 'client' : 'admin';
+    const t = m.sent_at ? m.sent_at.substring(11,16) : '';
+    return `<div class="msg ${cl}">${cl==='admin'?'<div class="sender">ReadyCo</div>':''}${esc(m.text)}<div class="time">${t}</div></div>`;
+  }).join('');
+  c.scrollTop = c.scrollHeight;
+}
+
+async function sendReply() {
+  const input = document.getElementById('replyInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    await api('/admin/reply', { method: 'POST', body: JSON.stringify({ lead_id: currentLeadId, text }) });
+    await loadMessages();
+    loadLeads();
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+async function submitOffer() {
+  const data = {};
+  FIELDS.forEach(f => { const el = document.getElementById('f_'+f.key); if (el && el.value.trim()) data[f.key] = el.value.trim(); });
+  if (!data.jurisdiction || !data.price) { alert('Jurisdiction and price required'); return; }
+  try {
+    await api('/admin/offers', { method: 'POST', body: JSON.stringify(data) });
+    alert('✅ Offer published to channel!');
+    backToMain();
+    loadOffers();
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+async function editOffer(ref) {
+  const o = offers.find(x => x.ref === ref);
+  if (o) { editingOffer = o; view = 'edit'; render(); }
+}
+
+async function submitEdit(ref) {
+  const data = {};
+  FIELDS.forEach(f => { const el = document.getElementById('f_'+f.key); if (el && el.value.trim()) data[f.key] = el.value.trim(); });
+  try {
+    await api(`/admin/offers/${ref}`, { method: 'PUT', body: JSON.stringify(data) });
+    alert('✅ Updated!');
+    view = 'offers'; loadOffers(); render();
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+function markSold(ref) {
+  showConfirm(`Mark ${ref} as SOLD?`, 'This will edit the channel post with strikethrough.', async () => {
+    try { await api(`/admin/offers/${ref}/sold`, { method: 'POST' }); alert('✅ Marked as sold!'); loadOffers(); }
+    catch(e) { alert('Failed: ' + e.message); }
+  });
+}
+
+function deleteOffer(ref) {
+  showConfirm(`Delete ${ref}?`, '⚠️ This will remove the post from channel and site permanently.', async () => {
+    try { await api(`/admin/offers/${ref}`, { method: 'DELETE' }); alert('✅ Deleted!'); loadOffers(); }
+    catch(e) { alert('Failed: ' + e.message); }
+  });
+}
+
+async function submitAnnounce() {
+  const text = document.getElementById('annText').value.trim();
+  if (!text) { alert('Text required'); return; }
+  try {
+    await api('/admin/announce', { method: 'POST', body: JSON.stringify({ text }) });
+    alert('✅ Announcement published!');
+    backToMain();
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+function showConfirm(title, body, onConfirm) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.innerHTML = `<div class="modal"><h3>${title}</h3><p>${body}</p><div class="modal-btns"><button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button><button class="modal-btn confirm" id="confirmBtn">Confirm</button></div></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#confirmBtn').onclick = () => { modal.remove(); onConfirm(); };
+}
+
+// === Load ===
+async function loadLeads() { try { const d = await api('/admin/leads'); leads = d.leads; if (view==='leads') render(); } catch(e) {} }
+async function loadOffers() { try { const d = await api('/admin/offers'); offers = d.offers; if (view==='offers') render(); } catch(e) {} }
+
+// Input handlers
+document.addEventListener('input', e => { if (e.target.id==='replyInput') { e.target.style.height='auto'; e.target.style.height=e.target.scrollHeight+'px'; } });
+document.addEventListener('keydown', e => { if (e.target.id==='replyInput' && e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } });
+
+// Init
+loadLeads();
+loadOffers();
+render();
+</script>
+</body>
+</html>
