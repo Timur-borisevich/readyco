@@ -301,12 +301,23 @@ async function sendReply() {
   const input = document.getElementById('replyInput');
   const text = input.value.trim();
   if (!text) return;
+  if (!currentLeadId) { alert('No lead selected'); return; }
   input.value = '';
+  input.style.height = 'auto';
+  
+  // Show sending state
+  const sendBtn = document.querySelector('.chat-send');
+  if (sendBtn) sendBtn.textContent = '...';
+  
   try {
-    await api('/admin/reply', { method: 'POST', body: JSON.stringify({ lead_id: currentLeadId, text }) });
+    const res = await api('/admin/reply', { method: 'POST', body: JSON.stringify({ lead_id: currentLeadId, text }) });
+    if (sendBtn) sendBtn.textContent = '➤';
     await loadMessages();
     loadLeads();
-  } catch(e) { alert('Failed: ' + e.message); }
+  } catch(e) {
+    if (sendBtn) sendBtn.textContent = '➤';
+    alert('Failed to send: ' + e.message);
+  }
 }
 
 async function submitOffer() {
