@@ -371,12 +371,21 @@ async def health():
     return {"ok": True, "service": "readyco-market"}
 
 
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+
 # === MINI APP (admin inbox) ===
 
 @app.get("/inbox")
 async def mini_app(request: Request):
     """Serve Mini App HTML — admin inbox."""
-    return FileResponse("/Users/timur/readyco/static/index.html")
+    path = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.exists(path):
+        raise HTTPException(404, "Mini App not found")
+    return FileResponse(path)
 
 
 # === WEBSITE (readyco.market) ===
@@ -384,7 +393,10 @@ async def mini_app(request: Request):
 @app.get("/")
 async def website():
     """Serve website — offers page."""
-    return FileResponse("/Users/timur/readyco/static/site.html")
+    path = os.path.join(STATIC_DIR, "site.html")
+    if not os.path.exists(path):
+        raise HTTPException(404, "Website not found")
+    return FileResponse(path)
 
 
 if __name__ == "__main__":
