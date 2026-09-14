@@ -357,7 +357,7 @@ def main_menu_kb():
         [{"text":"🔍 Search","callback_data":"menu_search"},{"text":"✏️ Edit","callback_data":"menu_edit"}],
         [{"text":"✅ Mark sold","callback_data":"menu_sold"},{"text":"🗑 Delete","callback_data":"menu_delete"}],
         [{"text":"📢 Announce","callback_data":"menu_announce"},{"text":"👤 Leads","callback_data":"menu_leads"}],
-        [{"text":"💬 Inbox (Mini App)","url":"https://readyco.vercel.app/inbox"},{"text":"⚙️ Manage","callback_data":"menu_manage"}],
+        [{"text":"💬 Inbox","web_app":{"url":"https://readyco.vercel.app/inbox"}},{"text":"⚙️ Manage","callback_data":"menu_manage"}],
     ]}
 
 def status_menu_kb():
@@ -742,10 +742,10 @@ async def bot_webhook(request: Request):
         await tg_send(user_id, "📋 ReadyCo Admin\n\nTap a button.", reply_markup=main_menu_kb())
         return {"ok": True}
     
-    # /inbox — open Mini App
+    # /inbox — open Mini App in Telegram
     if text.startswith("/inbox") and is_admin(user_id):
-        kb = {"inline_keyboard": [[{"text":"💬 Open Inbox","url":"https://readyco.vercel.app/inbox"}]]}
-        await tg_send(user_id, "💬 ReadyCo Inbox\n\nTap to open Mini App:", reply_markup=kb)
+        kb = {"inline_keyboard": [[{"text":"💬 Open Inbox","web_app":{"url":"https://readyco.vercel.app/inbox"}}]]}
+        await tg_send(user_id, "💬 ReadyCo Inbox\n\nTap to open:", reply_markup=kb)
         return {"ok": True}
     
     # /cancel
