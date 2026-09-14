@@ -3,195 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReadyCo Market — Buy & Sell Licensed Companies</title>
+<title>ReadyCo Market — Licensed Companies for Sale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --yellow: #FFD400;
+    --yellow-hover: #FFE54D;
     --navy: #081220;
-    --navy-light: #0f1a30;
-    --navy-lighter: #15233f;
+    --navy-2: #0d1729;
+    --navy-3: #131e36;
+    --border: #1c2944;
     --green: #00CB53;
     --orange: #FF8A00;
     --purple: #7A3CFF;
-    --gray: #6b7a99;
-    --border: #1a2540;
+    --text: #ffffff;
+    --text-2: #8499b8;
+    --text-3: #5a6c87;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Poppins', sans-serif; background: var(--navy); color: #fff; }
+  body { font-family: 'Poppins', sans-serif; background: var(--navy); color: var(--text); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
   
-  /* Hero */
-  .hero { background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%); padding: 100px 20px 60px; text-align: center; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,212,0,0.06) 0%, transparent 70%); }
-  .hero::after { content: ''; position: absolute; bottom: -30%; left: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(122,60,255,0.05) 0%, transparent 70%); }
-  .hero-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-  .hero-logo .badge { background: var(--yellow); color: var(--navy); font-weight: 800; padding: 6px 14px; border-radius: 10px; font-size: 20px; letter-spacing: -0.5px; }
-  .hero h1 { font-size: 42px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1.1; position: relative; z-index: 1; }
-  .hero h1 span { color: var(--yellow); }
-  .hero p { font-size: 18px; color: var(--gray); margin-top: 16px; max-width: 580px; margin-left: auto; margin-right: auto; line-height: 1.5; position: relative; z-index: 1; }
-  .hero-tags { display: flex; gap: 10px; justify-content: center; margin-top: 28px; flex-wrap: wrap; position: relative; z-index: 1; }
-  .hero-tag { background: var(--navy-light); border: 1px solid var(--border); padding: 8px 18px; border-radius: 24px; font-size: 14px; font-weight: 500; }
+  /* Hero — one idea, no gradient slop */
+  .hero { padding: 120px 24px 80px; max-width: 800px; margin: 0 auto; text-align: left; }
+  .hero-eyebrow { font-size: 13px; font-weight: 600; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(36px, 6vw, 56px); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 20px; }
+  .hero h1 .accent { color: var(--yellow); }
+  .hero p { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 540px; }
+  .hero-cta { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+  .btn-primary { background: var(--yellow); color: var(--navy); padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background .15s; }
+  .btn-primary:hover { background: var(--yellow-hover); }
+  .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 14px 28px; border-radius: 12px; font-weight: 600; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: border-color .15s; }
+  .btn-secondary:hover { border-color: var(--text-3); }
   
-  /* Section */
-  .section { max-width: 1100px; margin: 0 auto; padding: 48px 20px; }
-  .section-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-  .section-sub { font-size: 14px; color: var(--gray); margin-bottom: 24px; }
+  /* Stats strip — real numbers, not monument */
+  .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px 24px; display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 32px; font-weight: 800; color: var(--text); }
+  .stat-label { font-size: 13px; color: var(--text-3); margin-top: 4px; }
   
-  /* Offer grid */
-  .offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-  .offer-card { background: var(--navy-light); border-radius: 18px; padding: 24px; border: 1px solid var(--border); transition: all 0.2s; position: relative; overflow: hidden; }
-  .offer-card:hover { transform: translateY(-3px); border-color: var(--yellow); box-shadow: 0 8px 30px rgba(255,212,0,0.1); }
-  .offer-card.sold { opacity: 0.5; }
-  .offer-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
-  .offer-flag { font-size: 28px; margin-bottom: 8px; }
-  .offer-ref { font-size: 11px; color: var(--yellow); font-weight: 700; letter-spacing: 1px; }
-  .offer-desc { font-size: 13px; color: var(--gray); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.5; }
-  .offer-title { font-size: 22px; font-weight: 700; margin-top: 8px; }
-  .offer-license { font-size: 14px; color: var(--green); margin-top: 4px; font-weight: 600; }
-  .offer-details { font-size: 13px; color: var(--gray); margin-top: 14px; }
-  .offer-details div { margin-top: 5px; display: flex; align-items: center; gap: 8px; }
-  .offer-price { font-size: 28px; font-weight: 800; color: var(--yellow); margin-top: 18px; }
-  .offer-sold-badge { display: inline-block; background: var(--orange); color: var(--navy); font-weight: 700; font-size: 13px; padding: 5px 14px; border-radius: 8px; margin-top: 10px; }
-  .offer-btn { display: inline-block; margin-top: 16px; background: var(--yellow); color: var(--navy); text-decoration: none; padding: 11px 26px; border-radius: 24px; font-weight: 700; font-size: 14px; transition: all .15s; }
-  .offer-btn:hover { background: #FFE54D; transform: scale(1.02); }
-  
-  /* Features */
-  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 40px; }
-  .feature { background: var(--navy-light); border-radius: 16px; padding: 24px; border: 1px solid var(--border); }
-  .feature .icon { font-size: 28px; margin-bottom: 10px; }
-  .feature h3 { font-size: 16px; font-weight: 700; }
-  .feature p { font-size: 13px; color: var(--gray); margin-top: 6px; line-height: 1.5; }
+  /* Offers */
+  .offers { max-width: 1100px; margin: 0 auto; padding: 64px 24px; }
+  .section-header { margin-bottom: 32px; }
+  .section-header h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  .section-header p { font-size: 15px; color: var(--text-2); margin-top: 8px; }
+  .offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+  .card { background: var(--navy-2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: border-color .2s, transform .2s; }
+  .card:hover { border-color: var(--text-3); transform: translateY(-2px); }
+  .card.sold { opacity: 0.45; }
+  .card-flag { font-size: 32px; line-height: 1; margin-bottom: 16px; }
+  .card-jurisdiction { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .card-license { font-size: 14px; color: var(--green); margin-top: 4px; font-weight: 600; }
+  .card-rows { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .card-row { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+  .card-divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .card-price { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .card-desc { font-size: 13px; color: var(--text-3); line-height: 1.5; margin-top: 12px; }
+  .card-actions { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+  .card-ref { font-size: 11px; color: var(--text-3); font-weight: 600; letter-spacing: 1px; margin-top: 16px; }
+  .sold-badge { background: var(--orange); color: var(--navy); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 8px; }
   
   /* CTA */
-  .cta { text-align: center; padding: 60px 20px; background: var(--navy-light); margin-top: 40px; }
-  .cta h2 { font-size: 28px; font-weight: 800; }
-  .cta p { font-size: 15px; color: var(--gray); margin-top: 10px; }
-  .cta-btn { display: inline-block; margin-top: 20px; background: var(--yellow); color: var(--navy); text-decoration: none; padding: 14px 36px; border-radius: 28px; font-weight: 700; font-size: 16px; }
+  .cta { max-width: 800px; margin: 0 auto; padding: 80px 24px; text-align: left; }
+  .cta h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+  .cta p { font-size: 16px; color: var(--text-2); margin-top: 12px; max-width: 480px; }
   
   /* Footer */
-  .footer { text-align: center; padding: 32px 20px; color: var(--gray); font-size: 13px; border-top: 1px solid var(--border); }
-  .footer a { color: var(--yellow); text-decoration: none; font-weight: 600; }
+  .footer { border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; }
+  .footer a { color: var(--yellow); text-decoration: none; font-weight: 600; font-size: 14px; }
+  .footer span { color: var(--text-3); font-size: 14px; margin: 0 8px; }
   
-  .loading { text-align: center; padding: 60px; color: var(--gray); }
-  .empty { text-align: center; padding: 60px 20px; }
-  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty { text-align: center; padding: 80px 20px; color: var(--text-3); }
+  .empty .icon { font-size: 40px; margin-bottom: 12px; }
   
-  @media (max-width: 600px) {
-    .hero { padding: 70px 20px 40px; }
+  @media (max-width: 640px) {
+    .hero { padding: 80px 20px 60px; }
     .hero h1 { font-size: 32px; }
-    .hero p { font-size: 16px; }
+    .stats { gap: 24px; padding: 24px 16px; }
     .offer-grid { grid-template-columns: 1fr; }
-    .section-title { font-size: 20px; }
+    .offers { padding: 48px 16px; }
+    .cta { padding: 60px 20px; }
   }
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-logo"><span class="badge">RC</span></div>
-  <h1>ReadyCo <span>Market</span></h1>
-  <p>Buy and sell licensed companies — VASP, CASP, EMI, PI, iGaming licenses worldwide</p>
-  <div class="hero-tags">
-    <span class="hero-tag">🏦 FinTech</span>
-    <span class="hero-tag">₿ Crypto</span>
-    <span class="hero-tag">♠️ iGaming</span>
-    <span class="hero-tag">🌍 Worldwide</span>
+<section class="hero">
+  <div class="hero-eyebrow">ReadyCo Market</div>
+  <h1>Buy and sell <span class="accent">licensed companies</span> — ready for transfer.</h1>
+  <p>VASP, CASP, EMI, PI, and iGaming licenses across Europe, Middle East, and offshore jurisdictions. Verified, with bank accounts and regulatory standing intact.</p>
+  <div class="hero-cta">
+    <a class="btn-primary" href="#offers">Browse offers →</a>
+    <a class="btn-secondary" href="https://t.me/ReadyCoAdminBot">💬 Contact us</a>
   </div>
-</div>
+</section>
 
-<div class="section">
-  <div class="section-title">Available Offers</div>
-  <div class="section-sub">Browse our portfolio of licensed companies</div>
+<section class="stats">
+  <div class="stat"><div class="stat-num" id="stat-offers">—</div><div class="stat-label">Active listings</div></div>
+  <div class="stat"><div class="stat-num">12+</div><div class="stat-label">Jurisdictions</div></div>
+  <div class="stat"><div class="stat-num">5–10</div><div class="stat-label">Days to transfer</div></div>
+</section>
+
+<section class="offers" id="offers">
+  <div class="section-header">
+    <h2>Available offers</h2>
+    <p>Each company is verified before listing. Inquire privately through our team.</p>
+  </div>
   <div id="offerGrid" class="offer-grid">
-    <div class="loading">Loading offers...</div>
+    <div class="empty"><div class="icon">⟳</div><p>Loading offers…</p></div>
   </div>
-</div>
+</section>
 
-<div class="section">
-  <div class="section-title">Why ReadyCo Market?</div>
-  <div class="features">
-    <div class="feature">
-      <div class="icon">✅</div>
-      <h3>Verified Companies</h3>
-      <p>Every company is verified — licenses, bank accounts, and compliance checked before listing.</p>
-    </div>
-    <div class="feature">
-      <div class="icon">🔒</div>
-      <h3>Private Deals</h3>
-      <p>Your inquiry goes directly to our team. No public exposure, no data leaks.</p>
-    </div>
-    <div class="feature">
-      <div class="icon">⚡</div>
-      <h3>Fast Transfer</h3>
-      <p>Prepared companies ready for transfer in 5-10 business days.</p>
-    </div>
-    <div class="feature">
-      <div class="icon">🌍</div>
-      <h3>Global Coverage</h3>
-      <p>Poland, Lithuania, Cyprus, Curacao, UAE, and more jurisdictions available.</p>
-    </div>
+<section class="cta">
+  <h2>Selling a licensed company?</h2>
+  <p>We connect you with qualified buyers worldwide. Private, discreet, and fast.</p>
+  <div class="hero-cta">
+    <a class="btn-primary" href="https://t.me/ReadyCoAdminBot">💬 List with us</a>
   </div>
-</div>
+</section>
 
-<div class="cta">
-  <h2>Looking to sell your company?</h2>
-  <p>List it on ReadyCo Market — reach qualified buyers worldwide</p>
-  <a class="cta-btn" href="https://t.me/ReadyCoAdminBot">💬 Contact Us</a>
-</div>
-
-<div class="footer">
-  ReadyCo Market — <a href="https://t.me/readyco">@readyco</a> | <a href="https://t.me/ReadyCoAdminBot">@ReadyCoAdminBot</a>
-</div>
+<footer class="footer">
+  <a href="https://t.me/readyco">📺 @readyco</a>
+  <span>·</span>
+  <a href="https://t.me/ReadyCoAdminBot">💬 @ReadyCoAdminBot</a>
+</footer>
 
 <script>
-const COUNTRY_FLAGS = {
-  poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',
-  uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',
-  ireland:'🇮🇪',netherlands:'🇳🇱',luxembourg:'🇱🇺',belgium:'🇧🇪',france:'🇫🇷',
-  portugal:'🇵🇹',spain:'🇪🇸',italy:'🇮🇹',switzerland:'🇨🇭',singapore:'🇸🇬',
-  'hong kong':'🇭🇰',seychelles:'🇸🇨',belize:'🇧🇿',panama:'🇵🇦',bvi:'🇻🇬',
-  cayman:'🇰🇾',gibraltar:'🇬🇮','isle of man':'🇮🇲',jersey:'🇯🇪',australia:'🇦🇺',canada:'🇨🇦'
-};
-const LIC_EMOJI = {vasp:'₿',casp:'₿',emi:'🏦',pi:'🏦',psp:'💳',igaming:'♠️',casino:'🎰',betting:'🎲',forex:'📈'};
-function flag(j){if(!j)return '🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(COUNTRY_FLAGS)){if(j.includes(k))return v}return '🌍'}
-function licE(l){if(!l)return '📜';l=l.toLowerCase();for(const[k,v]of Object.entries(LIC_EMOJI)){if(l.includes(k))return v}return '📜'}
-function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
+const FLAGS = {poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',luxembourg:'🇱🇺',belgium:'🇧🇪',france:'🇫🇷',portugal:'🇵🇹',spain:'🇪🇸',italy:'🇮🇹',switzerland:'🇨🇭',singapore:'🇸🇬','hong kong':'🇭🇰',seychelles:'🇸🇨',belize:'🇧🇿',panama:'🇵🇦',bvi:'🇻🇬',cayman:'🇰🇾',gibraltar:'🇬🇮','isle of man':'🇮🇲',jersey:'🇯🇪',australia:'🇦🇺',canada:'🇨🇦'};
+const LIC = {vasp:'₿',casp:'₿',emi:'🏦',pi:'🏦',psp:'💳',igaming:'♠️',casino:'🎰',betting:'🎲',forex:'📈'};
+function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k))return v}return'🌍'}
+function licE(l){if(!l)return'📜';l=l.toLowerCase();for(const[k,v]of Object.entries(LIC)){if(l.includes(k))return v}return'📜'}
+function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
 
 async function loadOffers() {
   try {
     const res = await fetch('/api/offers?status=live');
     const data = await res.json();
+    document.getElementById('stat-offers').textContent = data.offers.length;
     const grid = document.getElementById('offerGrid');
     if (!data.offers.length) {
-      grid.innerHTML = '<div class="empty"><div class="icon">📋</div><h3>No offers available yet</h3><p style="color:var(--gray);margin-top:8px">Follow @readyco for new listings</p></div>';
+      grid.innerHTML = '<div class="empty"><div class="icon">📋</div><p>No active listings right now. Follow @readyco for new arrivals.</p></div>';
       return;
     }
     grid.innerHTML = data.offers.map(o => {
       const sold = o.status === 'sold';
-      const f = flag(o.jurisdiction);
-      const le = licE(o.license_type);
-      return `
-        <div class="offer-card ${sold?'sold':''}">
-          <div class="offer-flag">${f}</div>
-          <div class="offer-ref">${o.ref}</div>
-          <div class="offer-title">${esc(o.jurisdiction||'')}</div>
-          ${o.license_type ? `<div class="offer-license">${le} ${esc(o.license_type)}</div>` : ''}
-          <div class="offer-details">
-            ${o.company_type ? `<div>📦 ${esc(o.company_type)}</div>` : ''}
-            ${o.year_established ? `<div>📅 Established ${esc(o.year_established)}</div>` : ''}
-            ${o.bank_emi_account ? `<div>🏦 Bank/EMI: ${esc(o.bank_emi_account)}</div>` : ''}
-            ${o.vat_status ? `<div>📋 VAT: ${esc(o.vat_status)}</div>` : ''}
-            ${o.transfer_time ? `<div>⏱️ Transfer: ${esc(o.transfer_time)}</div>` : ''}
-          </div>
-          ${o.short_description ? `<div class="offer-desc">${esc(o.short_description)}</div>` : ''}
-          <div class="offer-price">${esc(o.price||'On request')}</div>
-          ${sold ? '<span class="offer-sold-badge">✅ SOLD</span>' : `<a class="offer-btn" href="https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}">💬 Inquire</a>`}
-        </div>`;
+      return `<div class="card ${sold?'sold':''}">
+        <div class="card-flag">${flag(o.jurisdiction)}</div>
+        <div class="card-jurisdiction">${esc(o.jurisdiction||'')}</div>
+        ${o.license_type?`<div class="card-license">${licE(o.license_type)} ${esc(o.license_type)}</div>`:''}
+        <div class="card-rows">
+          ${o.company_type?`<div class="card-row">📦 ${esc(o.company_type)}</div>`:''}
+          ${o.year_established?`<div class="card-row">📅 Established ${esc(o.year_established)}</div>`:''}
+          ${o.bank_emi_account?`<div class="card-row">🏦 Bank/EMI: ${esc(o.bank_emi_account)}</div>`:''}
+          ${o.vat_status?`<div class="card-row">📋 VAT: ${esc(o.vat_status)}</div>`:''}
+          ${o.transfer_time?`<div class="card-row">⏱️ ${esc(o.transfer_time)}</div>`:''}
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-price">${esc(o.price||'On request')}</div>
+        ${o.short_description?`<div class="card-desc">${esc(o.short_description)}</div>`:''}
+        <div class="card-actions">
+          ${sold?`<span class="sold-badge">✅ SOLD</span>`:`<a class="btn-primary" href="https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}" style="padding:10px 20px;font-size:13px">💬 Inquire</a>`}
+        </div>
+        <div class="card-ref">${o.ref}</div>
+      </div>`;
     }).join('');
   } catch(e) {
-    document.getElementById('offerGrid').innerHTML = '<div class="empty"><div class="icon">⚠️</div><p>Error loading offers</p></div>';
+    document.getElementById('offerGrid').innerHTML = '<div class="empty"><div class="icon">⚠️</div><p>Could not load offers.</p></div>';
   }
 }
 loadOffers();
