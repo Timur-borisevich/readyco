@@ -238,12 +238,13 @@ function renderLeads(c) {
     const tag = l.tag ? `<span class="badge tag" style="background:${tagColors[l.tag]||'var(--navy-3)'}">${l.tag}</span>` : '';
     const dot = isNew ? '<div class="unread-dot"></div>' : '';
     const offerBadge = l.offer_ref ? `<span style="color:var(--green);font-size:10px;font-weight:600">📋 ${l.offer_ref}</span>` : '';
+    const offerCount = l.offer_refs && l.offer_refs.split(',').length > 1 ? ` <span style="color:var(--purple);font-size:10px">+${l.offer_refs.split(',').length-1}</span>` : '';
     return `<div class="list-item" onclick="openLead(${l.id})">
       <div class="avatar a${(i%4)+1}">${esc(initials(name))}</div>
       <div class="item-info">
         <div class="item-title">${esc(name)} ${badge} ${tag}</div>
         <div class="item-sub">${esc((l.last_msg||'').slice(0,45))}</div>
-        <div class="item-meta">${l.msg_count||0} msgs ${offerBadge?'· '+offerBadge:''}</div>
+        <div class="item-meta">${l.msg_count||0} msgs ${offerBadge?'· '+offerBadge+offerCount:''}</div>
       </div>${dot}</div>`;
   }).join('');
 }
@@ -301,7 +302,7 @@ function renderChat(app) {
         <div class="chat-back" onclick="backToMain()">‹</div>
         <div class="chat-header-info">
           <div class="chat-header-name">${esc(name)}</div>
-          <div class="chat-header-sub">${lead?.offer_ref?`📋 ${lead.offer_ref}`:'General inquiry'}</div>
+          <div class="chat-header-sub">${lead?.offer_refs && lead.offer_refs.split(',').length > 1 ? `📋 ${lead.offer_refs.split(',').join(' · ')}` : lead?.offer_ref ? `📋 ${lead.offer_ref}` : 'General inquiry'}</div>
         </div>
         <a href="${profileLink}" class="chat-btn" target="_blank">👤</a>
         <button class="chat-btn" id="leadActionsBtn">⋯</button>

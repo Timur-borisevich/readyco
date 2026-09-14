@@ -111,12 +111,21 @@ async def db_create_lead(uid, username, offer_ref=None):
     try:
         existing = await conn.fetchval("SELECT id FROM leads WHERE telegram_user_id=$1 ORDER BY created_at DESC LIMIT 1", uid)
         if existing:
-            await conn.execute("UPDATE leads SET last_contact_at=now(), telegram_username=$1, offer_ref=$2 WHERE id=$3",
-                             username, offer_ref, existing)
+            if offer_ref:
+                row = await conn.fetchrow("SELECT offer_refs FROM leads WHERE id=$1", existing)
+                old_refs = (row.get("offer_refs") or "") if row else ""
+                all_refs = [r for r in old_refs.split(",") if r]
+                if offer_ref not in all_refs:
+                    all_refs.append(offer_ref)
+                await conn.execute("UPDATE leads SET last_contact_at=now(), telegram_username=$1, offer_ref=$2, offer_refs=$3 WHERE id=$4",
+                                 username, offer_ref, ",".join(all_refs), existing)
+            else:
+                await conn.execute("UPDATE leads SET last_contact_at=now(), telegram_username=$1 WHERE id=$2", username, existing)
             return existing
         lid = await conn.fetchval(
-            "INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, status, last_contact_at) "
-            "VALUES ($1, $2, $3, 'new', now()) RETURNING id", uid, username, offer_ref)
+            "INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, offer_refs, status, last_contact_at) "
+            "VALUES ($1, $2, $3, $4, 'new', now()) RETURNING id",
+            uid, username, offer_ref, offer_ref or "")
         return lid
     finally: await conn.close()
 
