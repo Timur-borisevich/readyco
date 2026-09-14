@@ -45,7 +45,9 @@
   .offer-card:hover { transform: translateY(-3px); border-color: var(--yellow); box-shadow: 0 8px 30px rgba(255,212,0,0.1); }
   .offer-card.sold { opacity: 0.5; }
   .offer-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
-  .offer-ref { font-size: 12px; color: var(--yellow); font-weight: 700; letter-spacing: 1px; }
+  .offer-flag { font-size: 28px; margin-bottom: 8px; }
+  .offer-ref { font-size: 11px; color: var(--yellow); font-weight: 700; letter-spacing: 1px; }
+  .offer-desc { font-size: 13px; color: var(--gray); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.5; }
   .offer-title { font-size: 22px; font-weight: 700; margin-top: 8px; }
   .offer-license { font-size: 14px; color: var(--green); margin-top: 4px; font-weight: 600; }
   .offer-details { font-size: 13px; color: var(--gray); margin-top: 14px; }
@@ -144,6 +146,19 @@
 </div>
 
 <script>
+const COUNTRY_FLAGS = {
+  poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',
+  uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',
+  ireland:'🇮🇪',netherlands:'🇳🇱',luxembourg:'🇱🇺',belgium:'🇧🇪',france:'🇫🇷',
+  portugal:'🇵🇹',spain:'🇪🇸',italy:'🇮🇹',switzerland:'🇨🇭',singapore:'🇸🇬',
+  'hong kong':'🇭🇰',seychelles:'🇸🇨',belize:'🇧🇿',panama:'🇵🇦',bvi:'🇻🇬',
+  cayman:'🇰🇾',gibraltar:'🇬🇮','isle of man':'🇮🇲',jersey:'🇯🇪',australia:'🇦🇺',canada:'🇨🇦'
+};
+const LIC_EMOJI = {vasp:'₿',casp:'₿',emi:'🏦',pi:'🏦',psp:'💳',igaming:'♠️',casino:'🎰',betting:'🎲',forex:'📈'};
+function flag(j){if(!j)return '🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(COUNTRY_FLAGS)){if(j.includes(k))return v}return '🌍'}
+function licE(l){if(!l)return '📜';l=l.toLowerCase();for(const[k,v]of Object.entries(LIC_EMOJI)){if(l.includes(k))return v}return '📜'}
+function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
+
 async function loadOffers() {
   try {
     const res = await fetch('/api/offers?status=live');
@@ -155,11 +170,14 @@ async function loadOffers() {
     }
     grid.innerHTML = data.offers.map(o => {
       const sold = o.status === 'sold';
+      const f = flag(o.jurisdiction);
+      const le = licE(o.license_type);
       return `
         <div class="offer-card ${sold?'sold':''}">
+          <div class="offer-flag">${f}</div>
           <div class="offer-ref">${o.ref}</div>
           <div class="offer-title">${esc(o.jurisdiction||'')}</div>
-          ${o.license_type ? `<div class="offer-license">${esc(o.license_type)}</div>` : ''}
+          ${o.license_type ? `<div class="offer-license">${le} ${esc(o.license_type)}</div>` : ''}
           <div class="offer-details">
             ${o.company_type ? `<div>📦 ${esc(o.company_type)}</div>` : ''}
             ${o.year_established ? `<div>📅 Established ${esc(o.year_established)}</div>` : ''}
@@ -167,6 +185,7 @@ async function loadOffers() {
             ${o.vat_status ? `<div>📋 VAT: ${esc(o.vat_status)}</div>` : ''}
             ${o.transfer_time ? `<div>⏱️ Transfer: ${esc(o.transfer_time)}</div>` : ''}
           </div>
+          ${o.short_description ? `<div class="offer-desc">${esc(o.short_description)}</div>` : ''}
           <div class="offer-price">${esc(o.price||'On request')}</div>
           ${sold ? '<span class="offer-sold-badge">✅ SOLD</span>' : `<a class="offer-btn" href="https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}">💬 Inquire</a>`}
         </div>`;
@@ -175,7 +194,6 @@ async function loadOffers() {
     document.getElementById('offerGrid').innerHTML = '<div class="empty"><div class="icon">⚠️</div><p>Error loading offers</p></div>';
   }
 }
-function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
 loadOffers();
 </script>
 </body>

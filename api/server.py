@@ -167,37 +167,81 @@ async def db_insert_announcement(text, mid, uid):
     finally: await conn.close()
 
 # === FORMATTING ===
+COUNTRY_FLAGS = {
+    "poland": "🇵🇱", "lithuania": "🇱🇹", "cyprus": "🇨🇾", "curacao": "🇨🇼",
+    "uae": "🇦🇪", "dubai": "🇦🇪", "uk": "🇬🇧", "usa": "🇺🇸", "germany": "🇩🇪",
+    "estonia": "🇪🇪", "latvia": "🇱🇻", "malta": "🇲🇹", "ireland": "🇮🇪",
+    "netherlands": "🇳🇱", "luxembourg": "🇱🇺", "belgium": "🇧🇪", "france": "🇫🇷",
+    "portugal": "🇵🇹", "spain": "🇪🇸", "italy": "🇮🇹", "switzerland": "🇨🇭",
+    "singapore": "🇸🇬", "hong kong": "🇭🇰", "seychelles": "🇸🇨", "belize": "🇧🇿",
+    "panama": "🇵🇦", "bvi": "🇻🇬", "cayman": "🇰🇾", "gibraltar": "🇬🇮",
+    "isle of man": "🇮🇲", "jersey": "🇯🇪", "australia": "🇦🇺", "canada": "🇨🇦",
+}
+
+LICENSE_EMOJI = {
+    "VASP": "₿", "CASP": "₿", "EMI": "🏦", "PI": "🏦", "PSP": "💳",
+    "iGaming": "♠️", "Casino": "🎰", "Betting": "🎲", "Forex": "📈",
+}
+
+def get_flag(jurisdiction):
+    if not jurisdiction: return "🌍"
+    j = jurisdiction.lower().strip()
+    for key, flag in COUNTRY_FLAGS.items():
+        if key in j: return flag
+    return "🌍"
+
+def get_license_emoji(license_type):
+    if not license_type: return "📜"
+    for key, emoji in LICENSE_EMOJI.items():
+        if key.lower() in license_type.lower(): return emoji
+    return "📜"
+
 def format_offer_card(offer, sold=False):
-    lines = []
+    jurisdiction = offer.get('jurisdiction', '')
+    flag = get_flag(jurisdiction)
+    license_type = offer.get('license_type', '')
+    lic_emoji = get_license_emoji(license_type)
+    ref = offer.get('ref', '')
+    price = offer.get('price', '')
+    
     if sold:
-        lines.append("~~FOR SALE~~ ✅ SOLD")
-        lines.append(f"~~Ref: {offer.get('ref','')}~~")
-        lines.append(f"~~Jurisdiction: {offer.get('jurisdiction','')}~~")
-        if offer.get('company_type'): lines.append(f"~~Company type: {offer['company_type']}~~")
-        if offer.get('license_type'): lines.append(f"~~License: {offer['license_type']}~~")
-        if offer.get('price'): lines.append(f"~~Price: {offer['price']}~~")
+        lines = [
+            "✅ SOLD",
+            "",
+            f"~~{flag} {jurisdiction}~~",
+        ]
+        if license_type: lines.append(f"~~{lic_emoji} {license_type}~~")
+        if offer.get('company_type'): lines.append(f"~~{offer['company_type']}~~")
+        if price: lines.append(f"~~💰 {price}~~")
+        lines.append("")
+        lines.append(f"~~Ref: {ref}~~")
         lines.append("")
         lines.append("Contact: @ReadyCoAdminBot")
     else:
-        lines.append("FOR SALE")
+        lines = [
+            "🔴 FOR SALE",
+            "",
+            f"{flag} {jurisdiction}",
+        ]
+        if license_type: lines.append(f"{lic_emoji} {license_type}")
+        if offer.get('company_type'): lines.append(f"📦 {offer['company_type']}")
+        if offer.get('year_established'): lines.append(f"📅 Established: {offer['year_established']}")
+        if offer.get('license_status'): lines.append(f"✅ License: {offer['license_status']}")
+        if offer.get('regulator'): lines.append(f"🏛️ Regulator: {offer['regulator']}")
+        if offer.get('bank_emi_account'): lines.append(f"🏦 Bank/EMI: {offer['bank_emi_account']}")
+        if offer.get('vat_status'): lines.append(f"📋 VAT: {offer['vat_status']}")
+        if offer.get('turnover_history'): lines.append(f"📊 Turnover: {offer['turnover_history']}")
+        if offer.get('employees'): lines.append(f"👤 Employees: {offer['employees']}")
+        if offer.get('transfer_time'): lines.append(f"⏱️ Transfer: {offer['transfer_time']}")
+        if price: lines.append(f"💰 Price: {price}")
         lines.append("")
-        lines.append(f"Ref: {offer.get('ref','')}")
-        lines.append(f"Jurisdiction: {offer.get('jurisdiction','')}")
-        if offer.get('company_type'): lines.append(f"Company type: {offer['company_type']}")
-        if offer.get('year_established'): lines.append(f"Year: {offer['year_established']}")
-        if offer.get('license_type'): lines.append(f"License: {offer['license_type']}")
-        if offer.get('license_status'): lines.append(f"License status: {offer['license_status']}")
-        if offer.get('regulator'): lines.append(f"Regulator: {offer['regulator']}")
-        if offer.get('bank_emi_account'): lines.append(f"Bank / EMI account: {offer['bank_emi_account']}")
-        if offer.get('vat_status'): lines.append(f"VAT: {offer['vat_status']}")
-        if offer.get('turnover_history'): lines.append(f"Turnover history: {offer['turnover_history']}")
-        if offer.get('employees'): lines.append(f"Employees: {offer['employees']}")
-        if offer.get('transfer_time'): lines.append(f"Transfer time: {offer['transfer_time']}")
-        if offer.get('price'): lines.append(f"Price: {offer['price']}")
-        lines.append("")
-        if offer.get('short_description'): lines.append(offer['short_description']); lines.append("")
+        if offer.get('short_description'):
+            lines.append(f"━━━━━━━━━━━━━")
+            lines.append(offer['short_description'])
+            lines.append("")
         if offer.get('hashtags'): lines.append(offer['hashtags']); lines.append("")
-        lines.append("Contact: @ReadyCoAdminBot")
+        lines.append(f"━━━━━━━━━━━━━")
+        lines.append(f"Ref: {ref} · @ReadyCoAdminBot")
     return "\n".join(lines)
 
 def format_announcement(text): return f"📢 {text}"
@@ -206,7 +250,7 @@ def inquiry_keyboard(ref):
     return {"inline_keyboard": [[
         {"text": "💬 Ask about this offer", "url": f"https://t.me/ReadyCoAdminBot?start=inquiry_{ref}"},
     ],[
-        {"text": "🌐 View on website", "url": f"https://readyco.market/offers/{ref.lower()}"},
+        {"text": "🌐 readyco.market", "url": "https://readyco.market"},
     ]]}
 
 # === TG API ===
