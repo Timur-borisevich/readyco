@@ -31,7 +31,7 @@
   /* Nav */
   .nav { position:sticky; top:0; z-index:100; background:rgba(8,18,32,0.85); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid var(--border-soft); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; }
   .nav-logo { display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; }
-  .nav-logo-mark { width:32px; height:32px; background:var(--yellow); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--navy); font-size:13px; }
+  .nav-logo-mark { width:36px; height:36px; border-radius:50%; object-fit:cover; }
   .nav-links { display:flex; gap:28px; align-items:center; }
   .nav-link { font-size:14px; color:var(--text-2); font-weight:400; transition:color .15s; }
   .nav-link:hover { color:var(--text); }
@@ -113,7 +113,7 @@
   /* Footer */
   .footer { border-top:1px solid var(--border-soft); padding:32px 24px; max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
   .footer-left { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-3); }
-  .footer-left .mark { width:24px; height:24px; background:var(--yellow); border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--navy); font-size:10px; }
+  .footer-left .mark { width:28px; height:28px; border-radius:50%; object-fit:cover; }
   .footer-links { display:flex; gap:20px; }
   .footer-link { font-size:13px; color:var(--text-2); }
   .footer-link:hover { color:var(--yellow); }
@@ -138,7 +138,7 @@
 
 <nav class="nav">
   <div class="nav-logo">
-    <div class="nav-logo-mark">RC</div>
+    <img src="/logo.png" class="nav-logo-mark" alt="ReadyCo">
     <span>ReadyCo Market</span>
   </div>
   <div class="nav-links">
@@ -161,18 +161,15 @@
   </div>
   <div class="hero-right">
     <div class="hero-card">
-      <div class="hero-card-label">Recent listings</div>
+      <div class="hero-card-label">How it works</div>
       <div class="hero-card-row">
-        <div style="display:flex;align-items:center"><span class="hero-card-flag">🇵🇱</span><div class="hero-card-info"><div class="hero-card-name">Poland VASP</div><div class="hero-card-sub">Sp. z o.o. · 2023</div></div></div>
-        <div class="hero-card-price">€45K</div>
+        <div class="hero-card-info"><div class="hero-card-name">Browse offers</div><div class="hero-card-sub">View verified companies on our channel</div></div>
       </div>
       <div class="hero-card-row">
-        <div style="display:flex;align-items:center"><span class="hero-card-flag">🇱🇹</span><div class="hero-card-info"><div class="hero-card-name">Lithuania EMI</div><div class="hero-card-sub">UAB · 2022</div></div></div>
-        <div class="hero-card-price">€80K</div>
+        <div class="hero-card-info"><div class="hero-card-name">Inquire privately</div><div class="hero-card-sub">Contact our team via bot — no public exposure</div></div>
       </div>
       <div class="hero-card-row">
-        <div style="display:flex;align-items:center"><span class="hero-card-flag">🇨🇼</span><div class="hero-card-info"><div class="hero-card-name">Curacao iGaming</div><div class="hero-card-sub">N.V. · 2021</div></div></div>
-        <div class="hero-card-price">€25K</div>
+        <div class="hero-card-info"><div class="hero-card-name">Close the deal</div><div class="hero-card-sub">Transfer in 5–10 business days</div></div>
       </div>
     </div>
   </div>
@@ -228,7 +225,7 @@
 
 <footer class="footer">
   <div class="footer-left">
-    <div class="mark">RC</div>
+    <img src="/logo.png" class="mark" alt="ReadyCo">
     <span>ReadyCo Market</span>
   </div>
   <div class="footer-links">

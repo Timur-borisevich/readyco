@@ -29,7 +29,7 @@
   
   /* Header — translucent, Apple-style */
   .header { padding:12px 16px; padding-top:max(12px,env(safe-area-inset-top)); background:rgba(8,18,32,0.85); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid var(--border); flex-shrink:0; display:flex; align-items:center; gap:10px; }
-  .header-logo { width:28px; height:28px; background:var(--yellow); border-radius:7px; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--navy); font-size:12px; flex-shrink:0; }
+  .header-logo { width:30px; height:30px; border-radius:50%; object-fit:cover; flex-shrink:0; }
   .header-title { font-size:16px; font-weight:700; letter-spacing:-0.01em; }
   .header-sub { font-size:10px; color:var(--text-3); margin-top:1px; }
   
@@ -213,7 +213,7 @@ function renderMain(app) {
   const tabs = [{k:'leads',l:'Leads',i:'👤'},{k:'offers',l:'Offers',i:'📋'},{k:'stats',l:'Stats',i:'📊'},{k:'manage',l:'Manage',i:'⚙️'}];
   app.innerHTML = `
     <div class="header">
-      <div class="header-logo">RC</div>
+      <img src="/logo.png" class="header-logo" alt="ReadyCo">
       <div><div class="header-title">ReadyCo Admin</div><div class="header-sub">@readyco</div></div>
     </div>
     <div class="tabs">${tabs.map(t=>`<div class="tab ${view===t.k?'active':''}" onclick="switchView('${t.k}')">${t.i} ${t.l}</div>`).join('')}</div>
