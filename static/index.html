@@ -38,6 +38,11 @@
   .tab { flex: 1; padding: 10px 2px; text-align: center; font-size: 12px; font-weight: 600; color: var(--gray); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
   .tab.active { color: var(--yellow); border-bottom-color: var(--yellow); }
   
+  /* Search */
+  .search-bar { padding: 8px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .search-input { width: 100%; background: var(--navy-light); border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px; color: #fff; font-size: 13px; outline: none; font-family: 'Poppins', sans-serif; }
+  .search-input:focus { border-color: var(--yellow); }
+  
   /* Content scroll area */
   .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   
@@ -56,6 +61,7 @@
   .badge.new { background: var(--orange); color: var(--navy); }
   .badge.live { background: var(--green); color: var(--navy); }
   .badge.sold { background: var(--orange); color: var(--navy); }
+  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
   
   /* Offer cards */
   .offer-card { background: var(--navy-light); margin: 8px 12px; border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
@@ -211,6 +217,7 @@ function renderMain(app) {
       <div><h1>ReadyCo Admin</h1><div class="sub">@readyco</div></div>
     </div>
     <div class="tabs">${tabs.map(t=>`<div class="tab ${view===t.k?'active':''}" onclick="switchView('${t.k}')">${t.i} ${t.l}</div>`).join('')}</div>
+    ${view==='leads'?'<div class="search-bar"><input class="search-input" id="searchInput" placeholder="🔍 Search leads..." oninput="searchLeads(this.value)"></div>':''}
     <div class="content" id="content"></div>
     ${view==='offers'?'<button class="fab" onclick="switchView(\'add\')">+</button>':''}
   `;
@@ -224,17 +231,21 @@ function renderMain(app) {
 function renderLeads(c) {
   if (!leads.length) { c.innerHTML = '<div class="empty"><div class="icon">👤</div><p>No leads yet</p></div>'; return; }
   const colors = ['','green','orange','purple'];
+  const tagColors = {hot:'var(--orange)',cold:'var(--gray)',closed:'var(--green)',warm:'var(--purple)'};
   c.innerHTML = leads.map((l,i) => {
     const name = l.telegram_username || `ID:${l.telegram_user_id}`;
     const colorClass = colors[i % colors.length];
-    const badge = l.status==='new' ? '<span class="badge new">NEW</span>' : '';
+    const isNew = l.status === 'new';
+    const badge = isNew ? '<span class="badge new">NEW</span>' : '';
+    const tag = l.tag ? `<span class="badge" style="background:${tagColors[l.tag]||'var(--navy-lighter)'};color:var(--navy)">${l.tag}</span>` : '';
+    const unreadDot = isNew ? '<div class="unread-dot"></div>' : '';
     return `<div class="list-item" onclick="openLead(${l.id})">
       <div class="avatar ${colorClass}">${esc(initials(name))}</div>
       <div class="item-info">
-        <div class="item-title">${esc(name)} ${badge}</div>
+        <div class="item-title">${esc(name)} ${badge} ${tag}</div>
         <div class="item-sub">${esc((l.last_msg||'').slice(0,45))}</div>
         <div class="item-meta">${l.msg_count||0} msgs</div>
-      </div></div>`;
+      </div>${unreadDot}</div>`;
   }).join('');
 }
 
@@ -274,6 +285,7 @@ function renderManage(c) {
     <div class="manage-item" onclick="loadLeads();switchView('leads')"><div class="manage-icon green">👤</div><div class="item-info"><div class="item-title">Leads</div><div class="item-sub">Client inquiries</div></div></div>
     <div class="manage-item" onclick="window.open('https://t.me/readyco','_blank')"><div class="manage-icon purple">📺</div><div class="item-info"><div class="item-title">Channel</div><div class="item-sub">@readyco</div></div></div>
     <div class="manage-item" onclick="window.open('https://readyco.vercel.app','_blank')"><div class="manage-icon yellow">🌐</div><div class="item-info"><div class="item-title">Website</div><div class="item-sub">readyco.vercel.app</div></div></div>
+    <div class="manage-item" onclick="exportLeads()"><div class="manage-icon green">📥</div><div class="item-info"><div class="item-title">Export leads</div><div class="item-sub">Download CSV</div></div></div>
   `;
 }
 
@@ -414,14 +426,43 @@ function showLeadActions(leadId) {
   m.className = 'modal-bg';
   m.innerHTML = `<div class="modal">
     <h3>Lead actions</h3>
-    <p>What do you want to do?</p>
+    <p>Manage this lead</p>
     <div class="modal-btns" style="flex-direction:column;gap:8px">
+      <div style="display:flex;gap:6px">
+        <button class="modal-btn" style="background:var(--orange);color:var(--navy)" onclick="setTag(${leadId},'hot')">🔥 Hot</button>
+        <button class="modal-btn" style="background:var(--purple);color:#fff" onclick="setTag(${leadId},'warm')">🔥 Warm</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="modal-btn" style="background:var(--gray);color:var(--navy)" onclick="setTag(${leadId},'cold')">❄️ Cold</button>
+        <button class="modal-btn" style="background:var(--green);color:var(--navy)" onclick="setTag(${leadId},'closed')">✅ Closed</button>
+      </div>
+      <button class="modal-btn" style="background:var(--navy-lighter);color:var(--gray)" onclick="setTag(${leadId},null)">Remove tag</button>
       <button class="modal-btn danger" onclick="this.closest('.modal-bg').remove();blockLead(${leadId})">🚫 Block client</button>
       <button class="modal-btn danger" onclick="this.closest('.modal-bg').remove();deleteLead(${leadId})">🗑 Delete chat</button>
       <button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button>
     </div>
   </div>`;
   document.body.appendChild(m);
+}
+
+async function setTag(leadId, tag) {
+  document.querySelectorAll('.modal-bg').forEach(m => m.remove());
+  try {
+    await api(`/admin/leads/${leadId}/tag`, {method:'POST', body:JSON.stringify({tag})});
+    loadLeads();
+  } catch(e) { alert(e.message); }
+}
+
+let searchTimer = null;
+function searchLeads(q) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    try {
+      const d = await api(`/admin/leads${q?('?search='+encodeURIComponent(q)):''}`);
+      leads = d.leads;
+      if (view === 'leads') render();
+    } catch(e) {}
+  }, 300);
 }
 
 async function blockLead(leadId) {
@@ -440,6 +481,16 @@ async function deleteLead(leadId) {
 
 async function loadLeads() { try { const d = await api('/admin/leads'); leads = d.leads; if (view==='leads') render(); } catch(e){} }
 async function loadOffers() { try { const d = await api('/admin/offers'); offers = d.offers; if (view==='offers') render(); } catch(e){} }
+
+function exportLeads() {
+  const h = {'Content-Type':'application/json','X-Telegram-Init-Data': tgUser ? tgUser.id.toString() : '8339164180'};
+  fetch(API+'/admin/leads/export', {headers:h}).then(r => r.blob()).then(b => {
+    const url = URL.createObjectURL(b);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'leads.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }).catch(e => alert('Export failed: ' + e.message));
+}
 
 document.addEventListener('input', e => { if (e.target.id==='replyInput') { e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,80)+'px'; } });
 document.addEventListener('keydown', e => { if (e.target.id==='replyInput' && e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } });

@@ -127,19 +127,40 @@ async def db_get_lead(lid):
         return dict(row) if row else None
     finally: await conn.close()
 
-async def db_list_leads(limit=50):
+async def db_list_leads(limit=50, search=None):
     conn = await get_db()
     try:
-        rows = await conn.fetch(
-            "SELECT l.*, COUNT(m.id) as msg_count, "
-            "(SELECT text FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg, "
-            "(SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg_time "
-            "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
-            "WHERE l.is_blocked = 0 "
-            "GROUP BY l.id ORDER BY "
-            "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
-            "COALESCE(last_msg_time, l.last_contact_at) DESC LIMIT $1", limit)
+        if search:
+            rows = await conn.fetch(
+                "SELECT l.*, COUNT(m.id) as msg_count, "
+                "(SELECT text FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg, "
+                "(SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg_time "
+                "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
+                "WHERE l.is_blocked = 0 AND (l.telegram_username ILIKE $2 OR l.offer_ref ILIKE $2) "
+                "GROUP BY l.id ORDER BY "
+                "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
+                "COALESCE(last_msg_time, l.last_contact_at) DESC LIMIT $1", limit, f"%{search}%")
+        else:
+            rows = await conn.fetch(
+                "SELECT l.*, COUNT(m.id) as msg_count, "
+                "(SELECT text FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg, "
+                "(SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg_time "
+                "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
+                "WHERE l.is_blocked = 0 "
+                "GROUP BY l.id ORDER BY "
+                "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
+                "COALESCE(last_msg_time, l.last_contact_at) DESC LIMIT $1", limit)
         return [dict(r) for r in rows]
+    finally: await conn.close()
+
+async def db_mark_read(lid):
+    conn = await get_db()
+    try: await conn.execute("UPDATE leads SET is_read=1, status='responded' WHERE id=$1 AND status='new'", lid)
+    finally: await conn.close()
+
+async def db_set_tag(lid, tag):
+    conn = await get_db()
+    try: await conn.execute("UPDATE leads SET tag=$1 WHERE id=$2", tag, lid)
     finally: await conn.close()
 
 async def db_get_messages(lid):
@@ -890,15 +911,16 @@ async def api_offer(ref: str):
 
 # === ADMIN: LEADS ===
 @app.get("/api/admin/leads")
-async def admin_leads(request: Request):
+async def admin_leads(request: Request, search: str = None):
     await verify_admin(request)
-    return {"leads": await db_list_leads(50)}
+    return {"leads": await db_list_leads(50, search)}
 
 @app.get("/api/admin/leads/{lead_id}")
 async def admin_lead(lead_id: int, request: Request):
     await verify_admin(request)
     lead = await db_get_lead(lead_id)
     if not lead: raise HTTPException(404, "Lead not found")
+    await db_mark_read(lead_id)
     return {"lead": lead, "messages": await db_get_messages(lead_id)}
 
 @app.post("/api/admin/reply")
@@ -906,12 +928,36 @@ async def admin_reply(req: ReplyReq, request: Request):
     uid = await verify_admin(request)
     lead = await db_get_lead(req.lead_id)
     if not lead: raise HTTPException(404, "Lead not found")
+    admin_name = ADMIN_NAMES.get(uid, f"Admin {uid}")
     r = await tg_send(lead["telegram_user_id"], f"💬 ReadyCo Market:\n\n{req.text}")
     if not r.get("ok"): raise HTTPException(500, f"TG error: {r.get('description')}")
     await db_store_message(req.lead_id, req.text, "admin_to_client")
     await db_update_lead_status(req.lead_id, "responded")
-    await db_audit(uid, "reply", "lead", req.lead_id, {"text": req.text[:100]})
+    await db_audit(uid, "reply", "lead", req.lead_id, {"text": req.text[:100], "admin": admin_name})
+    return {"ok": True, "admin_name": admin_name}
+
+@app.post("/api/admin/leads/{lead_id}/tag")
+async def admin_set_tag(lead_id: int, request: Request):
+    import json as _json
+    uid = await verify_admin(request)
+    body = await request.json()
+    tag = body.get("tag")
+    await db_set_tag(lead_id, tag)
+    await db_audit(uid, "tag", "lead", lead_id, {"tag": tag})
     return {"ok": True}
+
+@app.get("/api/admin/leads/export")
+async def admin_export_leads(request: Request):
+    uid = await verify_admin(request)
+    leads = await db_list_leads(500)
+    import csv, io
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID","Username","Telegram ID","Status","Tag","Offer Ref","Messages","Created","Last Contact"])
+    for l in leads:
+        writer.writerow([l["id"], l.get("telegram_username",""), l["telegram_user_id"], l["status"], l.get("tag",""), l.get("offer_ref",""), l.get("msg_count",0), str(l.get("created_at","")), str(l.get("last_contact_at",""))])
+    from fastapi.responses import Response
+    return Response(content=output.getvalue(), media_type="text/csv", headers={"Content-Disposition":"attachment; filename=leads.csv"})
 
 @app.post("/api/admin/leads/{lead_id}/block")
 async def admin_block_lead(lead_id: int, request: Request):
