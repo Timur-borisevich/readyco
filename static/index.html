@@ -363,7 +363,8 @@ function renderMsgs(msgs) {
   );
   Promise.all(promises).then(() => {
     // Also load audio URLs
-    const audioPromises = msgs.filter(m => m.file_id && m.msg_type in ('voice','audio')).map(m =>
+    const audioMsgs = msgs.filter(m => m.file_id && (m.msg_type === 'voice' || m.msg_type === 'audio'));
+    const audioPromises = audioMsgs.map(m =>
       api(`/admin/file/${encodeURIComponent(m.file_id)}`).then(d => m._audio_url = d.url).catch(() => {})
     );
     Promise.all(audioPromises).then(() => {
