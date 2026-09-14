@@ -170,9 +170,9 @@ async def db_get_messages(lid):
         return [dict(r) for r in rows]
     finally: await conn.close()
 
-async def db_store_message(lid, text, direction):
+async def db_store_message(lid, text, direction, file_id=None, msg_type="text"):
     conn = await get_db()
-    try: await conn.execute("INSERT INTO messages (lead_id, direction, text) VALUES ($1, $2, $3)", lid, direction, text)
+    try: await conn.execute("INSERT INTO messages (lead_id, direction, text, file_id, msg_type) VALUES ($1, $2, $3, $4, $5)", lid, direction, text, file_id, msg_type)
     finally: await conn.close()
 
 async def db_update_lead_status(lid, status):
@@ -908,7 +908,7 @@ async def bot_webhook(request: Request):
             return {"ok": True}
         
         lead_id = await db_create_lead(user_id, username)
-        await db_store_message(lead_id, msg_content, "client_to_admin")
+        await db_store_message(lead_id, msg_content, "client_to_admin", file_id=photo_file_id, msg_type=msg_type)
         lead = await db_get_lead(lead_id)
         offer_info = ""
         if lead and lead.get("offer_ref"):
@@ -1043,6 +1043,20 @@ async def admin_reply(req: ReplyReq, request: Request):
     await db_update_lead_status(req.lead_id, "responded")
     await db_audit(uid, "reply", "lead", req.lead_id, {"text": req.text[:100], "admin": admin_name})
     return {"ok": True, "admin_name": admin_name}
+
+@app.get("/api/admin/file/{file_id}")
+async def admin_get_file(file_id: str, request: Request):
+    """Get Telegram file URL for display in Mini App."""
+    await verify_admin(request)
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile"
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json={"file_id": file_id}) as r:
+            data = await r.json()
+            if data.get("ok"):
+                file_path = data["result"]["file_path"]
+                file_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+                return {"url": file_url}
+            raise HTTPException(404, "File not found")
 
 # === ADMIN: STATS ===
 @app.get("/api/admin/stats")
