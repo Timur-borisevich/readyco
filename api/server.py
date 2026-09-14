@@ -983,37 +983,6 @@ async def admin_leads(request: Request, search: str = None):
     await verify_admin(request)
     return {"leads": await db_list_leads(50, search)}
 
-@app.get("/api/admin/leads/{lead_id}")
-async def admin_lead(lead_id: int, request: Request):
-    await verify_admin(request)
-    lead = await db_get_lead(lead_id)
-    if not lead: raise HTTPException(404, "Lead not found")
-    await db_mark_read(lead_id)
-    return {"lead": lead, "messages": await db_get_messages(lead_id)}
-
-@app.post("/api/admin/reply")
-async def admin_reply(req: ReplyReq, request: Request):
-    uid = await verify_admin(request)
-    lead = await db_get_lead(req.lead_id)
-    if not lead: raise HTTPException(404, "Lead not found")
-    admin_name = ADMIN_NAMES.get(uid, f"Admin {uid}")
-    r = await tg_send(lead["telegram_user_id"], f"💬 ReadyCo Market:\n\n{req.text}")
-    if not r.get("ok"): raise HTTPException(500, f"TG error: {r.get('description')}")
-    await db_store_message(req.lead_id, req.text, "admin_to_client")
-    await db_update_lead_status(req.lead_id, "responded")
-    await db_audit(uid, "reply", "lead", req.lead_id, {"text": req.text[:100], "admin": admin_name})
-    return {"ok": True, "admin_name": admin_name}
-
-@app.post("/api/admin/leads/{lead_id}/tag")
-async def admin_set_tag(lead_id: int, request: Request):
-    import json as _json
-    uid = await verify_admin(request)
-    body = await request.json()
-    tag = body.get("tag")
-    await db_set_tag(lead_id, tag)
-    await db_audit(uid, "tag", "lead", lead_id, {"tag": tag})
-    return {"ok": True}
-
 @app.get("/api/admin/leads/export")
 async def admin_export_leads(request: Request):
     uid = await verify_admin(request)
@@ -1026,6 +995,23 @@ async def admin_export_leads(request: Request):
         writer.writerow([l["id"], l.get("telegram_username",""), l["telegram_user_id"], l["status"], l.get("tag",""), l.get("offer_ref",""), l.get("msg_count",0), str(l.get("created_at","")), str(l.get("last_contact_at",""))])
     from fastapi.responses import Response
     return Response(content=output.getvalue(), media_type="text/csv", headers={"Content-Disposition":"attachment; filename=leads.csv"})
+
+@app.get("/api/admin/leads/{lead_id}")
+async def admin_lead(lead_id: int, request: Request):
+    await verify_admin(request)
+    lead = await db_get_lead(lead_id)
+    if not lead: raise HTTPException(404, "Lead not found")
+    await db_mark_read(lead_id)
+    return {"lead": lead, "messages": await db_get_messages(lead_id)}
+
+@app.post("/api/admin/leads/{lead_id}/tag")
+async def admin_set_tag(lead_id: int, request: Request):
+    uid = await verify_admin(request)
+    body = await request.json()
+    tag = body.get("tag")
+    await db_set_tag(lead_id, tag)
+    await db_audit(uid, "tag", "lead", lead_id, {"tag": tag})
+    return {"ok": True}
 
 @app.post("/api/admin/leads/{lead_id}/block")
 async def admin_block_lead(lead_id: int, request: Request):
@@ -1044,6 +1030,19 @@ async def admin_delete_lead(lead_id: int, request: Request):
     await db_delete_lead(lead_id)
     await db_audit(uid, "delete_lead", "lead", lead_id, {})
     return {"ok": True}
+
+@app.post("/api/admin/reply")
+async def admin_reply(req: ReplyReq, request: Request):
+    uid = await verify_admin(request)
+    lead = await db_get_lead(req.lead_id)
+    if not lead: raise HTTPException(404, "Lead not found")
+    admin_name = ADMIN_NAMES.get(uid, f"Admin {uid}")
+    r = await tg_send(lead["telegram_user_id"], f"💬 ReadyCo Market:\n\n{req.text}")
+    if not r.get("ok"): raise HTTPException(500, f"TG error: {r.get('description')}")
+    await db_store_message(req.lead_id, req.text, "admin_to_client")
+    await db_update_lead_status(req.lead_id, "responded")
+    await db_audit(uid, "reply", "lead", req.lead_id, {"text": req.text[:100], "admin": admin_name})
+    return {"ok": True, "admin_name": admin_name}
 
 # === ADMIN: STATS ===
 @app.get("/api/admin/stats")

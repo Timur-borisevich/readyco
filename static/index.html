@@ -293,7 +293,6 @@ function renderChat(app) {
   const lead = leads.find(l => l.id === currentLeadId);
   const name = lead?.telegram_username || `ID:${lead?.telegram_user_id}`;
   const profileLink = lead?.telegram_username ? `https://t.me/${lead.telegram_username}` : `tg://user?id=${lead?.telegram_user_id}`;
-  const createGroupLink = lead?.telegram_username ? `https://t.me/?startgroup=readyco&user=${lead.telegram_username}` : null;
   app.innerHTML = `
     <div class="chat-view">
       <div class="chat-header">
@@ -303,8 +302,7 @@ function renderChat(app) {
           <div class="chat-header-sub">${lead?.offer_ref?('Offer: '+lead.offer_ref):'General inquiry'}</div>
         </div>
         <a href="${profileLink}" class="chat-profile-btn" target="_blank">👤</a>
-        ${createGroupLink ? `<a href="${createGroupLink}" class="chat-profile-btn" target="_blank">👥</a>` : ''}
-        <button class="chat-profile-btn" onclick="showLeadActions(${lead?.id})">⋯</button>
+        <button class="chat-profile-btn" onclick="showLeadActions(${lead?.id}, '${lead?.telegram_username || ''}', ${lead?.telegram_user_id || 0})">⋯</button>
       </div>
       <div class="chat-messages" id="chatMsgs"><div class="empty"><p>Loading...</p></div></div>
       <div class="chat-input-bar">
@@ -421,13 +419,15 @@ function showConfirm(title, body, onConfirm) {
   m.querySelector('#cfBtn').onclick = () => { m.remove(); onConfirm(); };
 }
 
-function showLeadActions(leadId) {
+function showLeadActions(leadId, username, userId) {
+  const profileLink = username ? `https://t.me/${username}` : `tg://user?id=${userId}`;
   const m = document.createElement('div');
   m.className = 'modal-bg';
   m.innerHTML = `<div class="modal">
     <h3>Lead actions</h3>
     <p>Manage this lead</p>
     <div class="modal-btns" style="flex-direction:column;gap:8px">
+      <a href="${profileLink}" target="_blank" class="modal-btn confirm" style="text-decoration:none;text-align:center;display:block">👤 Open client profile</a>
       <div style="display:flex;gap:6px">
         <button class="modal-btn" style="background:var(--orange);color:var(--navy)" onclick="setTag(${leadId},'hot')">🔥 Hot</button>
         <button class="modal-btn" style="background:var(--purple);color:#fff" onclick="setTag(${leadId},'warm')">🔥 Warm</button>
