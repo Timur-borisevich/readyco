@@ -132,9 +132,13 @@ async def db_list_leads(limit=50):
     try:
         rows = await conn.fetch(
             "SELECT l.*, COUNT(m.id) as msg_count, "
-            "(SELECT text FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg "
+            "(SELECT text FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg, "
+            "(SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg_time "
             "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
-            "GROUP BY l.id ORDER BY l.last_contact_at DESC LIMIT $1", limit)
+            "WHERE l.is_blocked = 0 "
+            "GROUP BY l.id ORDER BY "
+            "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
+            "COALESCE(last_msg_time, l.last_contact_at) DESC LIMIT $1", limit)
         return [dict(r) for r in rows]
     finally: await conn.close()
 
@@ -153,6 +157,25 @@ async def db_store_message(lid, text, direction):
 async def db_update_lead_status(lid, status):
     conn = await get_db()
     try: await conn.execute("UPDATE leads SET status=$1 WHERE id=$2", status, lid)
+    finally: await conn.close()
+
+async def db_block_lead(lid):
+    conn = await get_db()
+    try: await conn.execute("UPDATE leads SET is_blocked=1 WHERE id=$1", lid)
+    finally: await conn.close()
+
+async def db_delete_lead(lid):
+    conn = await get_db()
+    try:
+        await conn.execute("DELETE FROM messages WHERE lead_id=$1", lid)
+        await conn.execute("DELETE FROM leads WHERE id=$1", lid)
+    finally: await conn.close()
+
+async def db_is_blocked(uid):
+    conn = await get_db()
+    try:
+        r = await conn.fetchval("SELECT is_blocked FROM leads WHERE telegram_user_id=$1 ORDER BY created_at DESC LIMIT 1", uid)
+        return r == 1
     finally: await conn.close()
 
 async def db_audit(uid, action, etype=None, eid=None, details=None):
@@ -811,8 +834,10 @@ async def bot_webhook(request: Request):
             await tg_send(user_id, f"📋 Reply preview\n\nTo: {name}\nMessage: {text}\n\nSend?", kb)
             return {"ok": True}
     
-    # Client message = forward to admins
+    # Client message = forward to admins (unless blocked)
     if not is_admin(user_id) and text:
+        if await db_is_blocked(user_id):
+            return {"ok": True}
         lead_id = await db_create_lead(user_id, username)
         await db_store_message(lead_id, text, "client_to_admin")
         lead = await db_get_lead(lead_id)
@@ -886,6 +911,24 @@ async def admin_reply(req: ReplyReq, request: Request):
     await db_store_message(req.lead_id, req.text, "admin_to_client")
     await db_update_lead_status(req.lead_id, "responded")
     await db_audit(uid, "reply", "lead", req.lead_id, {"text": req.text[:100]})
+    return {"ok": True}
+
+@app.post("/api/admin/leads/{lead_id}/block")
+async def admin_block_lead(lead_id: int, request: Request):
+    uid = await verify_admin(request)
+    lead = await db_get_lead(lead_id)
+    if not lead: raise HTTPException(404, "Lead not found")
+    await db_block_lead(lead_id)
+    await db_audit(uid, "block", "lead", lead_id, {})
+    return {"ok": True}
+
+@app.delete("/api/admin/leads/{lead_id}")
+async def admin_delete_lead(lead_id: int, request: Request):
+    uid = await verify_admin(request)
+    lead = await db_get_lead(lead_id)
+    if not lead: raise HTTPException(404, "Lead not found")
+    await db_delete_lead(lead_id)
+    await db_audit(uid, "delete_lead", "lead", lead_id, {})
     return {"ok": True}
 
 # === ADMIN: STATS ===

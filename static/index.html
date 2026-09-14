@@ -81,6 +81,8 @@
   .chat-view { flex: 1; display: flex; flex-direction: column; height: 100%; }
   .chat-header { padding: 10px 14px; padding-top: max(10px, env(safe-area-inset-top)); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: var(--navy); }
   .chat-back { font-size: 20px; cursor: pointer; color: var(--yellow); line-height: 1; }
+  .chat-profile-btn { width: 34px; height: 34px; border-radius: 8px; background: var(--navy-light); border: none; color: var(--yellow); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; flex-shrink: 0; }
+  .chat-profile-btn:active { background: var(--navy-lighter); }
   .chat-header-info { flex: 1; }
   .chat-header-name { font-size: 15px; font-weight: 600; }
   .chat-header-sub { font-size: 11px; color: var(--gray); }
@@ -278,11 +280,19 @@ function renderManage(c) {
 function renderChat(app) {
   const lead = leads.find(l => l.id === currentLeadId);
   const name = lead?.telegram_username || `ID:${lead?.telegram_user_id}`;
+  const profileLink = lead?.telegram_username ? `https://t.me/${lead.telegram_username}` : `tg://user?id=${lead?.telegram_user_id}`;
+  const createGroupLink = lead?.telegram_username ? `https://t.me/?startgroup=readyco&user=${lead.telegram_username}` : null;
   app.innerHTML = `
     <div class="chat-view">
       <div class="chat-header">
         <div class="chat-back" onclick="backToMain()">‹</div>
-        <div class="chat-header-info"><div class="chat-header-name">${esc(name)}</div><div class="chat-header-sub">${lead?.offer_ref?('Offer: '+lead.offer_ref):'General inquiry'}</div></div>
+        <div class="chat-header-info">
+          <div class="chat-header-name">${esc(name)}</div>
+          <div class="chat-header-sub">${lead?.offer_ref?('Offer: '+lead.offer_ref):'General inquiry'}</div>
+        </div>
+        <a href="${profileLink}" class="chat-profile-btn" target="_blank">👤</a>
+        ${createGroupLink ? `<a href="${createGroupLink}" class="chat-profile-btn" target="_blank">👥</a>` : ''}
+        <button class="chat-profile-btn" onclick="showLeadActions(${lead?.id})">⋯</button>
       </div>
       <div class="chat-messages" id="chatMsgs"><div class="empty"><p>Loading...</p></div></div>
       <div class="chat-input-bar">
@@ -397,6 +407,35 @@ function showConfirm(title, body, onConfirm) {
   m.innerHTML = `<div class="modal"><h3>${title}</h3><p>${body}</p><div class="modal-btns"><button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button><button class="modal-btn confirm" id="cfBtn">Confirm</button></div></div>`;
   document.body.appendChild(m);
   m.querySelector('#cfBtn').onclick = () => { m.remove(); onConfirm(); };
+}
+
+function showLeadActions(leadId) {
+  const m = document.createElement('div');
+  m.className = 'modal-bg';
+  m.innerHTML = `<div class="modal">
+    <h3>Lead actions</h3>
+    <p>What do you want to do?</p>
+    <div class="modal-btns" style="flex-direction:column;gap:8px">
+      <button class="modal-btn danger" onclick="this.closest('.modal-bg').remove();blockLead(${leadId})">🚫 Block client</button>
+      <button class="modal-btn danger" onclick="this.closest('.modal-bg').remove();deleteLead(${leadId})">🗑 Delete chat</button>
+      <button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+}
+
+async function blockLead(leadId) {
+  showConfirm('Block this client?', 'They will not be able to send messages to the bot anymore.', async () => {
+    try { await api(`/admin/leads/${leadId}/block`, {method:'POST'}); alert('Client blocked'); backToMain(); }
+    catch(e) { alert(e.message); }
+  });
+}
+
+async function deleteLead(leadId) {
+  showConfirm('Delete this chat?', 'All messages and lead data will be permanently removed.', async () => {
+    try { await api(`/admin/leads/${leadId}`, {method:'DELETE'}); alert('Chat deleted'); backToMain(); }
+    catch(e) { alert(e.message); }
+  });
 }
 
 async function loadLeads() { try { const d = await api('/admin/leads'); leads = d.leads; if (view==='leads') render(); } catch(e){} }
