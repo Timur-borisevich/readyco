@@ -32,7 +32,12 @@ ADMIN_NAMES = {8339164180: "Timur", 143629845: "Yaroslav", 8585498778: "CompliCh
 
 # === DB ===
 async def get_db():
-    return await asyncpg.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, database=DB_NAME, ssl="require")
+    conn = await asyncpg.connect(
+        host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, 
+        database=DB_NAME, ssl="require",
+        statement_cache_size=0
+    )
+    return conn
 
 def is_admin(uid): return uid in ADMIN_IDS
 
