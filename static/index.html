@@ -213,7 +213,14 @@ function renderMain(app) {
   const tabs = [{k:'leads',l:'Leads',i:'👤'},{k:'offers',l:'Offers',i:'📋'},{k:'stats',l:'Stats',i:'📊'},{k:'manage',l:'Manage',i:'⚙️'}];
   app.innerHTML = `
     <div class="header">
-      <img src="/brandbook/ReadyCo_Market_Monogram.svg" class="header-logo" alt="ReadyCo">
+      <svg xmlns="http://www.w3.org/2000/svg" class="header-logo" viewBox="0 0 512 512">
+<rect class="header-logo" rx="110" fill="#FFD400"/>
+<path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/>
+<circle cx="212" cy="95" r="24" fill="#fff"/>
+<path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/>
+<text x="256" y="285" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text>
+<circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/>
+</svg>
       <div><div class="header-title">ReadyCo Admin</div><div class="header-sub">@readyco</div></div>
     </div>
     <div class="tabs">${tabs.map(t=>`<div class="tab ${view===t.k?'active':''}" onclick="switchView('${t.k}')">${t.i} ${t.l}</div>`).join('')}</div>
