@@ -31,26 +31,15 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 ADMIN_NAMES = {8339164180: "Timur", 143629845: "Yaroslav", 8585498778: "CompliChain", 6277380476: "Mikhail"}
 
 # === DB ===
-import asyncpg
-
-_db_pool = None
-
-async def get_db_pool():
-    global _db_pool
-    if _db_pool is None:
-        _db_pool = await asyncpg.create_pool(
-            host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS,
-            database=DB_NAME, ssl="require", statement_cache_size=0,
-            min_size=2, max_size=10, max_queries=500
-        )
-    return _db_pool
-
 async def get_db():
-    return await get_db_pool().acquire()
+    conn = await asyncpg.connect(
+        host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS,
+        database=DB_NAME, ssl="require", statement_cache_size=0
+    )
+    return conn
 
 async def release_db(conn):
-    pool = await get_db_pool()
-    await pool.release(conn)
+    await conn.close()
 
 def is_admin(uid): return uid in ADMIN_IDS
 
