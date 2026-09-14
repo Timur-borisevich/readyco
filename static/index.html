@@ -405,7 +405,7 @@ async function submitEdit(){
   try{await api(`/admin/offers/${editingOffer.ref}`,{method:'PUT',body:JSON.stringify(data)});alert('Updated!');view='offers';loadOffers();render()}catch(e){alert(e.message)}
 }
 function markSold(ref){showConfirm(`Mark ${ref} as SOLD?`,'Channel post will be edited.',async()=>{try{await api(`/admin/offers/${ref}/sold`,{method:'POST'});alert('Sold!');loadOffers()}catch(e){alert(e.message)}})}
-function deleteOffer(ref){showConfirm(`Delete ${ref}?`,'Permanent removal.',async()=>{try{await api(`/admin/offers/${ref}`,{method:'DELETE'});alert('Deleted!');loadOffers()}catch(e){alert(e.message)})}
+function deleteOffer(ref){showConfirm(`Delete ${ref}?`,'Permanent removal.',async()=>{try{await api(`/admin/offers/${ref}`,{method:'DELETE'});alert('Deleted!');loadOffers()}catch(e){alert(e.message)}})}
 async function submitAnnounce(){const t=document.getElementById('annText').value.trim();if(!t)return;try{await api('/admin/announce',{method:'POST',body:JSON.stringify({text:t})});alert('Published!');backToMain()}catch(e){alert(e.message)}}
 
 function showConfirm(title,body,onConfirm){const m=document.createElement('div');m.className='modal-bg';m.innerHTML=`<div class="modal"><h3>${title}</h3><p>${body}</p><div class="modal-btns" style="flex-direction:row"><button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button><button class="modal-btn confirm" id="cfBtn">Confirm</button></div></div>`;document.body.appendChild(m);m.querySelector('#cfBtn').onclick=()=>{m.remove();onConfirm()}}
