@@ -250,7 +250,7 @@ def inquiry_keyboard(ref):
     return {"inline_keyboard": [[
         {"text": "💬 Ask about this offer", "url": f"https://t.me/ReadyCoAdminBot?start=inquiry_{ref}"},
     ],[
-        {"text": "🌐 readyco.market", "url": "https://readyco.market"},
+        {"text": "🌐 readyco.market", "url": "https://readyco.vercel.app"},
     ]]}
 
 # === TG API ===
