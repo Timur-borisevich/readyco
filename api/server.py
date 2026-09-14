@@ -260,61 +260,47 @@ def format_offer_card(offer, sold=False):
     hashtags = offer.get('hashtags', '')
     
     if sold:
-        # SOLD — everything struck through
+        # SOLD — everything struck through (HTML <s> tag)
         lines = ["✅ SOLD", ""]
-        lines.append(f"~~{flag} {jurisdiction}~~")
-        if company_type: lines.append(f"~~{company_type}~~")
-        if license_type: lines.append(f"~~{lic_emoji} {license_type}~~")
-        if price: lines.append(f"~~💰 {price}~~")
+        lines.append(f"<s>{flag} {jurisdiction}</s>")
+        if company_type: lines.append(f"<s>{company_type}</s>")
+        if license_type: lines.append(f"<s>{lic_emoji} {license_type}</s>")
+        if price: lines.append(f"<s>💰 {price}</s>")
         lines.append("")
-        lines.append(f"~~Ref: {ref}~~")
+        lines.append(f"<s>Ref: {ref}</s>")
         lines.append("")
         lines.append("Contact: @ReadyCoAdminBot")
+        return ("\n".join(lines), "HTML")
     else:
         # Active offer — structured layout
         lines = []
-        # Header
-        lines.append(f"🔴 FOR SALE")
+        lines.append("🔴 FOR SALE")
         lines.append("━━━━━━━━━━━━━━━━━")
         lines.append("")
-        
-        # Main info
         lines.append(f"{flag} {jurisdiction}")
         if company_type: lines.append(f"📦 {company_type}")
         if year: lines.append(f"📅 Established: {year}")
         if license_type: lines.append(f"{lic_emoji} License: {license_type}")
         if license_status: lines.append(f"   Status: {license_status}")
         if regulator: lines.append(f"🏛️ Regulator: {regulator}")
-        
         lines.append("")
-        
-        # Financial
         if bank: lines.append(f"🏦 Bank/EMI: {bank}")
         if vat: lines.append(f"📋 VAT: {vat}")
         if turnover: lines.append(f"📊 Turnover: {turnover}")
         if employees: lines.append(f"👤 Employees: {employees}")
         if transfer: lines.append(f"⏱️ Transfer: {transfer}")
-        
-        # Price
         lines.append("")
         lines.append(f"💰 Price: {price}")
-        
-        # Description
         if desc:
             lines.append("━━━━━━━━━━━━━━━━━")
             lines.append(desc)
-        
-        # Tags
         if hashtags:
             lines.append("")
             lines.append(hashtags)
-        
-        # Footer
         lines.append("━━━━━━━━━━━━━━━━━")
         lines.append(f"Ref: {ref}")
         lines.append("💬 @ReadyCoAdminBot")
-    
-    return "\n".join(lines)
+        return ("\n".join(lines), None)
 
 def format_announcement(text): return f"📢 {text}"
 
@@ -334,10 +320,11 @@ async def tg_send(chat_id, text, reply_markup=None, parse_mode=None):
     async with aiohttp.ClientSession() as s:
         async with s.post(url, json=payload) as r: return await r.json()
 
-async def tg_edit(chat_id, msg_id, text, reply_markup=None):
+async def tg_edit(chat_id, msg_id, text, reply_markup=None, parse_mode=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
     payload = {"chat_id": chat_id, "message_id": msg_id, "text": text}
     if reply_markup: payload["reply_markup"] = reply_markup
+    if parse_mode: payload["parse_mode"] = parse_mode
     async with aiohttp.ClientSession() as s:
         async with s.post(url, json=payload) as r: return await r.json()
 
@@ -660,12 +647,12 @@ async def bot_webhook(request: Request):
             ref = cb_data.replace("confirm_sold_", "")
             offer = await db_get_offer(ref)
             if not offer: return {"ok": True}
-            card = format_offer_card(offer, sold=True)
+            card, parse_mode = format_offer_card(offer, sold=True)
             kb = inquiry_keyboard(ref)
             if offer.get("channel_message_id"):
-                r = await tg_edit(CHANNEL_ID, offer["channel_message_id"], card, kb)
+                r = await tg_edit(CHANNEL_ID, offer["channel_message_id"], card, kb, parse_mode=parse_mode)
                 if not r.get("ok"):
-                    await tg_send(CHANNEL_ID, f"✅ SOLD\n\n{card}", kb)
+                    await tg_send(CHANNEL_ID, f"✅ SOLD\n\n{card}", kb, parse_mode=parse_mode)
             await db_mark_sold(ref)
             await db_audit(user_id, "sold", "offer", offer.get("id"), {"ref": ref})
             await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ {ref} marked as SOLD!", "reply_markup": main_menu_kb()})
@@ -726,7 +713,7 @@ async def bot_webhook(request: Request):
                     await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "❌ Session expired. Use /add again."})
                     return {"ok": True}
                 oid = await db_insert_offer(d, user_id)
-                card = format_offer_card(d)
+                card, _ = format_offer_card(d)
                 kb = inquiry_keyboard(ref)
                 r = await tg_send(CHANNEL_ID, card, kb)
                 if r.get("ok"):
@@ -747,7 +734,8 @@ async def bot_webhook(request: Request):
             await db_update_field(ref, field, new_val)
             offer = await db_get_offer(ref)
             if offer.get("channel_message_id") and offer["status"] == "live":
-                await tg_edit(CHANNEL_ID, offer["channel_message_id"], format_offer_card(offer), inquiry_keyboard(ref))
+                card, _ = format_offer_card(offer)
+                await tg_edit(CHANNEL_ID, offer["channel_message_id"], card, inquiry_keyboard(ref))
             await db_audit(user_id, "edit", "offer", offer.get("id"), {"ref": ref, "field": field})
             if user_id in sessions: del sessions[user_id]
             await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ {ref} updated: {field} = {new_val}", "reply_markup": main_menu_kb()})
@@ -848,7 +836,7 @@ async def bot_webhook(request: Request):
                 if ht:
                     j = (d.get("jurisdiction") or "").split(" ")[0]
                     d["hashtags"] = f"#{j} {ht} #ForSale"
-                preview = format_offer_card(d)
+                preview, _ = format_offer_card(d)
                 kb = {"inline_keyboard": [[{"text":"✅ Publish","callback_data":f"publish_{ref}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
                 await tg_send(user_id, f"📋 PREVIEW\n\n{preview}\n\nPublish to channel?", kb)
             return {"ok": True}
@@ -1173,7 +1161,7 @@ async def admin_create(req: OfferCreate, request: Request):
         j = (data.get("jurisdiction") or "").split(" ")[0]
         data["hashtags"] = f"#{j} {ht} #ForSale"
     oid = await db_insert_offer(data, uid)
-    card = format_offer_card(data)
+    card, _ = format_offer_card(data)
     kb = inquiry_keyboard(ref)
     r = await tg_send(CHANNEL_ID, card, kb)
     if r.get("ok"):
@@ -1190,7 +1178,8 @@ async def admin_update(ref: str, req: OfferUpdate, request: Request):
         await db_update_field(ref, f, v)
     o = await db_get_offer(ref)
     if o.get("channel_message_id") and o["status"] == "live":
-        await tg_edit(CHANNEL_ID, o["channel_message_id"], format_offer_card(o), inquiry_keyboard(ref))
+        card, _ = format_offer_card(o)
+        await tg_edit(CHANNEL_ID, o["channel_message_id"], card, inquiry_keyboard(ref))
     await db_audit(uid, "edit", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
 
@@ -1199,12 +1188,12 @@ async def admin_sold(ref: str, request: Request):
     uid = await verify_admin(request)
     o = await db_get_offer(ref)
     if not o: raise HTTPException(404, "Not found")
-    card = format_offer_card(o, sold=True)
+    card, parse_mode = format_offer_card(o, sold=True)
     kb = inquiry_keyboard(ref)
     if o.get("channel_message_id"):
         r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, kb)
         if not r.get("ok"):
-            await tg_send(CHANNEL_ID, f"✅ SOLD\n\n{card}", kb)
+            await tg_send(CHANNEL_ID, f"✅ SOLD\n\n{card}", kb, parse_mode=parse_mode)
     await db_mark_sold(ref)
     await db_audit(uid, "sold", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
