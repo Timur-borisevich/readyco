@@ -104,6 +104,7 @@
   .chat-send { width: 38px; height: 38px; border-radius: 50%; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--navy); flex-shrink: 0; font-weight: 700; }
   .chat-send:active { transform: scale(0.92); }
   .chat-send.sending { opacity: 0.5; }
+  .chat-attach { width: 34px; height: 34px; border-radius: 50%; background: var(--navy-light); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; color: var(--yellow); }
   
   /* Forms */
   .form { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); overflow-y: auto; }
@@ -306,6 +307,10 @@ function renderChat(app) {
       </div>
       <div class="chat-messages" id="chatMsgs"><div class="empty"><p>Loading...</p></div></div>
       <div class="chat-input-bar">
+        <label class="chat-attach">
+          <input type="file" id="fileInput" accept="image/*,application/pdf" style="display:none" onchange="sendFile(this)">
+          📎
+        </label>
         <textarea class="chat-input" id="replyInput" rows="1" placeholder="Type reply..."></textarea>
         <button class="chat-send" id="sendBtn" onclick="sendReply()">➤</button>
       </div>
@@ -386,6 +391,26 @@ async function sendReply() {
     btn.classList.remove('sending');
     await loadMessages(); loadLeads();
   } catch(e) { btn.classList.remove('sending'); alert('Failed: ' + e.message); }
+}
+
+async function sendFile(input) {
+  const file = input.files[0];
+  if (!file || !currentLeadId) return;
+  input.value = '';
+  const btn = document.getElementById('sendBtn');
+  btn.classList.add('sending');
+  try {
+    // Upload via multipart
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('lead_id', currentLeadId);
+    const h = {};
+    h['X-Telegram-Init-Data'] = tgUser ? tgUser.id.toString() : '8339164180';
+    const res = await fetch(API+'/admin/sendfile', {method:'POST', headers:h, body:formData});
+    if (!res.ok) throw new Error(await res.text());
+    btn.classList.remove('sending');
+    await loadMessages(); loadLeads();
+  } catch(e) { btn.classList.remove('sending'); alert('Failed to send file: ' + e.message); }
 }
 
 async function submitOffer() {

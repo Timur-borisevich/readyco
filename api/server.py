@@ -1058,6 +1058,55 @@ async def admin_get_file(file_id: str, request: Request):
                 return {"url": file_url}
             raise HTTPException(404, "File not found")
 
+@app.post("/api/admin/sendfile")
+async def admin_send_file(request: Request):
+    """Admin sends file to client via bot."""
+    uid = await verify_admin(request)
+    form = await request.form()
+    file = form.get("file")
+    lead_id = int(form.get("lead_id"))
+    lead = await db_get_lead(lead_id)
+    if not lead: raise HTTPException(404, "Lead not found")
+    admin_name = ADMIN_NAMES.get(uid, f"Admin {uid}")
+    
+    # Read file
+    contents = await file.read()
+    filename = file.filename or "file"
+    is_image = file.content_type and file.content_type.startswith("image/")
+    
+    # Send to client via Telegram
+    if is_image:
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+        data = aiohttp.FormData()
+        data.add_field("chat_id", str(lead["telegram_user_id"]))
+        data.add_field("caption", f"💬 ReadyCo Market")
+        data.add_field("photo", contents, filename=filename, content_type=file.content_type)
+    else:
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+        data = aiohttp.FormData()
+        data.add_field("chat_id", str(lead["telegram_user_id"]))
+        data.add_field("caption", f"💬 ReadyCo Market")
+        data.add_field("document", contents, filename=filename, content_type=file.content_type)
+    
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, data=data) as r:
+            resp = await r.json()
+            if not resp.get("ok"):
+                raise HTTPException(500, f"TG error: {resp.get('description')}")
+            # Get file_id from response
+            result = resp["result"]
+            file_id = None
+            if "photo" in result:
+                file_id = result["photo"][-1]["file_id"]
+            elif "document" in result:
+                file_id = result["document"]["file_id"]
+    
+    msg_type = "photo" if is_image else "document"
+    await db_store_message(lead_id, f"[{msg_type}: {filename}]", "admin_to_client", file_id=file_id, msg_type=msg_type)
+    await db_update_lead_status(lead_id, "responded")
+    await db_audit(uid, "sendfile", "lead", lead_id, {"file": filename, "admin": admin_name})
+    return {"ok": True}
+
 # === ADMIN: STATS ===
 @app.get("/api/admin/stats")
 async def admin_stats(request: Request):
