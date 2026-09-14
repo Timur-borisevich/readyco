@@ -351,27 +351,30 @@ function backToMain() { view = 'leads'; currentLeadId = null; editingOffer = nul
 
 async function openLead(id) { currentLeadId = id; view = 'chat'; render(); }
 async function loadMessages() {
-  try { const d = await api(`/admin/leads/${currentLeadId}`); renderMsgs(d.messages); }
-  catch(e) { document.getElementById('chatMsgs').innerHTML = `<div class="empty"><p>${e.message}</p></div>`; }
-}
-function renderMsgs(msgs) {
   const c = document.getElementById('chatMsgs');
-  if (!msgs.length) { c.innerHTML = '<div class="empty"><div class="icon">💬</div><p>No messages</p></div>'; return; }
-  // Load images for messages with file_id
-  const promises = msgs.filter(m => m.file_id && m.msg_type === 'photo').map(m =>
-    api(`/admin/file/${encodeURIComponent(m.file_id)}`).then(d => m._img_url = d.url).catch(() => {})
-  );
-  Promise.all(promises).then(() => {
-    // Also load audio URLs
-    const audioMsgs = msgs.filter(m => m.file_id && (m.msg_type === 'voice' || m.msg_type === 'audio'));
-    const audioPromises = audioMsgs.map(m =>
-      api(`/admin/file/${encodeURIComponent(m.file_id)}`).then(d => m._audio_url = d.url).catch(() => {})
-    );
-    Promise.all(audioPromises).then(() => {
+  if (!c) return;
+  c.innerHTML = '<div class="empty"><p>Loading...</p></div>';
+  try {
+    const d = await api(`/admin/leads/${currentLeadId}`);
+    const msgs = d.messages || [];
+    if (!msgs.length) { c.innerHTML = '<div class="empty"><div class="icon">💬</div><p>No messages</p></div>'; return; }
+    
+    // Load file URLs for photos and audio
+    const fileMsgs = msgs.filter(m => m.file_id && (m.msg_type === 'photo' || m.msg_type === 'voice' || m.msg_type === 'audio'));
+    await Promise.all(fileMsgs.map(async m => {
+      try {
+        const res = await api(`/admin/file/${encodeURIComponent(m.file_id)}`);
+        if (m.msg_type === 'photo') m._img_url = res.url;
+        else m._audio_url = res.url;
+      } catch(e) {}
+    }));
+    
+    // Render
     c.innerHTML = msgs.map(m => {
-      const cl = m.direction==='client_to_admin'?'client':'admin';
+      const cl = m.direction === 'client_to_admin' ? 'client' : 'admin';
       const t = m.sent_at ? new Date(m.sent_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
       let content = esc(m.text);
+      
       if (m.file_id && m.msg_type === 'photo' && m._img_url) {
         content = `<img src="${m._img_url}" style="width:100%;border-radius:12px;margin-bottom:6px;" onerror="this.style.display='none'">${content}`;
       } else if (m.file_id && (m.msg_type === 'voice' || m.msg_type === 'audio') && m._audio_url) {
@@ -385,8 +388,9 @@ function renderMsgs(msgs) {
       return `<div class="msg ${cl}">${cl==='admin'?'<div class="sender">ReadyCo</div>':''}${content}<div class="time">${t}</div></div>`;
     }).join('');
     c.scrollTop = c.scrollHeight;
-    });
-  });
+  } catch(e) {
+    c.innerHTML = `<div class="empty"><p>${e.message}</p></div>`;
+  }
 }
 
 async function sendReply() {
