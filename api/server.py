@@ -137,9 +137,9 @@ async def db_list_leads(limit=50, search=None):
                 "(SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg_time "
                 "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
                 "WHERE l.is_blocked = 0 AND (l.telegram_username ILIKE $2 OR l.offer_ref ILIKE $2) "
-                "GROUP BY l.id ORDER BY "
+                "GROUP BY l.id, last_msg, last_msg_time ORDER BY "
                 "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
-                "COALESCE(last_msg_time, l.last_contact_at) DESC LIMIT $1", limit, f"%{search}%")
+                "COALESCE((SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1), l.last_contact_at) DESC LIMIT $1", limit, f"%{search}%")
         else:
             rows = await conn.fetch(
                 "SELECT l.*, COUNT(m.id) as msg_count, "
@@ -147,9 +147,9 @@ async def db_list_leads(limit=50, search=None):
                 "(SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg_time "
                 "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
                 "WHERE l.is_blocked = 0 "
-                "GROUP BY l.id ORDER BY "
+                "GROUP BY l.id, last_msg, last_msg_time ORDER BY "
                 "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
-                "COALESCE(last_msg_time, l.last_contact_at) DESC LIMIT $1", limit)
+                "COALESCE((SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1), l.last_contact_at) DESC LIMIT $1", limit)
         return [dict(r) for r in rows]
     finally: await conn.close()
 
