@@ -3,311 +3,333 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReadyCo Market — Licensed Companies for Sale</title>
+<title>ReadyCo Market — Buy Licensed Companies | Fintech, Crypto, iGaming</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --yellow: #FFD400;
-    --yellow-soft: rgba(255,212,0,0.08);
-    --navy: #081220;
-    --navy-2: #0d1729;
-    --navy-3: #131e36;
-    --border: #1a2540;
-    --border-soft: #141d33;
-    --green: #00CB53;
+    --navy: #0B1220;
+    --green: #00C853;
     --orange: #FF8A00;
     --purple: #7A3CFF;
-    --text: #ffffff;
-    --text-2: #7a8ba8;
-    --text-3: #4a5a7a;
-    --shadow: rgba(0,0,0,0.3) 0px 20px 40px -20px;
+    --light: #F6F8FB;
+    --white: #FFFFFF;
+    --text: #0B1220;
+    --text-2: #5a6580;
+    --text-3: #939eB8;
+    --border: #E4E8F0;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(11,18,32,0.06);
+    --shadow-lg: 0 8px 32px rgba(11,18,32,0.10);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Poppins',sans-serif; background:var(--navy); color:var(--text); -webkit-font-smoothing:antialiased; font-weight:400; }
+  body { font-family:'Poppins',sans-serif; background:var(--light); color:var(--text); -webkit-font-smoothing:antialiased; }
   a { color:inherit; text-decoration:none; }
+  img { max-width:100%; display:block; }
   
-  /* Nav */
-  .nav { position:sticky; top:0; z-index:100; background:rgba(8,18,32,0.85); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid var(--border-soft); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; }
-  .nav-logo { display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; }
-  .nav-logo-mark { width:36px; height:36px; }
-  .nav-links { display:flex; gap:28px; align-items:center; }
-  .nav-link { font-size:14px; color:var(--text-2); font-weight:400; transition:color .15s; }
-  .nav-link:hover { color:var(--text); }
-  .nav-cta { background:var(--yellow); color:var(--navy); padding:8px 18px; border-radius:8px; font-size:14px; font-weight:600; }
+  /* Header */
+  .header { background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+  .header-inner { max-width:1280px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:24px; }
+  .header-logo { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .header-logo svg { width:36px; height:36px; }
+  .header-logo-text { font-weight:700; font-size:16px; letter-spacing:-0.3px; }
+  .header-nav { display:flex; gap:24px; align-items:center; }
+  .header-nav a { font-size:14px; font-weight:500; color:var(--text-2); }
+  .header-nav a:hover { color:var(--text); }
+  .header-right { margin-left:auto; display:flex; gap:12px; align-items:center; }
+  .header-search { background:var(--light); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 16px; font-size:13px; color:var(--text-3); cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .header-login { font-size:14px; font-weight:500; color:var(--text-2); }
+  .header-cta { background:var(--navy); color:var(--white); padding:9px 18px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; }
+  .hamburger { display:none; }
   
   /* Hero */
-  .hero { max-width:1100px; margin:0 auto; padding:100px 24px 80px; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
-  .hero-left .eyebrow { font-size:13px; font-weight:500; color:var(--yellow); letter-spacing:1px; text-transform:uppercase; margin-bottom:24px; }
-  .hero-left h1 { font-size:52px; font-weight:300; line-height:1.05; letter-spacing:-1.5px; margin-bottom:24px; }
-  .hero-left h1 strong { font-weight:600; }
-  .hero-left p { font-size:17px; line-height:1.6; color:var(--text-2); max-width:440px; margin-bottom:32px; }
-  .hero-cta { display:flex; gap:12px; }
-  .btn { padding:12px 24px; border-radius:8px; font-size:15px; font-weight:600; transition:all .15s; display:inline-flex; align-items:center; gap:8px; }
-  .btn-primary { background:var(--yellow); color:var(--navy); }
-  .btn-primary:hover { background:#FFE54D; transform:translateY(-1px); }
-  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text); }
-  .btn-ghost:hover { border-color:var(--text-3); }
+  .hero { background:var(--white); padding:80px 24px 60px; max-width:1280px; margin:0 auto; display:grid; grid-template-columns:1.2fr 1fr; gap:60px; align-items:center; }
+  .hero-eyebrow { font-size:13px; font-weight:600; color:var(--text-2); letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; }
+  .hero h1 { font-size:56px; font-weight:800; line-height:1.05; letter-spacing:-2px; margin-bottom:16px; }
+  .hero-subtitle { font-size:20px; font-weight:500; color:var(--text-2); margin-bottom:32px; line-height:1.4; }
+  .hero-points { display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:28px; }
+  .hero-point { font-size:14px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
+  .hero-point::before { content:"✓"; color:var(--green); font-weight:700; }
+  .hero-search { display:flex; gap:8px; margin-bottom:16px; }
+  .hero-search-input { flex:1; background:var(--white); border:2px solid var(--border); border-radius:var(--radius-sm); padding:14px 18px; font-size:15px; font-family:'Poppins',sans-serif; outline:none; }
+  .hero-search-input:focus { border-color:var(--yellow); }
+  .hero-search-btn { background:var(--yellow); color:var(--navy); border:none; padding:14px 24px; border-radius:var(--radius-sm); font-size:15px; font-weight:700; cursor:pointer; font-family:'Poppins',sans-serif; }
+  .hero-tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .hero-tag { background:var(--light); border:1px solid var(--border); padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; color:var(--text-2); cursor:pointer; }
+  .hero-tag:hover { border-color:var(--text-3); }
+  .hero-logo { display:flex; justify-content:center; }
+  .hero-logo svg { width:320px; height:320px; }
   
-  /* Hero visual — abstract, not AI */
-  .hero-right { position:relative; display:flex; justify-content:center; align-items:center; }
-  .hero-logo-big { width:280px; height:280px; }
-  .hero-card { background:var(--navy-2); border:1px solid var(--border); border-radius:12px; padding:24px; box-shadow:var(--shadow); }
-  .hero-card-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border-soft); }
-  .hero-card-row:last-child { border-bottom:none; }
-  .hero-card-flag { font-size:20px; }
-  .hero-card-info { flex:1; margin-left:12px; }
-  .hero-card-name { font-size:14px; font-weight:500; }
-  .hero-card-sub { font-size:12px; color:var(--text-3); margin-top:1px; }
-  .hero-card-price { font-size:16px; font-weight:600; color:var(--yellow); }
-  .hero-card-label { font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; font-weight:500; }
+  /* Categories */
+  .categories { max-width:1280px; margin:0 auto; padding:20px 24px 60px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .cat-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; cursor:pointer; transition:transform .15s,box-shadow .15s; }
+  .cat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .cat-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:16px; }
+  .cat-icon.green { background:rgba(0,200,83,0.12); }
+  .cat-icon.orange { background:rgba(255,138,0,0.12); }
+  .cat-icon.purple { background:rgba(122,60,255,0.12); }
+  .cat-title { font-size:18px; font-weight:700; margin-bottom:4px; }
+  .cat-sub { font-size:13px; color:var(--text-2); line-height:1.4; }
+  .cat-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
+  .cat-dot.green { background:var(--green); }
+  .cat-dot.orange { background:var(--orange); }
+  .cat-dot.purple { background:var(--purple); }
   
   /* Stats */
-  .stats { border-top:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft); padding:40px 24px; max-width:1100px; margin:0 auto; display:flex; justify-content:space-around; }
+  .stats { background:var(--navy); padding:48px 24px; }
+  .stats-inner { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
   .stat { text-align:center; }
-  .stat-num { font-size:36px; font-weight:300; letter-spacing:-1px; }
-  .stat-num .accent { color:var(--yellow); }
-  .stat-label { font-size:13px; color:var(--text-3); margin-top:4px; }
+  .stat-num { font-size:40px; font-weight:800; color:var(--yellow); letter-spacing:-1px; }
+  .stat-label { font-size:14px; color:rgba(255,255,255,0.6); margin-top:4px; }
   
-  /* Offers */
-  .offers { max-width:1100px; margin:0 auto; padding:80px 24px; }
-  .section-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px; }
-  .section-head h2 { font-size:32px; font-weight:300; letter-spacing:-0.8px; }
-  .section-head p { font-size:15px; color:var(--text-2); margin-top:6px; }
-  .section-head a { font-size:14px; color:var(--yellow); font-weight:500; }
+  /* Listings */
+  .listings { max-width:1280px; margin:0 auto; padding:80px 24px; }
+  .section-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; }
+  .section-head h2 { font-size:32px; font-weight:800; letter-spacing:-0.8px; }
+  .section-head p { font-size:15px; color:var(--text-2); margin-top:4px; }
+  .section-head a { font-size:14px; font-weight:600; color:var(--text); }
+  .listing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .listing-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:transform .15s,box-shadow .15s; }
+  .listing-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .listing-cover { height:140px; background:var(--light); display:flex; align-items:center; justify-content:center; font-size:48px; position:relative; }
+  .listing-industry { position:absolute; top:12px; left:12px; font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; }
+  .listing-industry.fintech { background:rgba(0,200,83,0.15); color:var(--green); }
+  .listing-industry.crypto { background:rgba(255,138,0,0.15); color:var(--orange); }
+  .listing-industry.igaming { background:rgba(122,60,255,0.15); color:var(--purple); }
+  .listing-featured { position:absolute; top:12px; right:12px; background:var(--yellow); color:var(--navy); font-size:10px; font-weight:700; padding:4px 10px; border-radius:6px; }
+  .listing-body { padding:18px; }
+  .listing-title { font-size:16px; font-weight:700; margin-bottom:6px; letter-spacing:-0.2px; }
+  .listing-location { font-size:13px; color:var(--text-2); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
+  .listing-desc { font-size:13px; color:var(--text-3); line-height:1.4; margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .listing-tags { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+  .listing-tag { font-size:11px; font-weight:500; padding:3px 8px; border-radius:5px; background:var(--light); color:var(--text-2); }
+  .listing-bottom { display:flex; justify-content:space-between; align-items:center; }
+  .listing-price { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+  .listing-arrow { font-size:18px; color:var(--text-3); }
   
-  .offer-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:16px; }
-  .card { background:var(--navy-2); border:1px solid var(--border); border-radius:12px; padding:28px; transition:border-color .2s,transform .2s,box-shadow .2s; }
-  .card:hover { border-color:var(--text-3); transform:translateY(-2px); box-shadow:var(--shadow); }
-  .card.sold { opacity:0.4; }
-  .card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
-  .card-flag { font-size:28px; }
-  .card-status { font-size:10px; font-weight:600; padding:3px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px; }
-  .card-status.live { background:rgba(0,203,83,0.15); color:var(--green); }
-  .card-status.sold { background:rgba(255,138,0,0.15); color:var(--orange); }
-  .card-juris { font-size:20px; font-weight:600; letter-spacing:-0.3px; }
-  .card-lic { font-size:14px; color:var(--green); margin-top:4px; font-weight:500; }
-  .card-rows { margin-top:20px; display:flex; flex-direction:column; gap:7px; }
-  .card-row { font-size:13px; color:var(--text-2); }
-  .card-divider { height:1px; background:var(--border-soft); margin:20px 0; }
-  .card-price { font-size:28px; font-weight:600; letter-spacing:-0.5px; }
-  .card-desc { font-size:13px; color:var(--text-3); line-height:1.5; margin-top:12px; }
-  .card-bottom { display:flex; align-items:center; justify-content:space-between; margin-top:20px; }
-  .card-ref { font-size:11px; color:var(--text-3); font-weight:500; letter-spacing:1px; }
-  .card-btn { background:var(--yellow); color:var(--navy); padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; }
-  
-  /* Trust */
-  .trust { max-width:1100px; margin:0 auto; padding:60px 24px 80px; }
-  .trust-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:40px; }
-  .trust-item { }
-  .trust-item h3 { font-size:17px; font-weight:600; margin-bottom:8px; letter-spacing:-0.2px; }
-  .trust-item p { font-size:14px; color:var(--text-2); line-height:1.5; }
-  .trust-num { font-size:28px; font-weight:300; color:var(--yellow); margin-bottom:8px; }
-  
-  /* CTA section */
-  .cta { max-width:1100px; margin:0 auto; padding:80px 24px; }
-  .cta-box { background:var(--navy-2); border:1px solid var(--border); border-radius:16px; padding:60px 48px; text-align:center; }
-  .cta-box h2 { font-size:36px; font-weight:300; letter-spacing:-0.8px; margin-bottom:16px; }
-  .cta-box p { font-size:16px; color:var(--text-2); margin-bottom:32px; }
+  /* CTA */
+  .cta { max-width:1280px; margin:0 auto; padding:80px 24px; }
+  .cta-box { background:var(--navy); border-radius:20px; padding:60px; text-align:center; }
+  .cta-box h2 { font-size:36px; font-weight:800; color:var(--white); letter-spacing:-0.8px; margin-bottom:12px; }
+  .cta-box p { font-size:16px; color:rgba(255,255,255,0.6); margin-bottom:28px; }
+  .cta-box .btn { background:var(--yellow); color:var(--navy); padding:14px 32px; border-radius:var(--radius-sm); font-size:16px; font-weight:700; display:inline-block; }
   
   /* Footer */
-  .footer { border-top:1px solid var(--border-soft); padding:32px 24px; max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
-  .footer-left { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-3); }
-  .footer-left .mark { height:28px; }
+  .footer { background:var(--white); border-top:1px solid var(--border); padding:32px 24px; }
+  .footer-inner { max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
+  .footer-logo { height:32px; }
   .footer-links { display:flex; gap:20px; }
   .footer-link { font-size:13px; color:var(--text-2); }
-  .footer-link:hover { color:var(--yellow); }
+  .footer-link:hover { color:var(--text); }
   
-  .empty { text-align:center; padding:80px 20px; color:var(--text-3); }
+  /* Mobile bottom nav */
+  .bottom-nav { display:none; }
+  
+  /* Empty */
+  .empty { text-align:center; padding:60px 20px; color:var(--text-3); }
   .empty p { font-size:15px; margin-top:8px; }
   
+  @media (max-width:1024px) {
+    .header-nav { display:none; }
+    .header-search { display:none; }
+    .listing-grid { grid-template-columns:repeat(2,1fr); }
+    .hero { grid-template-columns:1fr; text-align:center; }
+    .hero-points { justify-content:center; }
+    .hero-search { max-width:500px; margin-left:auto; margin-right:auto; }
+    .hero-tags { justify-content:center; }
+  }
   @media (max-width:768px) {
-    .nav-links { display:none; }
-    .hero { grid-template-columns:1fr; padding:60px 20px 40px; gap:32px; }
-    .hero-left h1 { font-size:36px; }
-    .stats { flex-wrap:wrap; gap:20px; padding:28px 16px; }
-    .offer-grid { grid-template-columns:1fr; }
-    .trust-grid { grid-template-columns:1fr; gap:24px; }
+    .header-inner { padding:12px 16px; gap:12px; }
+    .header-login, .header-cta { display:none; }
+    .hamburger { display:block; font-size:24px; cursor:pointer; background:none; border:none; color:var(--text); }
+    .hero { padding:48px 16px 32px; }
+    .hero h1 { font-size:36px; }
+    .hero-subtitle { font-size:16px; }
+    .hero-logo svg { width:220px; height:220px; }
+    .categories { grid-template-columns:1fr; padding:16px 16px 48px; }
+    .stats-inner { grid-template-columns:repeat(2,1fr); gap:20px; }
+    .listing-grid { grid-template-columns:1fr; }
     .cta-box { padding:40px 24px; }
-    .cta-box h2 { font-size:28px; }
-    .section-head { flex-direction:column; align-items:flex-start; gap:8px; }
+    .cta-box h2 { font-size:26px; }
+    .section-head { flex-direction:column; align-items:flex-start; gap:6px; }
+    /* Bottom nav */
+    .bottom-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--white); border-top:1px solid var(--border); padding:8px 16px; padding-bottom:max(8px,env(safe-area-inset-bottom)); justify-content:space-around; z-index:100; }
+    .bottom-nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:var(--text-3); font-weight:500; }
+    .bottom-nav-item.active { color:var(--text); }
+    .bottom-nav-submit { width:44px; height:44px; border-radius:50%; background:var(--yellow); color:var(--navy); border:none; font-size:22px; font-weight:700; display:flex; align-items:center; justify-content:center; }
   }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-logo">
-    <svg xmlns="http://www.w3.org/2000/svg" class="nav-logo-mark" viewBox="0 0 512 512">
-<rect class="nav-logo-mark" rx="110" fill="#FFD400"/>
-<path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/>
-<circle cx="212" cy="95" r="24" fill="#fff"/>
-<path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/>
-<text x="256" y="285" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text>
-<circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/>
-</svg>
-    <span>ReadyCo Market</span>
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#FFD400"/><path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/><circle cx="212" cy="95" r="24" fill="#fff"/><path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/><text x="256" y="285" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text><circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/></svg>
+      <span class="header-logo-text">ReadyCo Market</span>
+    </div>
+    <nav class="header-nav">
+      <a href="#listings">Listings</a>
+      <a href="#how">How it works</a>
+      <a href="#">About</a>
+      <a href="#">Blog</a>
+      <a href="https://t.me/ReadyCoAdminBot">Contact</a>
+    </nav>
+    <div class="header-right">
+      <div class="header-search">🔍 Search by license, jurisdiction...</div>
+      <a class="header-login" href="https://t.me/ReadyCoAdminBot">Login</a>
+      <a class="header-cta" href="https://t.me/ReadyCoAdminBot">+ Submit Offer</a>
+      <button class="hamburger">☰</button>
+    </div>
   </div>
-  <div class="nav-links">
-    <a class="nav-link" href="#offers">Offers</a>
-    <a class="nav-link" href="#how">How it works</a>
-    <a class="nav-link" href="https://t.me/readyco">Channel</a>
-    <a class="nav-cta" href="https://t.me/ReadyCoAdminBot">Contact</a>
-  </div>
-</nav>
+</header>
 
 <section class="hero">
   <div class="hero-left">
-    <div class="eyebrow">Licensed Companies Marketplace</div>
-    <h1>Buy and sell <strong>licensed companies</strong> — ready for transfer.</h1>
-    <p>VASP, CASP, EMI, PI, and iGaming licenses across Europe, Middle East, and offshore. Verified, with bank accounts and regulatory standing intact.</p>
-    <div class="hero-cta">
-      <a class="btn btn-primary" href="#offers">Browse offers</a>
-      <a class="btn btn-ghost" href="https://t.me/ReadyCoAdminBot">Contact us</a>
+    <div class="hero-eyebrow">Established Companies. Real Value.</div>
+    <h1>Buy Licensed Companies</h1>
+    <div class="hero-subtitle">Fintech. Crypto. iGaming. Ready for what's next.</div>
+    <div class="hero-points">
+      <span class="hero-point">Verified Listings</span>
+      <span class="hero-point">Real Businesses</span>
+      <span class="hero-point">Global Opportunities</span>
+      <span class="hero-point">Direct Deals</span>
+    </div>
+    <div class="hero-search">
+      <input class="hero-search-input" placeholder="Search by license, jurisdiction, industry..." id="heroSearch">
+      <button class="hero-search-btn" onclick="doSearch()">Search</button>
+    </div>
+    <div class="hero-tags">
+      <span class="hero-tag" onclick="tagSearch('VASP')">VASP</span>
+      <span class="hero-tag" onclick="tagSearch('EMI')">EMI</span>
+      <span class="hero-tag" onclick="tagSearch('PSP')">PSP</span>
+      <span class="hero-tag" onclick="tagSearch('CASP')">CASP</span>
+      <span class="hero-tag" onclick="tagSearch('Malta')">Malta</span>
+      <span class="hero-tag" onclick="tagSearch('UAE')">UAE</span>
+      <span class="hero-tag" onclick="tagSearch('UK')">UK</span>
+      <span class="hero-tag" onclick="tagSearch('Poland')">Poland</span>
     </div>
   </div>
-  <div class="hero-right">
-    <svg xmlns="http://www.w3.org/2000/svg" class="hero-logo-big" viewBox="0 0 800 800">
- <defs><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".18"/></filter></defs>
- <g filter="url(#shadow)">
-  <path d="M225 125 L620 125 L665 620 Q670 705 585 725 L220 725 Q145 715 140 640 L125 220 Q122 140 225 125Z" fill="#FFD400"/>
-  <path d="M165 160 L605 160" stroke="#F3B900" stroke-width="10" opacity=".45"/>
-  <path d="M340 130 C320 45 440 38 455 122" fill="none" stroke="#7C8795" stroke-width="23" stroke-linecap="round"/>
-  <circle cx="398" cy="132" r="26" fill="#fff"/>
-  <text x="180" y="365" font-family="Poppins, Arial, sans-serif" font-size="91" font-weight="800" fill="#0B1220">ReadyCo</text>
-  <text x="220" y="420" font-family="Poppins, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="18" fill="#0B1220">MARKET</text>
-  <circle cx="220" cy="560" r="53" fill="#00C853"/><path d="M190 580h60M198 570v-45h44v45M192 525h56" stroke="#fff" stroke-width="9" fill="none"/>
-  <circle cx="400" cy="560" r="53" fill="#FF8A00"/><text x="400" y="582" text-anchor="middle" font-family="Arial" font-size="65" font-weight="700" fill="#fff">₿</text>
-  <circle cx="580" cy="560" r="53" fill="#7A3CFF"/><path d="M580 510 C558 490 542 510 558 527 C536 519 538 548 580 590 C622 548 624 519 602 527 C618 510 602 490 580 510Z" fill="#fff"/>
- </g>
-</svg>
+  <div class="hero-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><defs><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".18"/></filter></defs><g filter="url(#shadow)"><path d="M225 125 L620 125 L665 620 Q670 705 585 725 L220 725 Q145 715 140 640 L125 220 Q122 140 225 125Z" fill="#FFD400"/><path d="M165 160 L605 160" stroke="#F3B900" stroke-width="10" opacity=".45"/><path d="M340 130 C320 45 440 38 455 122" fill="none" stroke="#7C8795" stroke-width="23" stroke-linecap="round"/><circle cx="398" cy="132" r="26" fill="#fff"/><text x="180" y="365" font-family="Poppins, Arial, sans-serif" font-size="91" font-weight="800" fill="#0B1220">ReadyCo</text><text x="220" y="420" font-family="Poppins, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="18" fill="#0B1220">MARKET</text><circle cx="220" cy="560" r="53" fill="#00C853"/><path d="M190 580h60M198 570v-45h44v45M192 525h56" stroke="#fff" stroke-width="9" fill="none"/><circle cx="400" cy="560" r="53" fill="#FF8A00"/><text x="400" y="582" text-anchor="middle" font-family="Arial" font-size="65" font-weight="700" fill="#fff">₿</text><circle cx="580" cy="560" r="53" fill="#7A3CFF"/><path d="M580 510 C558 490 542 510 558 527 C536 519 538 548 580 590 C622 548 624 519 602 527 C618 510 602 490 580 510Z" fill="#fff"/></g></svg>
+  </div>
+</section>
+
+<section class="categories">
+  <div class="cat-card" onclick="tagSearch('fintech')">
+    <div class="cat-icon green">🏦</div>
+    <div class="cat-title"><span class="cat-dot green"></span>Fintech</div>
+    <div class="cat-sub">PSP, EMI, AEMI, Payment Institutions</div>
+  </div>
+  <div class="cat-card" onclick="tagSearch('crypto')">
+    <div class="cat-icon orange">₿</div>
+    <div class="cat-title"><span class="cat-dot orange"></span>Crypto</div>
+    <div class="cat-sub">VASP, CASP, Exchanges, Custody</div>
+  </div>
+  <div class="cat-card" onclick="tagSearch('igaming')">
+    <div class="cat-icon purple">♠️</div>
+    <div class="cat-title"><span class="cat-dot purple"></span>iGaming</div>
+    <div class="cat-sub">Online Casinos, Betting, Gaming Licenses</div>
   </div>
 </section>
 
 <section class="stats">
-  <div class="stat"><div class="stat-num" id="stat-offers"><span class="accent">—</span></div><div class="stat-label">Active listings</div></div>
-  <div class="stat"><div class="stat-num">12+</div><div class="stat-label">Jurisdictions</div></div>
-  <div class="stat"><div class="stat-num">5–10</div><div class="stat-label">Days to transfer</div></div>
-  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Verified</div></div>
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-num" id="stat-count">—</div><div class="stat-label">Companies Listed</div></div>
+    <div class="stat"><div class="stat-num">35+</div><div class="stat-label">Jurisdictions</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Verified Offers</div></div>
+    <div class="stat"><div class="stat-num">↗</div><div class="stat-label">Growing Daily</div></div>
+  </div>
 </section>
 
-<section class="offers" id="offers">
+<section class="listings" id="listings">
   <div class="section-head">
     <div>
-      <h2>Available offers</h2>
-      <p>Each company is verified before listing. Inquire privately.</p>
+      <h2>Latest Opportunities</h2>
+      <p>Licensed businesses. Established operations. Ready for the next owner.</p>
     </div>
-    <a href="https://t.me/ReadyCoAdminBot">Can't find what you need? →</a>
+    <a href="https://t.me/readyco">View all →</a>
   </div>
-  <div id="offerGrid" class="offer-grid">
-    <div class="empty"><p>Loading offers…</p></div>
-  </div>
-</section>
-
-<section class="trust" id="how">
-  <div class="trust-grid">
-    <div class="trust-item">
-      <div class="trust-num">01</div>
-      <h3>Verified companies</h3>
-      <p>Every listing is checked — licenses, bank accounts, and compliance status confirmed before publishing.</p>
-    </div>
-    <div class="trust-item">
-      <div class="trust-num">02</div>
-      <h3>Private deals</h3>
-      <p>Your inquiry goes directly to our team. No public exposure, no data leaks. We connect you with the seller.</p>
-    </div>
-    <div class="trust-item">
-      <div class="trust-num">03</div>
-      <h3>Fast transfer</h3>
-      <p>Prepared companies ready for ownership transfer in 5–10 business days. Full legal support included.</p>
-    </div>
+  <div id="listingGrid" class="listing-grid">
+    <div class="empty"><p>Loading listings…</p></div>
   </div>
 </section>
 
 <section class="cta">
   <div class="cta-box">
-    <h2>Selling a licensed company?</h2>
-    <p>We connect you with qualified buyers worldwide. Private, discreet, and fast.</p>
-    <a class="btn btn-primary" href="https://t.me/ReadyCoAdminBot">List with us</a>
+    <h2>Sell a Ready Business</h2>
+    <p>List your established company and reach serious buyers worldwide.</p>
+    <a class="btn" href="https://t.me/ReadyCoAdminBot">Submit Offer</a>
   </div>
 </section>
 
 <footer class="footer">
-  <div class="footer-left">
-    <svg xmlns="http://www.w3.org/2000/svg" class="mark" viewBox="0 0 1200 360">
-  <defs>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".16"/>
-    </filter>
-  </defs>
-  <g filter="url(#shadow)">
-    <path d="M105 62 L290 62 L310 250 Q312 300 265 310 L105 310 Q65 305 62 265 L55 110 Q53 72 105 62Z" fill="#FFD400"/>
-    <path d="M82 82 L282 82" stroke="#F3B900" stroke-width="7" opacity=".45"/>
-    <path d="M155 67 C145 10 220 5 228 62" fill="none" stroke="#7C8795" stroke-width="16" stroke-linecap="round"/>
-    <circle cx="190" cy="68" r="17" fill="#fff"/>
-    <text x="78" y="180" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="800" fill="#0B1220">ReadyCo</text>
-    <text x="98" y="218" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="11" fill="#0B1220">MARKET</text>
-    <circle cx="105" cy="263" r="27" fill="#00C853"/>
-    <path d="M90 273h30M94 268v-24h22v24M91 244h28" stroke="#fff" stroke-width="5" fill="none"/>
-    <circle cx="177" cy="263" r="27" fill="#FF8A00"/>
-    <text x="177" y="275" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#fff">₿</text>
-    <circle cx="249" cy="263" r="27" fill="#7A3CFF"/>
-    <path d="M249 239 C238 229 230 240 238 248 C227 244 227 258 249 280 C271 258 271 244 260 248 C268 240 260 229 249 239Z" fill="#fff"/>
-  </g>
-  <text x="360" y="165" font-family="Poppins, Arial, sans-serif" font-size="92" font-weight="800" fill="#0B1220">Ready<tspan fill="#00C853">Co</tspan></text>
-  <text x="367" y="215" font-family="Poppins, Arial, sans-serif" font-size="31" font-weight="600" letter-spacing="16" fill="#0B1220">MARKET</text>
-  <text x="367" y="285" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="600" letter-spacing="4" fill="#0B1220">FINTECH  ·  CRYPTO  ·  iGAMING</text>
-</svg>
-  </div>
-  <div class="footer-links">
-    <a class="footer-link" href="https://t.me/readyco">Channel</a>
-    <a class="footer-link" href="https://t.me/ReadyCoAdminBot">Bot</a>
-    <a class="footer-link" href="https://readyco.vercel.app/inbox">Admin</a>
+  <div class="footer-inner">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" class="footer-logo"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".16"/></filter></defs><g filter="url(#sh2)"><path d="M105 62 L290 62 L310 250 Q312 300 265 310 L105 310 Q65 305 62 265 L55 110 Q53 72 105 62Z" fill="#FFD400"/><path d="M82 82 L282 82" stroke="#F3B900" stroke-width="7" opacity=".45"/><path d="M155 67 C145 10 220 5 228 62" fill="none" stroke="#7C8795" stroke-width="16" stroke-linecap="round"/><circle cx="190" cy="68" r="17" fill="#fff"/><text x="78" y="180" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="800" fill="#0B1220">ReadyCo</text><text x="98" y="218" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="11" fill="#0B1220">MARKET</text><circle cx="105" cy="263" r="27" fill="#00C853"/><path d="M90 273h30M94 268v-24h22v24M91 244h28" stroke="#fff" stroke-width="5" fill="none"/><circle cx="177" cy="263" r="27" fill="#FF8A00"/><text x="177" y="275" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#fff">₿</text><circle cx="249" cy="263" r="27" fill="#7A3CFF"/><path d="M249 239 C238 229 230 240 238 248 C227 244 227 258 249 280 C271 258 271 244 260 248 C268 240 260 229 249 239Z" fill="#fff"/></g><text x="380" y="200" font-family="Poppins, Arial, sans-serif" font-size="52" font-weight="700" fill="#0B1220">ReadyCo Market</text></svg>
+    <div class="footer-links">
+      <a class="footer-link" href="https://t.me/readyco">Channel</a>
+      <a class="footer-link" href="https://t.me/ReadyCoAdminBot">Bot</a>
+      <a class="footer-link" href="https://readyco.vercel.app/inbox">Admin</a>
+    </div>
   </div>
 </footer>
 
+<nav class="bottom-nav">
+  <div class="bottom-nav-item active">🏠 Home</div>
+  <div class="bottom-nav-item">🔍 Search</div>
+  <button class="bottom-nav-submit">+</button>
+  <div class="bottom-nav-item">📑 Saved</div>
+  <div class="bottom-nav-item">👤 Profile</div>
+</nav>
+
 <script>
-const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',luxembourg:'🇱🇺',belgium:'🇧🇪',france:'🇫🇷',portugal:'🇵🇹',spain:'🇪🇸',italy:'🇮🇹',switzerland:'🇨🇭',singapore:'🇸🇬','hong kong':'🇭🇰',seychelles:'🇸🇨',belize:'🇧🇿',panama:'🇵🇦',bvi:'🇻🇬',cayman:'🇰🇾',gibraltar:'🇬🇮','isle of man':'🇮🇲',jersey:'🇯🇪',australia:'🇦🇺',canada:'🇨🇦'};
-const LIC={vasp:'₿',casp:'₿',emi:'🏦',pi:'🏦',psp:'💳',igaming:'♠️',casino:'🎰',betting:'🎲',forex:'📈'};
-function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k))return v}return'🌍'}
-function licE(l){if(!l)return'📜';l=l.toLowerCase();for(const[k,v]of Object.entries(LIC)){if(l.includes(k))return v}return'📜'}
+const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
+const INDUSTRY={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
+function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
+function industryOf(lic){if(!lic)return'fintech';for(const[k,v]of Object.entries(INDUSTRY)){if(lic.toLowerCase().includes(k.toLowerCase()))return v}return'fintech'}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
-async function loadOffers(){
+
+function doSearch(){const q=document.getElementById('heroSearch').value;if(q)window.location.href='/api/offers?q='+encodeURIComponent(q)}
+function tagSearch(t){document.getElementById('heroSearch').value=t;loadListings(t)}
+
+async function loadListings(q){
   try{
-    const res=await fetch('/api/offers?status=live');
+    const url=q?('/api/offers?status=live'):('/api/offers?status=live');
+    const res=await fetch(url);
     const data=await res.json();
-    document.getElementById('stat-offers').innerHTML='<span class="accent">'+data.offers.length+'</span>';
-    const grid=document.getElementById('offerGrid');
-    if(!data.offers.length){grid.innerHTML='<div class="empty"><p>No active listings right now. Follow @readyco for new arrivals.</p></div>';return}
-    grid.innerHTML=data.offers.map(o=>{
-      const sold=o.status==='sold';
-      return `<div class="card ${sold?'sold':''}">
-        <div class="card-top">
-          <div class="card-flag">${flag(o.jurisdiction)}</div>
-          <span class="card-status ${o.status}">${o.status}</span>
+    const offers=q?data.offers.filter(o=>JSON.stringify(o).toLowerCase().includes(q.toLowerCase())):data.offers;
+    document.getElementById('stat-count').textContent=offers.length+'+';
+    const grid=document.getElementById('listingGrid');
+    if(!offers.length){grid.innerHTML='<div class="empty"><p>No listings found. Follow @readyco for new arrivals.</p></div>';return}
+    grid.innerHTML=offers.map(o=>{
+      const ind=industryOf(o.license_type);
+      const emoji={fintech:'🏦',crypto:'₿',igaming:'♠️'}[ind];
+      const tags=[];
+      if(o.bank_emi_account&&o.bank_emi_account.toLowerCase().includes('yes'))tags.push('Bank Accounts');
+      if(o.license_status)tags.push(o.license_status);
+      if(o.vat_status&&o.vat_status.toLowerCase().includes('active'))tags.push('VAT Active');
+      return `<div class="listing-card" onclick="window.location.href='https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}'">
+        <div class="listing-cover">${emoji}
+          <span class="listing-industry ${ind}">${ind}</span>
         </div>
-        <div class="card-juris">${esc(o.jurisdiction||'')}</div>
-        ${o.license_type?`<div class="card-lic">${licE(o.license_type)} ${esc(o.license_type)}</div>`:''}
-        <div class="card-rows">
-          ${o.company_type?`<div class="card-row">${esc(o.company_type)}</div>`:''}
-          ${o.year_established?`<div class="card-row">Established ${esc(o.year_established)}</div>`:''}
-          ${o.bank_emi_account?`<div class="card-row">Bank/EMI: ${esc(o.bank_emi_account)}</div>`:''}
-          ${o.vat_status?`<div class="card-row">VAT: ${esc(o.vat_status)}</div>`:''}
-          ${o.transfer_time?`<div class="card-row">${esc(o.transfer_time)}</div>`:''}
-        </div>
-        <div class="card-divider"></div>
-        <div class="card-price">${esc(o.price||'On request')}</div>
-        ${o.short_description?`<div class="card-desc">${esc(o.short_description)}</div>`:''}
-        <div class="card-bottom">
-          <div class="card-ref">${o.ref}</div>
-          ${sold?'':`<a class="card-btn" href="https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}">Inquire</a>`}
+        <div class="listing-body">
+          <div class="listing-title">${esc(o.license_type||'Company')} — ${esc(o.jurisdiction||'')}</div>
+          <div class="listing-location">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
+          ${o.short_description?`<div class="listing-desc">${esc(o.short_description)}</div>`:''}
+          ${tags.length?`<div class="listing-tags">${tags.map(t=>`<span class="listing-tag">${esc(t)}</span>`).join('')}</div>`:''}
+          <div class="listing-bottom">
+            <div class="listing-price">${esc(o.price||'On request')}</div>
+            <div class="listing-arrow">→</div>
+          </div>
         </div>
       </div>`;
     }).join('');
-  }catch(e){document.getElementById('offerGrid').innerHTML='<div class="empty"><p>Could not load offers.</p></div>'}
+  }catch(e){document.getElementById('listingGrid').innerHTML='<div class="empty"><p>Could not load listings.</p></div>'}
 }
-loadOffers();
+loadListings();
 </script>
 </body>
 </html>
