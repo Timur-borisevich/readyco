@@ -303,7 +303,7 @@ function renderChat(app) {
           <div class="chat-header-sub">${lead?.offer_ref?('Offer: '+lead.offer_ref):'General'}</div>
         </div>
         <a href="${profileLink}" class="chat-btn" target="_blank">👤</a>
-        <button class="chat-btn" onclick="showLeadActions(${lead?.id},'${lead?.telegram_username||''}',${lead?.telegram_user_id||0})">⋯</button>
+        <button class="chat-btn" id="leadActionsBtn">⋯</button>
       </div>
       <div class="chat-messages" id="chatMsgs"><div class="empty"><p>Loading...</p></div></div>
       <div class="chat-input-bar">
@@ -313,6 +313,10 @@ function renderChat(app) {
       </div>
     </div>`;
   loadMessages();
+  const actionsBtn = document.getElementById('leadActionsBtn');
+  if (actionsBtn && lead) {
+    actionsBtn.addEventListener('click', () => showLeadActions(lead.id, lead.telegram_username||'', lead.telegram_user_id||0));
+  }
 }
 
 function renderForm(app, mode) {
