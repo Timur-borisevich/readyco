@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-aiosqlite
+asyncpg
 aiohttp
 pydantic
 pydantic-settings

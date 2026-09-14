@@ -1,13 +1,13 @@
-"""ReadyCo Market — Vercel Serverless API (single file, includes bot webhook)"""
+"""ReadyCo Market — Vercel Serverless API (Supabase Postgres)"""
 import json
 import os
 import asyncio
 import aiohttp
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
-import aiosqlite
+import asyncpg
 
 app = FastAPI(title="ReadyCo Market API")
 
@@ -18,7 +18,12 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 BOT_TOKEN = "8817038916:AAH3G9vxsqcptcNkZEBmDIHEIA_JevEXXpk"
 CHANNEL_ID = -1004361452090
 ADMIN_IDS = [8339164180, 143629845, 8585498778, 6277380476]
-DB_PATH = "/tmp/readyco.db"
+
+DB_HOST = "aws-0-eu-central-1.pooler.supabase.com"
+DB_PORT = 6543
+DB_USER = "postgres.ztzgtscvyfwhczhjyfyd"
+DB_PASS = "Timmi1047784!"
+DB_NAME = "postgres"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -26,46 +31,8 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 ADMIN_NAMES = {8339164180: "Timur", 143629845: "Yaroslav", 8585498778: "CompliChain", 6277380476: "Mikhail"}
 
 # === DB ===
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS admins (
-    telegram_user_id INTEGER PRIMARY KEY, role TEXT DEFAULT 'publisher', name TEXT, is_active INTEGER DEFAULT 1,
-    created_at TEXT DEFAULT (datetime('now')));
-CREATE TABLE IF NOT EXISTS offers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, ref TEXT UNIQUE NOT NULL, status TEXT NOT NULL DEFAULT 'draft',
-    jurisdiction TEXT, company_type TEXT, year_established TEXT, license_type TEXT, license_status TEXT,
-    regulator TEXT, bank_emi_account TEXT, vat_status TEXT, turnover_history TEXT, employees TEXT,
-    transfer_time TEXT, price TEXT, short_description TEXT, hashtags TEXT,
-    channel_message_id INTEGER, views_count INTEGER DEFAULT 0, inquiry_count INTEGER DEFAULT 0,
-    created_by INTEGER NOT NULL, created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now')),
-    sold_at TEXT, sold_price TEXT);
-CREATE INDEX IF NOT EXISTS idx_offers_status ON offers(status);
-CREATE TABLE IF NOT EXISTS offer_versions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, offer_id INTEGER NOT NULL, payload_json TEXT NOT NULL,
-    changed_by INTEGER NOT NULL, changed_at TEXT DEFAULT (datetime('now')));
-CREATE TABLE IF NOT EXISTS leads (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, telegram_user_id INTEGER NOT NULL, telegram_username TEXT,
-    offer_ref TEXT, offer_id INTEGER, status TEXT DEFAULT 'new', last_contact_at TEXT,
-    created_at TEXT DEFAULT (datetime('now')));
-CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, lead_id INTEGER NOT NULL, direction TEXT NOT NULL,
-    text TEXT, sent_at TEXT DEFAULT (datetime('now')));
-CREATE TABLE IF NOT EXISTS announcements (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT NOT NULL, channel_message_id INTEGER,
-    status TEXT DEFAULT 'draft', published_at TEXT, created_by INTEGER NOT NULL,
-    created_at TEXT DEFAULT (datetime('now')));
-CREATE TABLE IF NOT EXISTS audit_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, admin_user_id INTEGER NOT NULL, action TEXT NOT NULL,
-    entity_type TEXT, entity_id INTEGER, details_json TEXT DEFAULT '{}',
-    created_at TEXT DEFAULT (datetime('now')));
-"""
-
 async def get_db():
-    db = await aiosqlite.connect(DB_PATH)
-    await db.executescript(SCHEMA)
-    for uid, name in [(8339164180,'Timur'),(143629845,'Yaroslav'),(8585498778,'CompliChain'),(6277380476,'Mikhail')]:
-        await db.execute(f"INSERT OR IGNORE INTO admins (telegram_user_id, role, name) VALUES ({uid}, 'super_admin', '{name}')")
-    await db.commit()
-    return db
+    return await asyncpg.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, database=DB_NAME, ssl="require")
 
 def is_admin(uid): return uid in ADMIN_IDS
 
@@ -75,134 +42,124 @@ def esc(text):
 
 # === DB OPS ===
 async def db_next_ref():
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute("SELECT COUNT(*) + 1 FROM offers") as c: return f"RC{(await c.fetchone())[0]:03d}"
-    finally: await db.close()
+        n = await conn.fetchval("SELECT COUNT(*) + 1 FROM offers")
+        return f"RC{n:03d}"
+    finally: await conn.close()
 
 async def db_get_offer(ref):
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute("SELECT * FROM offers WHERE ref = ? AND status != 'deleted'", (ref.upper(),)) as c:
-            r = await c.fetchone()
-            if r: return dict(zip([d[0] for d in c.description], r))
-    finally: await db.close()
+        row = await conn.fetchrow("SELECT * FROM offers WHERE ref = $1 AND status != 'deleted'", ref.upper())
+        return dict(row) if row else None
+    finally: await conn.close()
 
 async def db_get_offers(status):
-    db = await get_db()
+    conn = await get_db()
     try:
-        q = "SELECT * FROM offers WHERE status != 'deleted' ORDER BY created_at DESC LIMIT 50" if status=="all" else "SELECT * FROM offers WHERE status = ? ORDER BY created_at DESC LIMIT 50"
-        p = () if status=="all" else (status,)
-        async with db.execute(q, p) as c:
-            rows = await c.fetchall()
-            cols = [d[0] for d in c.description]
-            return [dict(zip(cols, r)) for r in rows]
-    finally: await db.close()
+        if status == "all":
+            rows = await conn.fetch("SELECT * FROM offers WHERE status != 'deleted' ORDER BY created_at DESC LIMIT 50")
+        else:
+            rows = await conn.fetch("SELECT * FROM offers WHERE status = $1 ORDER BY created_at DESC LIMIT 50", status)
+        return [dict(r) for r in rows]
+    finally: await conn.close()
 
 async def db_insert_offer(data, created_by):
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute(
+        oid = await conn.fetchval(
             "INSERT INTO offers (ref, status, jurisdiction, company_type, year_established, license_type, "
             "license_status, regulator, bank_emi_account, vat_status, turnover_history, employees, "
             "transfer_time, price, short_description, hashtags, created_by) "
-            "VALUES (?, 'live', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id",
-            (data.get('ref'), data.get('jurisdiction'), data.get('company_type'), data.get('year_established'),
-             data.get('license_type'), data.get('license_status'), data.get('regulator'),
-             data.get('bank_emi_account'), data.get('vat_status'), data.get('turnover_history'),
-             data.get('employees'), data.get('transfer_time'), data.get('price'),
-             data.get('short_description'), data.get('hashtags'), created_by)) as c:
-            oid = (await c.fetchone())[0]
-        await db.commit()
+            "VALUES ($1, 'live', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id",
+            data.get('ref'), data.get('jurisdiction'), data.get('company_type'), data.get('year_established'),
+            data.get('license_type'), data.get('license_status'), data.get('regulator'),
+            data.get('bank_emi_account'), data.get('vat_status'), data.get('turnover_history'),
+            data.get('employees'), data.get('transfer_time'), data.get('price'),
+            data.get('short_description'), data.get('hashtags'), created_by)
         return oid
-    finally: await db.close()
+    finally: await conn.close()
 
 async def db_update_channel_msg(oid, mid):
-    db = await get_db()
-    try: await db.execute("UPDATE offers SET channel_message_id = ? WHERE id = ?", (mid, oid)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("UPDATE offers SET channel_message_id = $1 WHERE id = $2", mid, oid)
+    finally: await conn.close()
 
 async def db_mark_sold(ref):
-    db = await get_db()
-    try: await db.execute("UPDATE offers SET status='sold', sold_at=datetime('now') WHERE ref=?", (ref,)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("UPDATE offers SET status='sold', sold_at=now() WHERE ref=$1", ref)
+    finally: await conn.close()
 
 async def db_delete_offer(ref):
-    db = await get_db()
-    try: await db.execute("UPDATE offers SET status='deleted' WHERE ref=?", (ref,)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("UPDATE offers SET status='deleted' WHERE ref=$1", ref)
+    finally: await conn.close()
 
 async def db_update_field(ref, field, value):
-    db = await get_db()
-    try: await db.execute(f"UPDATE offers SET {field}=?, updated_at=datetime('now') WHERE ref=?", (value, ref)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute(f"UPDATE offers SET {field}=$1, updated_at=now() WHERE ref=$2", value, ref)
+    finally: await conn.close()
 
 async def db_create_lead(uid, username, offer_ref=None):
-    db = await get_db()
+    conn = await get_db()
     try:
-        offer_id = None
-        if offer_ref:
-            o = await db_get_offer(offer_ref)
-            if o: offer_id = o["id"]
-        async with db.execute("SELECT id FROM leads WHERE telegram_user_id=? ORDER BY created_at DESC LIMIT 1", (uid,)) as c:
-            r = await c.fetchone()
-        if r:
-            await db.execute("UPDATE leads SET last_contact_at=datetime('now'), telegram_username=?, offer_ref=? WHERE id=?", (username, offer_ref, r[0]))
-            await db.commit(); return r[0]
-        async with db.execute("INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, offer_id, status, last_contact_at) VALUES (?, ?, ?, ?, 'new', datetime('now')) RETURNING id", (uid, username, offer_ref, offer_id)) as c:
-            lid = (await c.fetchone())[0]
-        await db.commit(); return lid
-    finally: await db.close()
+        existing = await conn.fetchval("SELECT id FROM leads WHERE telegram_user_id=$1 ORDER BY created_at DESC LIMIT 1", uid)
+        if existing:
+            await conn.execute("UPDATE leads SET last_contact_at=now(), telegram_username=$1, offer_ref=$2 WHERE id=$3",
+                             username, offer_ref, existing)
+            return existing
+        lid = await conn.fetchval(
+            "INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, status, last_contact_at) "
+            "VALUES ($1, $2, $3, 'new', now()) RETURNING id", uid, username, offer_ref)
+        return lid
+    finally: await conn.close()
 
 async def db_get_lead(lid):
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute("SELECT * FROM leads WHERE id=?", (lid,)) as c:
-            r = await c.fetchone()
-            if r: return dict(zip([d[0] for d in c.description], r))
-    finally: await db.close()
+        row = await conn.fetchrow("SELECT * FROM leads WHERE id=$1", lid)
+        return dict(row) if row else None
+    finally: await conn.close()
 
 async def db_list_leads(limit=50):
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute(
+        rows = await conn.fetch(
             "SELECT l.*, COUNT(m.id) as msg_count, "
             "(SELECT text FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1) as last_msg "
-            "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id GROUP BY l.id ORDER BY l.last_contact_at DESC LIMIT ?", (limit,)) as c:
-            rows = await c.fetchall()
-            cols = [d[0] for d in c.description]
-            return [dict(zip(cols, r)) for r in rows]
-    finally: await db.close()
+            "FROM leads l LEFT JOIN messages m ON m.lead_id=l.id "
+            "GROUP BY l.id ORDER BY l.last_contact_at DESC LIMIT $1", limit)
+        return [dict(r) for r in rows]
+    finally: await conn.close()
 
 async def db_get_messages(lid):
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute("SELECT * FROM messages WHERE lead_id=? ORDER BY sent_at ASC", (lid,)) as c:
-            rows = await c.fetchall()
-            cols = [d[0] for d in c.description]
-            return [dict(zip(cols, r)) for r in rows]
-    finally: await db.close()
+        rows = await conn.fetch("SELECT * FROM messages WHERE lead_id=$1 ORDER BY sent_at ASC", lid)
+        return [dict(r) for r in rows]
+    finally: await conn.close()
 
 async def db_store_message(lid, text, direction):
-    db = await get_db()
-    try: await db.execute("INSERT INTO messages (lead_id, direction, text) VALUES (?, ?, ?)", (lid, direction, text)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("INSERT INTO messages (lead_id, direction, text) VALUES ($1, $2, $3)", lid, direction, text)
+    finally: await conn.close()
 
 async def db_update_lead_status(lid, status):
-    db = await get_db()
-    try: await db.execute("UPDATE leads SET status=? WHERE id=?", (status, lid)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("UPDATE leads SET status=$1 WHERE id=$2", status, lid)
+    finally: await conn.close()
 
 async def db_audit(uid, action, etype=None, eid=None, details=None):
-    db = await get_db()
-    try: await db.execute("INSERT INTO audit_log (admin_user_id, action, entity_type, entity_id, details_json) VALUES (?, ?, ?, ?, ?)",
-        (uid, action, etype, eid, json.dumps(details or {}))); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("INSERT INTO audit_log (admin_user_id, action, entity_type, entity_id, details_json) VALUES ($1,$2,$3,$4,$5)",
+        uid, action, etype, eid, json.dumps(details or {}))
+    finally: await conn.close()
 
 async def db_insert_announcement(text, mid, uid):
-    db = await get_db()
-    try: await db.execute("INSERT INTO announcements (text, channel_message_id, status, published_at, created_by) VALUES (?, ?, 'published', datetime('now'), ?)", (text, mid, uid)); await db.commit()
-    finally: await db.close()
+    conn = await get_db()
+    try: await conn.execute("INSERT INTO announcements (text, channel_message_id, status, published_at, created_by) VALUES ($1,$2,'published',now(),$3)", text, mid, uid)
+    finally: await conn.close()
 
 # === FORMATTING ===
 def format_offer_card(offer, sold=False):
@@ -254,30 +211,19 @@ async def tg_send(chat_id, text, reply_markup=None, parse_mode=None):
     if parse_mode: payload["parse_mode"] = parse_mode
     if reply_markup: payload["reply_markup"] = reply_markup
     async with aiohttp.ClientSession() as s:
-        async with s.post(url, json=payload) as r:
-            return await r.json()
+        async with s.post(url, json=payload) as r: return await r.json()
 
 async def tg_edit(chat_id, msg_id, text, reply_markup=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
     payload = {"chat_id": chat_id, "message_id": msg_id, "text": text}
     if reply_markup: payload["reply_markup"] = reply_markup
     async with aiohttp.ClientSession() as s:
-        async with s.post(url, json=payload) as r:
-            return await r.json()
+        async with s.post(url, json=payload) as r: return await r.json()
 
 async def tg_delete(chat_id, msg_id):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
     async with aiohttp.ClientSession() as s:
-        async with s.post(url, json={"chat_id": chat_id, "message_id": msg_id}) as r:
-            return await r.json()
-
-async def tg_set_commands(commands, scope=None):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/setMyCommands"
-    payload = {"commands": commands}
-    if scope: payload["scope"] = scope
-    async with aiohttp.ClientSession() as s:
-        async with s.post(url, json=payload) as r:
-            return await r.json()
+        async with s.post(url, json={"chat_id": chat_id, "message_id": msg_id}) as r: return await r.json()
 
 # === AUTH ===
 async def verify_admin(request):
@@ -339,35 +285,24 @@ class AnnounceReq(BaseModel):
 # === BOT WEBHOOK ===
 @app.post("/api/webhook")
 async def bot_webhook(request: Request):
-    """Handle Telegram bot updates via webhook."""
     data = await request.json()
-    
-    # Handle callback queries
-    if "callback_query" in data:
-        return {"ok": True}
-    
-    # Handle messages
+    if "callback_query" in data: return {"ok": True}
     msg = data.get("message") or data.get("edited_message")
-    if not msg:
-        return {"ok": True}
-    
+    if not msg: return {"ok": True}
     user = msg.get("from", {})
     user_id = user.get("id")
     username = user.get("username", "")
     first_name = user.get("first_name", "")
     text = msg.get("text", "")
-    
-    # /start command
+
     if text.startswith("/start"):
         args = text.split()[1:] if len(text.split()) > 1 else []
         offer_ref = None
         if args and args[0].startswith("inquiry_"):
             offer_ref = args[0].replace("inquiry_", "")
-        
         if is_admin(user_id):
             await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nUse Mini App: https://readyco.vercel.app/inbox")
             return {"ok": True}
-        
         lead_id = await db_create_lead(user_id, username, offer_ref)
         if offer_ref:
             offer = await db_get_offer(offer_ref)
@@ -383,34 +318,27 @@ async def bot_webhook(request: Request):
             else:
                 await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies.\n\nNo offers available yet. Send your question here — our team will respond privately.")
         return {"ok": True}
-    
-    # Regular message from non-admin = client inquiry
+
     if not is_admin(user_id) and text:
         lead_id = await db_create_lead(user_id, username)
         await db_store_message(lead_id, text, "client_to_admin")
-        
-        # Get offer info
         lead = await db_get_lead(lead_id)
         offer_info = ""
         if lead and lead.get("offer_ref"):
             offer = await db_get_offer(lead["offer_ref"])
             if offer:
                 offer_info = f"\n📊 Offer: {offer['ref']} — {offer.get('jurisdiction','')} {offer.get('license_type','') or ''} | {offer.get('price','?')}"
-        
-        # Get history
         history = await db_get_messages(lead_id)
         history_text = ""
         if len(history) > 1:
             lines = []
             for m in history[:-1]:
                 d = "Client" if m["direction"] == "client_to_admin" else "Admin"
-                ts = m["sent_at"][:16] if m["sent_at"] else ""
+                ts = str(m["sent_at"])[:16] if m.get("sent_at") else ""
                 lines.append(f"[{ts}] {d}: {esc(m['text'][:80])}")
             history_text = "\n\n📜 History:\n" + "\n".join(lines[-5:])
-        
         user_link = f"t.me/{username}" if username else f"tg://user?id={user_id}"
         user_disp = f"@{username}" if username else f"ID: {user_id}"
-        
         admin_text = (
             f"👤 <b>New inquiry</b>\n"
             f"From: {user_disp}\n"
@@ -418,20 +346,13 @@ async def bot_webhook(request: Request):
             f"{offer_info}\n\n"
             f"💬 {esc(text)}"
             f"{history_text}\n\n"
-            f"Reply: {user_link}"
-        )
-        
+            f"Reply: {user_link}")
         kb = {"inline_keyboard": [[{"text": "💬 Reply", "callback_data": f"reply_{lead_id}"}]]}
-        
         for admin_id in ADMIN_IDS:
-            try:
-                await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
-            except:
-                pass
-        
+            try: await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
+            except: pass
         await tg_send(user_id, "✅ Thank you! Our team will respond shortly.")
         return {"ok": True}
-    
     return {"ok": True}
 
 # === PUBLIC ENDPOINTS ===
@@ -477,15 +398,15 @@ async def admin_reply(req: ReplyReq, request: Request):
 @app.get("/api/admin/stats")
 async def admin_stats(request: Request):
     await verify_admin(request)
-    db = await get_db()
+    conn = await get_db()
     try:
-        async with db.execute("SELECT COUNT(*) FROM offers WHERE status='live'") as c: live = (await c.fetchone())[0]
-        async with db.execute("SELECT COUNT(*) FROM offers WHERE status='sold'") as c: sold = (await c.fetchone())[0]
-        async with db.execute("SELECT COUNT(*) FROM leads") as c: leads = (await c.fetchone())[0]
-        async with db.execute("SELECT COUNT(*) FROM leads WHERE status='new'") as c: new = (await c.fetchone())[0]
-        async with db.execute("SELECT COUNT(*) FROM leads WHERE status='responded'") as c: resp = (await c.fetchone())[0]
-        async with db.execute("SELECT COUNT(*) FROM announcements WHERE status='published'") as c: ann = (await c.fetchone())[0]
-    finally: await db.close()
+        live = await conn.fetchval("SELECT COUNT(*) FROM offers WHERE status='live'")
+        sold = await conn.fetchval("SELECT COUNT(*) FROM offers WHERE status='sold'")
+        leads = await conn.fetchval("SELECT COUNT(*) FROM leads")
+        new = await conn.fetchval("SELECT COUNT(*) FROM leads WHERE status='new'")
+        resp = await conn.fetchval("SELECT COUNT(*) FROM leads WHERE status='responded'")
+        ann = await conn.fetchval("SELECT COUNT(*) FROM announcements WHERE status='published'")
+    finally: await conn.close()
     return {"live_offers": live, "sold_offers": sold, "total_leads": leads, "new_leads": new, "responded_leads": resp, "announcements": ann}
 
 # === ADMIN: OFFERS ===
