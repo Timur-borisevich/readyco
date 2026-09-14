@@ -681,10 +681,11 @@ async def bot_webhook(request: Request):
         else:
             offers = await db_get_offers("live")
             if offers:
-                kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('license_type','')} | {o.get('price','?')}", "callback_data": f"client_offer_{o['ref']}"}] for o in offers]}
+                kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('license_type','')} | {o.get('price','?')}", "callback_data": f"client_offer_{o['ref']}"}] for o in offers] + [[{"text":"🌐 Visit website","url":"https://readyco.vercel.app"},{"text":"📺 Channel @readyco","url":"https://t.me/readyco"}]]}
                 await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies:\n🏦 FinTech (EMI, PI, PSP)\n₿ Crypto (VASP, CASP, Exchanges)\n♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\nSelect an offer 👇", kb)
             else:
-                await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies.\n\nNo offers available yet. Send your question here — our team will respond privately.")
+                kb = {"inline_keyboard": [[{"text":"🌐 Visit website","url":"https://readyco.vercel.app"},{"text":"📺 Channel @readyco","url":"https://t.me/readyco"}]]}
+                await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies.\n\nNo offers available yet. Send your question here — our team will respond privately.", kb)
         return {"ok": True}
     
     # /menu
