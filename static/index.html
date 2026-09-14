@@ -496,11 +496,6 @@ document.addEventListener('input', e => { if (e.target.id==='replyInput') { e.ta
 document.addEventListener('keydown', e => { if (e.target.id==='replyInput' && e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } });
 
 loadLeads(); loadOffers(); render();
-
-// Auto-refresh leads every 10 seconds for near-real-time updates
-setInterval(() => {
-  if (view === 'leads' || view === 'chat') loadLeads();
-}, 10000);
 </script>
 </body>
 </html>
