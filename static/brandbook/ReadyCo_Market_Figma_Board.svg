@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+<rect width="1600" height="1000" fill="#fff"/>
+<text x="80" y="90" font-family="Poppins,Arial" font-size="42" font-weight="800" fill="#0B1220">ReadyCo Market — Figma Starter Board</text>
+<text x="80" y="135" font-family="Poppins,Arial" font-size="20" fill="#667085">BUY LICENSED COMPANIES · FINTECH · CRYPTO · iGAMING</text>
+<g transform="translate(80,190) scale(.55)">
+ <defs><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".18"/></filter></defs>
+ <g filter="url(#shadow)">
+  <path d="M225 125 L620 125 L665 620 Q670 705 585 725 L220 725 Q145 715 140 640 L125 220 Q122 140 225 125Z" fill="#FFD400"/>
+  <path d="M165 160 L605 160" stroke="#F3B900" stroke-width="10" opacity=".45"/>
+  <path d="M340 130 C320 45 440 38 455 122" fill="none" stroke="#7C8795" stroke-width="23" stroke-linecap="round"/>
+  <circle cx="398" cy="132" r="26" fill="#fff"/>
+  <text x="180" y="365" font-family="Poppins, Arial, sans-serif" font-size="91" font-weight="800" fill="#0B1220">ReadyCo</text>
+  <text x="220" y="420" font-family="Poppins, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="18" fill="#0B1220">MARKET</text>
+  <circle cx="220" cy="560" r="53" fill="#00C853"/><path d="M190 580h60M198 570v-45h44v45M192 525h56" stroke="#fff" stroke-width="9" fill="none"/>
+  <circle cx="400" cy="560" r="53" fill="#FF8A00"/><text x="400" y="582" text-anchor="middle" font-family="Arial" font-size="65" font-weight="700" fill="#fff">₿</text>
+  <circle cx="580" cy="560" r="53" fill="#7A3CFF"/><path d="M580 510 C558 490 542 510 558 527 C536 519 538 548 580 590 C622 548 624 519 602 527 C618 510 602 490 580 510Z" fill="#fff"/>
+ </g>
+</g>
+<text x="720" y="230" font-family="Poppins,Arial" font-size="26" font-weight="700" fill="#0B1220">COLORS</text>
+<rect x="720" y="285" width="70" height="70" rx="18" fill="#FFD400"/><text x="815" y="315" font-family="Poppins,Arial" font-size="22" font-weight="700" fill="#0B1220">Sunny Yellow</text><text x="815" y="343" font-family="Poppins,Arial" font-size="18" fill="#667085">#FFD400</text><rect x="720" y="390" width="70" height="70" rx="18" fill="#0B1220"/><text x="815" y="420" font-family="Poppins,Arial" font-size="22" font-weight="700" fill="#0B1220">Deep Navy</text><text x="815" y="448" font-family="Poppins,Arial" font-size="18" fill="#667085">#0B1220</text><rect x="720" y="495" width="70" height="70" rx="18" fill="#00C853"/><text x="815" y="525" font-family="Poppins,Arial" font-size="22" font-weight="700" fill="#0B1220">Fintech Green</text><text x="815" y="553" font-family="Poppins,Arial" font-size="18" fill="#667085">#00C853</text><rect x="720" y="600" width="70" height="70" rx="18" fill="#FF8A00"/><text x="815" y="630" font-family="Poppins,Arial" font-size="22" font-weight="700" fill="#0B1220">Crypto Orange</text><text x="815" y="658" font-family="Poppins,Arial" font-size="18" fill="#667085">#FF8A00</text><rect x="720" y="705" width="70" height="70" rx="18" fill="#7A3CFF"/><text x="815" y="735" font-family="Poppins,Arial" font-size="22" font-weight="700" fill="#0B1220">iGaming Purple</text><text x="815" y="763" font-family="Poppins,Arial" font-size="18" fill="#667085">#7A3CFF</text>
+<text x="1150" y="230" font-family="Poppins,Arial" font-size="26" font-weight="700" fill="#0B1220">TYPE</text>
+<text x="1150" y="290" font-family="Poppins,Arial" font-size="42" font-weight="800" fill="#0B1220">Poppins Bold</text>
+<text x="1150" y="330" font-family="Poppins,Arial" font-size="22" fill="#0B1220">Headlines / names</text>
+<text x="1150" y="405" font-family="Poppins,Arial" font-size="32" font-weight="600" fill="#0B1220">Poppins SemiBold</text>
+<text x="1150" y="440" font-family="Poppins,Arial" font-size="22" fill="#0B1220">Labels / navigation</text>
+<text x="1150" y="510" font-family="Poppins,Arial" font-size="27" fill="#0B1220">Poppins Regular</text>
+<text x="1150" y="545" font-family="Poppins,Arial" font-size="22" fill="#0B1220">Body copy</text>
+<rect x="80" y="800" width="1440" height="120" rx="30" fill="#FFD400"/>
+<text x="120" y="850" font-family="Poppins,Arial" font-size="27" font-weight="800" fill="#0B1220">BRAND RULE</text>
+<text x="120" y="890" font-family="Poppins,Arial" font-size="24" fill="#0B1220">Simple enough to remember. Unusual enough to recognize.</text>
+</svg>

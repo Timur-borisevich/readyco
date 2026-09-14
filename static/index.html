@@ -213,7 +213,7 @@ function renderMain(app) {
   const tabs = [{k:'leads',l:'Leads',i:'👤'},{k:'offers',l:'Offers',i:'📋'},{k:'stats',l:'Stats',i:'📊'},{k:'manage',l:'Manage',i:'⚙️'}];
   app.innerHTML = `
     <div class="header">
-      <img src="/logo.png" class="header-logo" alt="ReadyCo">
+      <img src="/brandbook/ReadyCo_Market_Monogram.svg" class="header-logo" alt="ReadyCo">
       <div><div class="header-title">ReadyCo Admin</div><div class="header-sub">@readyco</div></div>
     </div>
     <div class="tabs">${tabs.map(t=>`<div class="tab ${view===t.k?'active':''}" onclick="switchView('${t.k}')">${t.i} ${t.l}</div>`).join('')}</div>

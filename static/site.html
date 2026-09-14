@@ -31,7 +31,7 @@
   /* Nav */
   .nav { position:sticky; top:0; z-index:100; background:rgba(8,18,32,0.85); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border-bottom:1px solid var(--border-soft); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; max-width:1100px; margin:0 auto; }
   .nav-logo { display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; }
-  .nav-logo-mark { width:36px; height:36px; border-radius:50%; object-fit:cover; }
+  .nav-logo-mark { width:36px; height:36px; }
   .nav-links { display:flex; gap:28px; align-items:center; }
   .nav-link { font-size:14px; color:var(--text-2); font-weight:400; transition:color .15s; }
   .nav-link:hover { color:var(--text); }
@@ -51,7 +51,8 @@
   .btn-ghost:hover { border-color:var(--text-3); }
   
   /* Hero visual — abstract, not AI */
-  .hero-right { position:relative; }
+  .hero-right { position:relative; display:flex; justify-content:center; align-items:center; }
+  .hero-logo-big { width:280px; height:280px; }
   .hero-card { background:var(--navy-2); border:1px solid var(--border); border-radius:12px; padding:24px; box-shadow:var(--shadow); }
   .hero-card-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border-soft); }
   .hero-card-row:last-child { border-bottom:none; }
@@ -113,7 +114,7 @@
   /* Footer */
   .footer { border-top:1px solid var(--border-soft); padding:32px 24px; max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
   .footer-left { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-3); }
-  .footer-left .mark { width:28px; height:28px; border-radius:50%; object-fit:cover; }
+  .footer-left .mark { height:28px; }
   .footer-links { display:flex; gap:20px; }
   .footer-link { font-size:13px; color:var(--text-2); }
   .footer-link:hover { color:var(--yellow); }
@@ -138,7 +139,7 @@
 
 <nav class="nav">
   <div class="nav-logo">
-    <img src="/logo.png" class="nav-logo-mark" alt="ReadyCo">
+    <img src="/brandbook/ReadyCo_Market_Monogram.svg" class="nav-logo-mark" alt="ReadyCo">
     <span>ReadyCo Market</span>
   </div>
   <div class="nav-links">
@@ -160,18 +161,7 @@
     </div>
   </div>
   <div class="hero-right">
-    <div class="hero-card">
-      <div class="hero-card-label">How it works</div>
-      <div class="hero-card-row">
-        <div class="hero-card-info"><div class="hero-card-name">Browse offers</div><div class="hero-card-sub">View verified companies on our channel</div></div>
-      </div>
-      <div class="hero-card-row">
-        <div class="hero-card-info"><div class="hero-card-name">Inquire privately</div><div class="hero-card-sub">Contact our team via bot — no public exposure</div></div>
-      </div>
-      <div class="hero-card-row">
-        <div class="hero-card-info"><div class="hero-card-name">Close the deal</div><div class="hero-card-sub">Transfer in 5–10 business days</div></div>
-      </div>
-    </div>
+    <img src="/brandbook/ReadyCo_Market_Primary.svg" class="hero-logo-big" alt="ReadyCo Market">
   </div>
 </section>
 
@@ -225,8 +215,7 @@
 
 <footer class="footer">
   <div class="footer-left">
-    <img src="/logo.png" class="mark" alt="ReadyCo">
-    <span>ReadyCo Market</span>
+    <img src="/brandbook/ReadyCo_Market_Horizontal.svg" class="mark" alt="ReadyCo Market">
   </div>
   <div class="footer-links">
     <a class="footer-link" href="https://t.me/readyco">Channel</a>

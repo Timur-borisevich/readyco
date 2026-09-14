@@ -1,0 +1,20 @@
+ReadyCo Market — Color Tokens
+
+PRIMARY
+Sunny Yellow: #FFD400
+Deep Navy: #0B1220
+
+SECTOR
+Fintech Green: #00C853
+Crypto Orange: #FF8A00
+iGaming Purple: #7A3CFF
+
+BACKGROUND
+Light: #F6F8FB
+
+Usage:
+- Yellow = master brand / CTA / marketplace tag
+- Green = fintech
+- Orange = crypto
+- Purple = iGaming
+- Navy = text / contrast

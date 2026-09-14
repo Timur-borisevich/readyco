@@ -1,0 +1,25 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360">
+  <defs>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".16"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M105 62 L290 62 L310 250 Q312 300 265 310 L105 310 Q65 305 62 265 L55 110 Q53 72 105 62Z" fill="#FFD400"/>
+    <path d="M82 82 L282 82" stroke="#F3B900" stroke-width="7" opacity=".45"/>
+    <path d="M155 67 C145 10 220 5 228 62" fill="none" stroke="#7C8795" stroke-width="16" stroke-linecap="round"/>
+    <circle cx="190" cy="68" r="17" fill="#fff"/>
+    <text x="78" y="180" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="800" fill="#0B1220">ReadyCo</text>
+    <text x="98" y="218" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="11" fill="#0B1220">MARKET</text>
+    <circle cx="105" cy="263" r="27" fill="#00C853"/>
+    <path d="M90 273h30M94 268v-24h22v24M91 244h28" stroke="#fff" stroke-width="5" fill="none"/>
+    <circle cx="177" cy="263" r="27" fill="#FF8A00"/>
+    <text x="177" y="275" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#fff">₿</text>
+    <circle cx="249" cy="263" r="27" fill="#7A3CFF"/>
+    <path d="M249 239 C238 229 230 240 238 248 C227 244 227 258 249 280 C271 258 271 244 260 248 C268 240 260 229 249 239Z" fill="#fff"/>
+  </g>
+  <text x="360" y="165" font-family="Poppins, Arial, sans-serif" font-size="92" font-weight="800" fill="#0B1220">Ready<tspan fill="#00C853">Co</tspan></text>
+  <text x="367" y="215" font-family="Poppins, Arial, sans-serif" font-size="31" font-weight="600" letter-spacing="16" fill="#0B1220">MARKET</text>
+  <text x="367" y="285" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="600" letter-spacing="4" fill="#0B1220">FINTECH  ·  CRYPTO  ·  iGAMING</text>
+</svg>
