@@ -429,13 +429,19 @@ async function setTag(leadId,tag){document.querySelectorAll('.modal-bg').forEach
 let searchTimer=null;function searchLeads(q){clearTimeout(searchTimer);searchTimer=setTimeout(async()=>{try{const d=await api(`/admin/leads${q?('?search='+encodeURIComponent(q)):''}`);leads=d.leads;if(view==='leads')render()}catch(e){}},300)}
 async function blockLead(leadId){showConfirm('Block client?','They cannot message the bot.',async()=>{try{await api(`/admin/leads/${leadId}/block`,{method:'POST'});alert('Blocked');backToMain()}catch(e){alert(e.message)}})}
 async function deleteLead(leadId){showConfirm('Delete chat?','All messages removed.',async()=>{try{await api(`/admin/leads/${leadId}`,{method:'DELETE'});alert('Deleted');backToMain()}catch(e){alert(e.message)}})}
-async function loadLeads(){try{const d=await api('/admin/leads');leads=d.leads;if(view==='leads')render()}catch(e){}}
-async function loadOffers(){try{const d=await api('/admin/offers');offers=d.offers;if(view==='offers')render()}catch(e){}}
 function exportLeads(){const h={};h['X-Telegram-Init-Data']=tgUser?tgUser.id.toString():'8339164180';fetch(API+'/admin/leads/export',{headers:h}).then(r=>r.blob()).then(b=>{const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='leads.csv';a.click();URL.revokeObjectURL(u)}).catch(e=>alert('Export failed'))}
 
 document.addEventListener('input',e=>{if(e.target.id==='replyInput'){e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,80)+'px'}});
 document.addEventListener('keydown',e=>{if(e.target.id==='replyInput'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendReply()}});
-loadLeads();loadOffers();render();
+async function loadLeads() { try { const d = await api('/admin/leads'); leads = d.leads; if (view==='leads') render(); } catch(e){} }
+async function loadOffers() { try { const d = await api('/admin/offers'); offers = d.offers; if (view==='offers') render(); } catch(e){} }
+
+// Parallel load on startup
+async function initLoad() {
+  await Promise.all([loadLeads(), loadOffers()]);
+  render();
+}
+initLoad();
 </script>
 </body>
 </html>

@@ -31,13 +31,26 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 ADMIN_NAMES = {8339164180: "Timur", 143629845: "Yaroslav", 8585498778: "CompliChain", 6277380476: "Mikhail"}
 
 # === DB ===
+import asyncpg
+
+_db_pool = None
+
+async def get_db_pool():
+    global _db_pool
+    if _db_pool is None:
+        _db_pool = await asyncpg.create_pool(
+            host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS,
+            database=DB_NAME, ssl="require", statement_cache_size=0,
+            min_size=2, max_size=10, max_queries=500
+        )
+    return _db_pool
+
 async def get_db():
-    conn = await asyncpg.connect(
-        host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS, 
-        database=DB_NAME, ssl="require",
-        statement_cache_size=0
-    )
-    return conn
+    return await get_db_pool().acquire()
+
+async def release_db(conn):
+    pool = await get_db_pool()
+    await pool.release(conn)
 
 def is_admin(uid): return uid in ADMIN_IDS
 
@@ -51,14 +64,14 @@ async def db_next_ref():
     try:
         n = await conn.fetchval("SELECT COUNT(*) + 1 FROM offers")
         return f"RC{n:03d}"
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_get_offer(ref):
     conn = await get_db()
     try:
         row = await conn.fetchrow("SELECT * FROM offers WHERE ref = $1 AND status != 'deleted'", ref.upper())
         return dict(row) if row else None
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_get_offers(status):
     conn = await get_db()
@@ -68,7 +81,7 @@ async def db_get_offers(status):
         else:
             rows = await conn.fetch("SELECT * FROM offers WHERE status = $1 ORDER BY created_at DESC LIMIT 50", status)
         return [dict(r) for r in rows]
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_insert_offer(data, created_by):
     conn = await get_db()
@@ -84,27 +97,27 @@ async def db_insert_offer(data, created_by):
             data.get('employees'), data.get('transfer_time'), data.get('price'),
             data.get('short_description'), data.get('hashtags'), created_by)
         return oid
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_update_channel_msg(oid, mid):
     conn = await get_db()
     try: await conn.execute("UPDATE offers SET channel_message_id = $1 WHERE id = $2", mid, oid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_mark_sold(ref):
     conn = await get_db()
     try: await conn.execute("UPDATE offers SET status='sold', sold_at=now() WHERE ref=$1", ref)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_delete_offer(ref):
     conn = await get_db()
     try: await conn.execute("UPDATE offers SET status='deleted' WHERE ref=$1", ref)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_update_field(ref, field, value):
     conn = await get_db()
     try: await conn.execute(f"UPDATE offers SET {field}=$1, updated_at=now() WHERE ref=$2", value, ref)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_create_lead(uid, username, offer_ref=None):
     conn = await get_db()
@@ -127,14 +140,14 @@ async def db_create_lead(uid, username, offer_ref=None):
             "VALUES ($1, $2, $3, $4, 'new', now()) RETURNING id",
             uid, username, offer_ref, offer_ref or "")
         return lid
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_get_lead(lid):
     conn = await get_db()
     try:
         row = await conn.fetchrow("SELECT * FROM leads WHERE id=$1", lid)
         return dict(row) if row else None
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_list_leads(limit=50, search=None):
     conn = await get_db()
@@ -160,64 +173,64 @@ async def db_list_leads(limit=50, search=None):
                 "CASE WHEN l.status='new' THEN 0 ELSE 1 END, "
                 "COALESCE((SELECT sent_at FROM messages WHERE lead_id=l.id ORDER BY sent_at DESC LIMIT 1), l.last_contact_at) DESC LIMIT $1", limit)
         return [dict(r) for r in rows]
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_mark_read(lid):
     conn = await get_db()
     try: await conn.execute("UPDATE leads SET is_read=1, status='responded' WHERE id=$1 AND status='new'", lid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_set_tag(lid, tag):
     conn = await get_db()
     try: await conn.execute("UPDATE leads SET tag=$1 WHERE id=$2", tag, lid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_get_messages(lid):
     conn = await get_db()
     try:
         rows = await conn.fetch("SELECT * FROM messages WHERE lead_id=$1 ORDER BY sent_at ASC", lid)
         return [dict(r) for r in rows]
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_store_message(lid, text, direction, file_id=None, msg_type="text", duration=None):
     conn = await get_db()
     try: await conn.execute("INSERT INTO messages (lead_id, direction, text, file_id, msg_type, duration) VALUES ($1, $2, $3, $4, $5, $6)", lid, direction, text, file_id, msg_type, duration)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_update_lead_status(lid, status):
     conn = await get_db()
     try: await conn.execute("UPDATE leads SET status=$1 WHERE id=$2", status, lid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_block_lead(lid):
     conn = await get_db()
     try: await conn.execute("UPDATE leads SET is_blocked=1 WHERE id=$1", lid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_delete_lead(lid):
     conn = await get_db()
     try:
         await conn.execute("DELETE FROM messages WHERE lead_id=$1", lid)
         await conn.execute("DELETE FROM leads WHERE id=$1", lid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_is_blocked(uid):
     conn = await get_db()
     try:
         r = await conn.fetchval("SELECT is_blocked FROM leads WHERE telegram_user_id=$1 ORDER BY created_at DESC LIMIT 1", uid)
         return r == 1
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_audit(uid, action, etype=None, eid=None, details=None):
     conn = await get_db()
     try: await conn.execute("INSERT INTO audit_log (admin_user_id, action, entity_type, entity_id, details_json) VALUES ($1,$2,$3,$4,$5)",
         uid, action, etype, eid, json.dumps(details or {}))
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 async def db_insert_announcement(text, mid, uid):
     conn = await get_db()
     try: await conn.execute("INSERT INTO announcements (text, channel_message_id, status, published_at, created_by) VALUES ($1,$2,'published',now(),$3)", text, mid, uid)
-    finally: await conn.close()
+    finally: await release_db(conn)
 
 # === FORMATTING ===
 COUNTRY_FLAGS = {
@@ -614,7 +627,7 @@ async def bot_webhook(request: Request):
                 sold = await conn.fetchval("SELECT COUNT(*) FROM offers WHERE status='sold'")
                 leads = await conn.fetchval("SELECT COUNT(*) FROM leads")
                 ann = await conn.fetchval("SELECT COUNT(*) FROM announcements WHERE status='published'")
-            finally: await conn.close()
+            finally: await release_db(conn)
             await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
                 "text": f"📊 Statistics\n\n🟢 Live: {live}\n✅ Sold: {sold}\n👤 Leads: {leads}\n📢 Announcements: {ann}", "reply_markup": manage_menu_kb()})
             return {"ok": True}
@@ -623,7 +636,7 @@ async def bot_webhook(request: Request):
             conn = await get_db()
             try:
                 rows = await conn.fetch("SELECT telegram_user_id, role, name FROM admins WHERE is_active=1 ORDER BY created_at")
-            finally: await conn.close()
+            finally: await release_db(conn)
             lines = [f"• {ADMIN_NAMES.get(r['telegram_user_id'], r.get('name','?'))} — {r['role']} (ID: {r['telegram_user_id']})" for r in rows]
             await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
                 "text": f"👥 Admins ({len(rows)})\n\n" + "\n".join(lines), "reply_markup": manage_menu_kb()})
@@ -633,7 +646,7 @@ async def bot_webhook(request: Request):
             conn = await get_db()
             try:
                 rows = await conn.fetch("SELECT admin_user_id, action, entity_type, created_at FROM audit_log ORDER BY created_at DESC LIMIT 10")
-            finally: await conn.close()
+            finally: await release_db(conn)
             if not rows:
                 await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "📜 Audit log\n\nNo actions yet.", "reply_markup": manage_menu_kb()})
                 return {"ok": True}
@@ -1149,7 +1162,7 @@ async def admin_stats(request: Request):
         new = await conn.fetchval("SELECT COUNT(*) FROM leads WHERE status='new'")
         resp = await conn.fetchval("SELECT COUNT(*) FROM leads WHERE status='responded'")
         ann = await conn.fetchval("SELECT COUNT(*) FROM announcements WHERE status='published'")
-    finally: await conn.close()
+    finally: await release_db(conn)
     return {"live_offers": live, "sold_offers": sold, "total_leads": leads, "new_leads": new, "responded_leads": resp, "announcements": ann}
 
 # === ADMIN: OFFERS ===
