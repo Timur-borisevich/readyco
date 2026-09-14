@@ -170,9 +170,9 @@ async def db_get_messages(lid):
         return [dict(r) for r in rows]
     finally: await conn.close()
 
-async def db_store_message(lid, text, direction, file_id=None, msg_type="text"):
+async def db_store_message(lid, text, direction, file_id=None, msg_type="text", duration=None):
     conn = await get_db()
-    try: await conn.execute("INSERT INTO messages (lead_id, direction, text, file_id, msg_type) VALUES ($1, $2, $3, $4, $5)", lid, direction, text, file_id, msg_type)
+    try: await conn.execute("INSERT INTO messages (lead_id, direction, text, file_id, msg_type, duration) VALUES ($1, $2, $3, $4, $5, $6)", lid, direction, text, file_id, msg_type, duration)
     finally: await conn.close()
 
 async def db_update_lead_status(lid, status):
@@ -247,45 +247,73 @@ def format_offer_card(offer, sold=False):
     lic_emoji = get_license_emoji(license_type)
     ref = offer.get('ref', '')
     price = offer.get('price', '')
+    company_type = offer.get('company_type', '')
+    year = offer.get('year_established', '')
+    license_status = offer.get('license_status', '')
+    regulator = offer.get('regulator', '')
+    bank = offer.get('bank_emi_account', '')
+    vat = offer.get('vat_status', '')
+    turnover = offer.get('turnover_history', '')
+    employees = offer.get('employees', '')
+    transfer = offer.get('transfer_time', '')
+    desc = offer.get('short_description', '')
+    hashtags = offer.get('hashtags', '')
     
     if sold:
-        lines = [
-            "✅ SOLD",
-            "",
-            f"~~{flag} {jurisdiction}~~",
-        ]
+        # SOLD — everything struck through
+        lines = ["✅ SOLD", ""]
+        lines.append(f"~~{flag} {jurisdiction}~~")
+        if company_type: lines.append(f"~~{company_type}~~")
         if license_type: lines.append(f"~~{lic_emoji} {license_type}~~")
-        if offer.get('company_type'): lines.append(f"~~{offer['company_type']}~~")
         if price: lines.append(f"~~💰 {price}~~")
         lines.append("")
         lines.append(f"~~Ref: {ref}~~")
         lines.append("")
         lines.append("Contact: @ReadyCoAdminBot")
     else:
-        lines = [
-            "🔴 FOR SALE",
-            "",
-            f"{flag} {jurisdiction}",
-        ]
-        if license_type: lines.append(f"{lic_emoji} {license_type}")
-        if offer.get('company_type'): lines.append(f"📦 {offer['company_type']}")
-        if offer.get('year_established'): lines.append(f"📅 Established: {offer['year_established']}")
-        if offer.get('license_status'): lines.append(f"✅ License: {offer['license_status']}")
-        if offer.get('regulator'): lines.append(f"🏛️ Regulator: {offer['regulator']}")
-        if offer.get('bank_emi_account'): lines.append(f"🏦 Bank/EMI: {offer['bank_emi_account']}")
-        if offer.get('vat_status'): lines.append(f"📋 VAT: {offer['vat_status']}")
-        if offer.get('turnover_history'): lines.append(f"📊 Turnover: {offer['turnover_history']}")
-        if offer.get('employees'): lines.append(f"👤 Employees: {offer['employees']}")
-        if offer.get('transfer_time'): lines.append(f"⏱️ Transfer: {offer['transfer_time']}")
-        if price: lines.append(f"💰 Price: {price}")
+        # Active offer — structured layout
+        lines = []
+        # Header
+        lines.append(f"🔴 FOR SALE")
+        lines.append("━━━━━━━━━━━━━━━━━")
         lines.append("")
-        if offer.get('short_description'):
-            lines.append(f"━━━━━━━━━━━━━")
-            lines.append(offer['short_description'])
+        
+        # Main info
+        lines.append(f"{flag} {jurisdiction}")
+        if company_type: lines.append(f"📦 {company_type}")
+        if year: lines.append(f"📅 Established: {year}")
+        if license_type: lines.append(f"{lic_emoji} License: {license_type}")
+        if license_status: lines.append(f"   Status: {license_status}")
+        if regulator: lines.append(f"🏛️ Regulator: {regulator}")
+        
+        lines.append("")
+        
+        # Financial
+        if bank: lines.append(f"🏦 Bank/EMI: {bank}")
+        if vat: lines.append(f"📋 VAT: {vat}")
+        if turnover: lines.append(f"📊 Turnover: {turnover}")
+        if employees: lines.append(f"👤 Employees: {employees}")
+        if transfer: lines.append(f"⏱️ Transfer: {transfer}")
+        
+        # Price
+        lines.append("")
+        lines.append(f"💰 Price: {price}")
+        
+        # Description
+        if desc:
+            lines.append("━━━━━━━━━━━━━━━━━")
+            lines.append(desc)
+        
+        # Tags
+        if hashtags:
             lines.append("")
-        if offer.get('hashtags'): lines.append(offer['hashtags']); lines.append("")
-        lines.append(f"━━━━━━━━━━━━━")
-        lines.append(f"Ref: {ref} · @ReadyCoAdminBot")
+            lines.append(hashtags)
+        
+        # Footer
+        lines.append("━━━━━━━━━━━━━━━━━")
+        lines.append(f"Ref: {ref}")
+        lines.append("💬 @ReadyCoAdminBot")
+    
     return "\n".join(lines)
 
 def format_announcement(text): return f"📢 {text}"
@@ -864,6 +892,7 @@ async def bot_webhook(request: Request):
         msg_type = "text"
         msg_content = ""
         photo_file_id = None
+        duration = None
         
         if msg.get("text"):
             msg_type = "text"
@@ -885,12 +914,16 @@ async def bot_webhook(request: Request):
         elif msg.get("voice"):
             msg_type = "voice"
             msg_content = "[Voice message]"
+            photo_file_id = msg["voice"].get("file_id")
+            duration = msg["voice"].get("duration")
         elif msg.get("video"):
             msg_type = "video"
             msg_content = f"[Video: {msg.get('caption','')}]"
         elif msg.get("audio"):
             msg_type = "audio"
             msg_content = f"[Audio: {msg.get('caption','')}]"
+            photo_file_id = msg["audio"].get("file_id")
+            duration = msg["audio"].get("duration")
         elif msg.get("contact"):
             msg_type = "contact"
             c = msg["contact"]
@@ -908,7 +941,7 @@ async def bot_webhook(request: Request):
             return {"ok": True}
         
         lead_id = await db_create_lead(user_id, username)
-        await db_store_message(lead_id, msg_content, "client_to_admin", file_id=photo_file_id, msg_type=msg_type)
+        await db_store_message(lead_id, msg_content, "client_to_admin", file_id=photo_file_id, msg_type=msg_type, duration=duration)
         lead = await db_get_lead(lead_id)
         offer_info = ""
         if lead and lead.get("offer_ref"):

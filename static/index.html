@@ -362,12 +362,20 @@ function renderMsgs(msgs) {
     api(`/admin/file/${encodeURIComponent(m.file_id)}`).then(d => m._img_url = d.url).catch(() => {})
   );
   Promise.all(promises).then(() => {
+    // Also load audio URLs
+    const audioPromises = msgs.filter(m => m.file_id && m.msg_type in ('voice','audio')).map(m =>
+      api(`/admin/file/${encodeURIComponent(m.file_id)}`).then(d => m._audio_url = d.url).catch(() => {})
+    );
+    Promise.all(audioPromises).then(() => {
     c.innerHTML = msgs.map(m => {
       const cl = m.direction==='client_to_admin'?'client':'admin';
       const t = m.sent_at ? new Date(m.sent_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
       let content = esc(m.text);
       if (m.file_id && m.msg_type === 'photo' && m._img_url) {
         content = `<img src="${m._img_url}" style="width:100%;border-radius:12px;margin-bottom:6px;" onerror="this.style.display='none'">${content}`;
+      } else if (m.file_id && (m.msg_type === 'voice' || m.msg_type === 'audio') && m._audio_url) {
+        const dur = m.duration ? ` (${Math.floor(m.duration/60)}:${String(m.duration%60).padStart(2,'0')})` : '';
+        content = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">🎤<audio controls style="height:32px;max-width:200px" src="${m._audio_url}"></audio>${dur}</div>${content}`;
       } else if (m.msg_type && m.msg_type !== 'text') {
         const icons = {photo:'📷',sticker:'🎨',document:'📎',voice:'🎤',video:'🎬',audio:'🎵',contact:'👤',location:'📍',animation:'🎞️'};
         const icon = icons[m.msg_type] || '💬';
@@ -376,6 +384,7 @@ function renderMsgs(msgs) {
       return `<div class="msg ${cl}">${cl==='admin'?'<div class="sender">ReadyCo</div>':''}${content}<div class="time">${t}</div></div>`;
     }).join('');
     c.scrollTop = c.scrollHeight;
+    });
   });
 }
 
