@@ -692,6 +692,12 @@ async def bot_webhook(request: Request):
         await tg_send(user_id, "📋 ReadyCo Admin\n\nTap a button.", reply_markup=main_menu_kb())
         return {"ok": True}
     
+    # /inbox — open Mini App
+    if text.startswith("/inbox") and is_admin(user_id):
+        kb = {"inline_keyboard": [[{"text":"💬 Open Inbox","url":"https://readyco.vercel.app/inbox"}]]}
+        await tg_send(user_id, "💬 ReadyCo Inbox\n\nTap to open Mini App:", reply_markup=kb)
+        return {"ok": True}
+    
     # /cancel
     if text.startswith("/cancel") and is_admin(user_id):
         if user_id in sessions: del sessions[user_id]
