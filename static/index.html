@@ -219,7 +219,7 @@ function renderMain(app) {
     <div class="tabs">${tabs.map(t=>`<div class="tab ${view===t.k?'active':''}" onclick="switchView('${t.k}')">${t.i} ${t.l}</div>`).join('')}</div>
     ${view==='leads'?'<div class="search-bar"><input class="search-input" id="searchInput" placeholder="Search leads..." oninput="searchLeads(this.value)"></div>':''}
     <div class="content" id="content"></div>
-    ${view==='offers'?'<button class="fab" onclick="switchView(\'add\')">+</button>':''}
+    ${view==='offers'?"<button class=\"fab\" onclick=\"switchView('add')\">+</button>":''}
   `;
   const c = document.getElementById('content');
   if (view==='leads') renderLeads(c);
