@@ -1230,6 +1230,115 @@ async def admin_announce(req: AnnounceReq, request: Request):
         return {"ok": True}
     raise HTTPException(500, f"TG error: {r.get('description')}")
 
+@app.get("/api/admin/backup")
+async def admin_backup(request: Request):
+    """Export full DB as JSON, optionally send to Telegram."""
+    uid = await verify_admin(request)
+    conn = await get_db()
+    try:
+        offers = await conn.fetch("SELECT * FROM offers WHERE status != 'deleted'")
+        leads = await conn.fetch("SELECT * FROM leads")
+        messages = await conn.fetch("SELECT * FROM messages")
+        announcements = await conn.fetch("SELECT * FROM announcements")
+        audit = await conn.fetch("SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 100")
+    finally:
+        await release_db(conn)
+    
+    backup = {
+        "version": 1,
+        "created_at": __import__("datetime").datetime.now().isoformat(),
+        "offers": [dict(r) for r in offers],
+        "leads": [dict(r) for r in leads],
+        "messages": [dict(r) for r in messages],
+        "announcements": [dict(r) for r in announcements],
+        "audit_log": [dict(r) for r in audit],
+    }
+    
+    # Convert non-serializable fields
+    def clean(obj):
+        if isinstance(obj, dict):
+            return {k: str(v) if hasattr(v, 'isoformat') else v for k, v in obj.items()}
+        return obj
+    
+    backup = {k: [clean(item) for item in v] if isinstance(v, list) else v for k, v in backup.items()}
+    
+    json_str = json.dumps(backup, indent=2, default=str)
+    
+    # Send to all admins as a document
+    import aiohttp
+    from datetime import datetime
+    filename = f"readyco_backup_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
+    
+    for admin_id in ADMIN_IDS:
+        try:
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+            data = aiohttp.FormData()
+            data.add_field("chat_id", str(admin_id))
+            data.add_field("caption", f"💾 ReadyCo Backup\n{len(offers)} offers, {len(leads)} leads, {len(messages)} messages")
+            data.add_field("document", json_str.encode(), filename=filename, content_type="application/json")
+            async with aiohttp.ClientSession() as s:
+                async with s.post(url, data=data) as r:
+                    await r.json()
+        except:
+            pass
+    
+    await db_audit(uid, "backup", "database", None, {"offers": len(offers), "leads": len(leads)})
+    
+    from fastapi.responses import Response
+    return Response(content=json_str, media_type="application/json", 
+                    headers={"Content-Disposition": f"attachment; filename={filename}"})
+
+@app.post("/api/admin/restore")
+async def admin_restore(request: Request):
+    """Restore DB from uploaded JSON backup."""
+    uid = await verify_admin(request)
+    form = await request.form()
+    file = form.get("file")
+    if not file: raise HTTPException(400, "No file provided")
+    contents = await file.read()
+    data = json.loads(contents)
+    
+    conn = await get_db()
+    try:
+        # Clear existing data
+        await conn.execute("DELETE FROM messages")
+        await conn.execute("DELETE FROM leads")
+        await conn.execute("DELETE FROM offer_versions")
+        await conn.execute("DELETE FROM offers")
+        await conn.execute("DELETE FROM announcements")
+        await conn.execute("DELETE FROM audit_log")
+        
+        # Restore offers
+        for o in data.get("offers", []):
+            await conn.execute(
+                "INSERT INTO offers (ref, status, jurisdiction, company_type, year_established, license_type, "
+                "license_status, regulator, bank_emi_account, vat_status, turnover_history, employees, "
+                "transfer_time, price, short_description, hashtags, channel_message_id, created_by, created_at, sold_at) "
+                "VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)",
+                o.get("ref"), o.get("status"), o.get("jurisdiction"), o.get("company_type"),
+                o.get("year_established"), o.get("license_type"), o.get("license_status"),
+                o.get("regulator"), o.get("bank_emi_account"), o.get("vat_status"),
+                o.get("turnover_history"), o.get("employees"), o.get("transfer_time"),
+                o.get("price"), o.get("short_description"), o.get("hashtags"),
+                o.get("channel_message_id"), o.get("created_by"), o.get("created_at"), o.get("sold_at")
+            )
+        
+        # Restore leads
+        for l in data.get("leads", []):
+            await conn.execute(
+                "INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, status, last_contact_at, created_at) "
+                "VALUES ($1,$2,$3,$4,$5,$6)",
+                l.get("telegram_user_id"), l.get("telegram_username"), l.get("offer_ref"),
+                l.get("status"), l.get("last_contact_at"), l.get("created_at")
+            )
+        
+        count = len(data.get("offers", [])) + len(data.get("leads", []))
+    finally:
+        await release_db(conn)
+    
+    await db_audit(uid, "restore", "database", None, {"items": count})
+    return {"ok": True, "restored": {"offers": len(data.get("offers",[])), "leads": len(data.get("leads",[]))}}
+
 # === STATIC ===
 @app.get("/inbox")
 async def mini_app():
