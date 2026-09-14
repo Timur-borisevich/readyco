@@ -856,11 +856,59 @@ async def bot_webhook(request: Request):
             return {"ok": True}
     
     # Client message = forward to admins (unless blocked)
-    if not is_admin(user_id) and text:
+    if not is_admin(user_id):
         if await db_is_blocked(user_id):
             return {"ok": True}
+        
+        # Determine message type and content
+        msg_type = "text"
+        msg_content = ""
+        photo_file_id = None
+        
+        if msg.get("text"):
+            msg_type = "text"
+            msg_content = msg["text"]
+        elif msg.get("photo"):
+            msg_type = "photo"
+            # Get largest photo
+            photos = msg["photo"]
+            photo_file_id = photos[-1]["file_id"]
+            msg_content = msg.get("caption", "[Photo]")
+        elif msg.get("sticker"):
+            msg_type = "sticker"
+            msg_content = f"[Sticker: {msg['sticker'].get('emoji','')}]"
+        elif msg.get("document"):
+            msg_type = "document"
+            doc = msg["document"]
+            msg_content = f"[Document: {doc.get('file_name','file')}]"
+            photo_file_id = doc.get("file_id")
+        elif msg.get("voice"):
+            msg_type = "voice"
+            msg_content = "[Voice message]"
+        elif msg.get("video"):
+            msg_type = "video"
+            msg_content = f"[Video: {msg.get('caption','')}]"
+        elif msg.get("audio"):
+            msg_type = "audio"
+            msg_content = f"[Audio: {msg.get('caption','')}]"
+        elif msg.get("contact"):
+            msg_type = "contact"
+            c = msg["contact"]
+            msg_content = f"[Contact: {c.get('first_name','')} {c.get('phone_number','')}]"
+        elif msg.get("location"):
+            msg_type = "location"
+            msg_content = "[Location]"
+        elif msg.get("animation"):
+            msg_type = "animation"
+            msg_content = f"[GIF: {msg.get('caption','')}]"
+        else:
+            msg_content = "[Unsupported message type]"
+        
+        if not msg_content and not photo_file_id:
+            return {"ok": True}
+        
         lead_id = await db_create_lead(user_id, username)
-        await db_store_message(lead_id, text, "client_to_admin")
+        await db_store_message(lead_id, msg_content, "client_to_admin")
         lead = await db_get_lead(lead_id)
         offer_info = ""
         if lead and lead.get("offer_ref"):
@@ -878,18 +926,38 @@ async def bot_webhook(request: Request):
             history_text = "\n\n📜 History:\n" + "\n".join(lines[-5:])
         user_link = f"t.me/{username}" if username else f"tg://user?id={user_id}"
         user_disp = f"@{username}" if username else f"ID: {user_id}"
+        
+        type_icon = {"photo":"📷","sticker":"🎨","document":"📎","voice":"🎤","video":"🎬","audio":"🎵","contact":"👤","location":"📍","animation":"🎞️","text":"💬"}.get(msg_type, "💬")
+        
         admin_text = (
             f"👤 <b>New inquiry</b>\n"
             f"From: {user_disp}\n"
             f"Name: {esc(first_name)}"
             f"{offer_info}\n\n"
-            f"💬 {esc(text)}"
+            f"{type_icon} {esc(msg_content)}"
             f"{history_text}\n\n"
             f"Reply: {user_link}")
         kb = {"inline_keyboard": [[{"text":"💬 Reply","callback_data":f"reply_{lead_id}"}]]}
+        
         for admin_id in ADMIN_IDS:
-            try: await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
+            try:
+                # If photo, send photo to admins
+                if photo_file_id and msg_type in ("photo","document"):
+                    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto" if msg_type == "photo" else f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+                    payload = {"chat_id": admin_id, "caption": admin_text, "parse_mode": "HTML", "reply_markup": kb}
+                    if msg_type == "photo":
+                        payload["photo"] = photo_file_id
+                    else:
+                        payload["document"] = photo_file_id
+                    async with aiohttp.ClientSession() as s:
+                        async with s.post(url, json=payload) as r:
+                            resp = await r.json()
+                            if not resp.get("ok"):
+                                await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
+                else:
+                    await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
             except: pass
+        
         await tg_send(user_id, "✅ Thank you! Our team will respond shortly.")
         return {"ok": True}
     
