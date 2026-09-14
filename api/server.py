@@ -283,10 +283,376 @@ class AnnounceReq(BaseModel):
     text: str
 
 # === BOT WEBHOOK ===
+# In-memory sessions (per-instance, works for most cases)
+sessions: dict = {}
+
+OFFER_FIELDS = [
+    ("jurisdiction", "Jurisdiction? (e.g. Poland)"),
+    ("company_type", "Company type? (e.g. Sp. z o.o.)"),
+    ("year_established", "Year established? (e.g. 2023)"),
+    ("license_type", "License type? (VASP, CASP, EMI, PI, iGaming, or skip)"),
+    ("license_status", "License status? (Active, or skip)"),
+    ("regulator", "Regulator? (e.g. KNF, or skip)"),
+    ("bank_emi_account", "Bank / EMI account? (Yes/No)"),
+    ("vat_status", "VAT status? (Active/None)"),
+    ("turnover_history", "Turnover history? (Yes/No)"),
+    ("employees", "Employees? (Yes/No, or number)"),
+    ("transfer_time", "Transfer time? (e.g. 5-10 business days)"),
+    ("price", "Price? (e.g. EUR 45,000)"),
+    ("short_description", "Short description? (or skip)"),
+]
+
+def main_menu_kb():
+    return {"inline_keyboard": [
+        [{"text":"📝 Add offer","callback_data":"menu_add"},{"text":"📋 List offers","callback_data":"menu_list"}],
+        [{"text":"🔍 Search","callback_data":"menu_search"},{"text":"✏️ Edit","callback_data":"menu_edit"}],
+        [{"text":"✅ Mark sold","callback_data":"menu_sold"},{"text":"🗑 Delete","callback_data":"menu_delete"}],
+        [{"text":"📢 Announce","callback_data":"menu_announce"},{"text":"👤 Leads","callback_data":"menu_leads"}],
+        [{"text":"💬 Inbox (Mini App)","url":"https://readyco.vercel.app/inbox"},{"text":"⚙️ Manage","callback_data":"menu_manage"}],
+    ]}
+
+def status_menu_kb():
+    return {"inline_keyboard": [
+        [{"text":"🟢 Live","callback_data":"list_live"},{"text":"✅ Sold","callback_data":"list_sold"}],
+        [{"text":"📋 All","callback_data":"list_all"},{"text":"🔙 Back","callback_data":"menu_main"}],
+    ]}
+
+def manage_menu_kb():
+    return {"inline_keyboard": [
+        [{"text":"🏠 Main menu","callback_data":"menu_main"},{"text":"📊 Stats","callback_data":"manage_stats"}],
+        [{"text":"👥 Admins","callback_data":"manage_admins"},{"text":"📜 Audit log","callback_data":"manage_audit"}],
+        [{"text":"🔙 Back","callback_data":"menu_main"}],
+    ]}
+
+def format_offer_list(offers, status_filter="live"):
+    if not offers: return f"No offers with status: {status_filter}"
+    lines = [f"📋 Offers ({status_filter}): {len(offers)}\n"]
+    for o in offers:
+        lines.append(f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('license_type','No license')} | {o.get('price','?')}")
+    return "\n".join(lines)
+
+async def answer_callback(callback_id):
+    await aiohttp_request(f"answerCallbackQuery", {"callback_query_id": callback_id})
+
+async def aiohttp_request(method, payload):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json=payload) as r: return await r.json()
+
 @app.post("/api/webhook")
 async def bot_webhook(request: Request):
     data = await request.json()
-    if "callback_query" in data: return {"ok": True}
+    
+    # === CALLBACK QUERY ===
+    cb = data.get("callback_query")
+    if cb:
+        cb_id = cb.get("id")
+        user_id = cb["from"]["id"]
+        cb_data = cb.get("data", "")
+        msg = cb.get("message", {})
+        chat_id = msg.get("chat", {}).get("id")
+        await answer_callback(cb_id)
+        
+        if not is_admin(user_id):
+            # Client selecting an offer
+            if cb_data.startswith("client_offer_"):
+                ref = cb_data.replace("client_offer_", "")
+                offer = await db_get_offer(ref)
+                if not offer:
+                    await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"Offer {ref} is no longer available."})
+                    return {"ok": True}
+                lead_id = await db_create_lead(user_id, cb["from"].get("username",""), ref)
+                sessions[user_id] = {"action": "client_inquiry", "data": {"offer_ref": ref, "lead_id": lead_id}}
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                    "text": f"📋 {ref} — {offer.get('jurisdiction','')} {offer.get('license_type','')}\n📊 Price: {offer.get('price','On request')}\n\nSend your question about this offer here. Our team will respond privately."})
+            return {"ok": True}
+        
+        # Admin callbacks
+        if cb_data == "cancel_action":
+            if user_id in sessions: del sessions[user_id]
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "✅ Cancelled.", "reply_markup": main_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data == "menu_main":
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "📋 ReadyCo Admin\n\nTap a button.", "reply_markup": main_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data == "menu_add":
+            sessions[user_id] = {"action": "add", "step": 0, "data": {}}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": f"📝 Creating new offer. Step 1/{len(OFFER_FIELDS)}:\n\n{OFFER_FIELDS[0][1]}\n\nSend /cancel to abort."})
+            return {"ok": True}
+        
+        if cb_data == "menu_list":
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "📋 List offers\n\nSelect status:", "reply_markup": status_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data.startswith("list_"):
+            status = cb_data.replace("list_", "")
+            offers = await db_get_offers(status)
+            text = format_offer_list(offers, status)
+            kb = {"inline_keyboard": [[{"text":"🔙 Back to menu","callback_data":"menu_main"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": text, "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data == "menu_search":
+            kb = {"inline_keyboard": [[{"text":"🔙 Back","callback_data":"menu_main"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": "🔍 Search\n\nUse /search <keyword>\n(e.g. /search VASP Poland)", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data == "menu_edit":
+            offers = await db_get_offers("live")
+            if not offers:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "No live offers.", "reply_markup": main_menu_kb()})
+                return {"ok": True}
+            kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('price','?')}", "callback_data": f"selectedit_{o['ref']}"}] for o in offers] + [[{"text":"🔙 Back","callback_data":"menu_main"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "✏️ Select offer to edit:", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data.startswith("selectedit_"):
+            ref = cb_data.replace("selectedit_", "")
+            offer = await db_get_offer(ref)
+            if not offer: return {"ok": True}
+            fields = ["jurisdiction","company_type","year_established","license_type","license_status","regulator","bank_emi_account","vat_status","turnover_history","employees","transfer_time","price","short_description"]
+            kb_rows = []
+            for i in range(0, len(fields), 2):
+                row = [{"text": f, "callback_data": f"edit_{ref}_{f}"} for f in fields[i:i+2]]
+                kb_rows.append(row)
+            kb_rows.append([{"text":"🔙 Back","callback_data":"menu_edit"}])
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": f"Editing {ref} — {offer.get('jurisdiction','?')} {offer.get('license_type','')}\n\nCurrent price: {offer.get('price','?')}\n\nWhich field to edit?", "reply_markup": {"inline_keyboard": kb_rows}})
+            return {"ok": True}
+        
+        if cb_data == "menu_sold":
+            offers = await db_get_offers("live")
+            if not offers:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "No live offers.", "reply_markup": main_menu_kb()})
+                return {"ok": True}
+            kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('price','?')}", "callback_data": f"sold_{o['ref']}"}] for o in offers] + [[{"text":"🔙 Back","callback_data":"menu_main"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "✅ Which offer is sold?", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data == "menu_delete":
+            offers = await db_get_offers("all")
+            if not offers:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "No offers.", "reply_markup": main_menu_kb()})
+                return {"ok": True}
+            kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o['status']}", "callback_data": f"delete_{o['ref']}"}] for o in offers[:15]] + [[{"text":"🔙 Back","callback_data":"menu_main"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "⚠️ DELETE which offer?", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data == "menu_announce":
+            sessions[user_id] = {"action": "announce", "data": {}}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "📢 Send the announcement text:"})
+            return {"ok": True}
+        
+        if cb_data == "menu_leads":
+            leads = await db_list_leads(20)
+            if not leads:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "No leads yet.", "reply_markup": main_menu_kb()})
+                return {"ok": True}
+            kb_rows = []
+            for l in leads:
+                lname = l.get('telegram_username') or f"ID:{l['telegram_user_id']}"
+                kb_rows.append([{"text": f"● {lname} ({l.get('msg_count',0)} msgs)", "callback_data": f"leadview_{l['id']}"}])
+            kb_rows.append([{"text":"🔙 Back","callback_data":"menu_main"}])
+            kb = {"inline_keyboard": kb_rows}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "👤 Leads\n\nSelect to view history:", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data.startswith("leadview_"):
+            lid = int(cb_data.replace("leadview_", ""))
+            lead = await db_get_lead(lid)
+            if not lead: return {"ok": True}
+            msgs = await db_get_messages(lid)
+            name = lead.get("telegram_username") or f"ID:{lead['telegram_user_id']}"
+            lines = [f"👤 {name} — {len(msgs)} messages\n"]
+            for m in msgs[-10:]:
+                d = "👤" if m["direction"] == "client_to_admin" else "💬"
+                ts = str(m["sent_at"])[:16] if m.get("sent_at") else ""
+                lines.append(f"{d} [{ts}] {esc(m['text'][:100])}")
+            kb = {"inline_keyboard": [[{"text":"💬 Reply","callback_data":f"reply_{lid}"},{"text":"🔙 Back to leads","callback_data":"menu_leads"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "\n".join(lines), "reply_markup": kb, "parse_mode": "HTML"})
+            return {"ok": True}
+        
+        if cb_data.startswith("reply_"):
+            lid = int(cb_data.replace("reply_", ""))
+            lead = await db_get_lead(lid)
+            if not lead: return {"ok": True}
+            sessions[user_id] = {"action": "reply", "data": {"lead_id": lid}}
+            name = lead.get("telegram_username") or f"ID:{lead['telegram_user_id']}"
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"💬 Replying to {name}\n\nSend your reply text:"})
+            return {"ok": True}
+        
+        if cb_data == "menu_manage":
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": "⚙️ Manage\n\n🏠 Main menu\n📊 Stats\n👥 Admins\n📜 Audit log", "reply_markup": manage_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data == "manage_stats":
+            conn = await get_db()
+            try:
+                live = await conn.fetchval("SELECT COUNT(*) FROM offers WHERE status='live'")
+                sold = await conn.fetchval("SELECT COUNT(*) FROM offers WHERE status='sold'")
+                leads = await conn.fetchval("SELECT COUNT(*) FROM leads")
+                ann = await conn.fetchval("SELECT COUNT(*) FROM announcements WHERE status='published'")
+            finally: await conn.close()
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": f"📊 Statistics\n\n🟢 Live: {live}\n✅ Sold: {sold}\n👤 Leads: {leads}\n📢 Announcements: {ann}", "reply_markup": manage_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data == "manage_admins":
+            conn = await get_db()
+            try:
+                rows = await conn.fetch("SELECT telegram_user_id, role, name FROM admins WHERE is_active=1 ORDER BY created_at")
+            finally: await conn.close()
+            lines = [f"• {ADMIN_NAMES.get(r['telegram_user_id'], r.get('name','?'))} — {r['role']} (ID: {r['telegram_user_id']})" for r in rows]
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": f"👥 Admins ({len(rows)})\n\n" + "\n".join(lines), "reply_markup": manage_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data == "manage_audit":
+            conn = await get_db()
+            try:
+                rows = await conn.fetch("SELECT admin_user_id, action, entity_type, created_at FROM audit_log ORDER BY created_at DESC LIMIT 10")
+            finally: await conn.close()
+            if not rows:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "📜 Audit log\n\nNo actions yet.", "reply_markup": manage_menu_kb()})
+                return {"ok": True}
+            lines = [f"• {str(r['created_at'])[:19]} | {ADMIN_NAMES.get(r['admin_user_id'], '?')} → {r['action']} {r.get('entity_type','') or ''}" for r in rows]
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": "📜 Audit log (last 10)\n\n" + "\n".join(lines), "reply_markup": manage_menu_kb()})
+            return {"ok": True}
+        
+        # sold_ callback
+        if cb_data.startswith("sold_"):
+            ref = cb_data.replace("sold_", "")
+            offer = await db_get_offer(ref)
+            if not offer: return {"ok": True}
+            card = format_offer_card(offer, sold=True)
+            kb = {"inline_keyboard": [[{"text":"✅ Confirm SOLD","callback_data":f"confirm_sold_{ref}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"SOLD PREVIEW\n\n{card}\n\nMark as sold?", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data.startswith("confirm_sold_"):
+            ref = cb_data.replace("confirm_sold_", "")
+            offer = await db_get_offer(ref)
+            if not offer: return {"ok": True}
+            card = format_offer_card(offer, sold=True)
+            kb = inquiry_keyboard(ref)
+            if offer.get("channel_message_id"):
+                r = await tg_edit(CHANNEL_ID, offer["channel_message_id"], card, kb)
+                if not r.get("ok"):
+                    await tg_send(CHANNEL_ID, f"✅ SOLD\n\n{card}", kb)
+            await db_mark_sold(ref)
+            await db_audit(user_id, "sold", "offer", offer.get("id"), {"ref": ref})
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ {ref} marked as SOLD!", "reply_markup": main_menu_kb()})
+            return {"ok": True}
+        
+        # delete_ callback
+        if cb_data.startswith("delete_"):
+            ref = cb_data.replace("delete_", "")
+            offer = await db_get_offer(ref)
+            if not offer: return {"ok": True}
+            kb = {"inline_keyboard": [[{"text":"⚠️ Delete permanently","callback_data":f"confirm_delete_{ref}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": f"⚠️ DELETE {ref}\n\n{offer.get('jurisdiction','?')} | {offer.get('price','?')}\n\nCannot be undone.", "reply_markup": kb})
+            return {"ok": True}
+        
+        if cb_data.startswith("confirm_delete_"):
+            ref = cb_data.replace("confirm_delete_", "")
+            offer = await db_get_offer(ref)
+            if not offer: return {"ok": True}
+            if offer.get("channel_message_id"):
+                await tg_delete(CHANNEL_ID, offer["channel_message_id"])
+            await db_delete_offer(ref)
+            await db_audit(user_id, "delete", "offer", offer.get("id"), {"ref": ref})
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ {ref} deleted.", "reply_markup": main_menu_kb()})
+            return {"ok": True}
+        
+        # edit_ callback
+        if cb_data.startswith("edit_"):
+            parts = cb_data.split("_", 2)
+            ref, field = parts[1], parts[2]
+            offer = await db_get_offer(ref)
+            sessions[user_id] = {"action": "edit_field", "data": {"ref": ref, "field": field}}
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
+                "text": f"Editing {ref} → {field}\nCurrent: {offer.get(field, '')}\n\nSend new value:"})
+            return {"ok": True}
+        
+        # publish_ callback
+        if cb_data.startswith("publish_"):
+            if cb_data == "publish_announce":
+                session = sessions.get(user_id, {})
+                text = session.get("data", {}).get("text", "")
+                if not text:
+                    await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "❌ Session expired."})
+                    return {"ok": True}
+                formatted = format_announcement(text)
+                r = await tg_send(CHANNEL_ID, formatted)
+                if r.get("ok"):
+                    await db_insert_announcement(text, r["result"]["message_id"], user_id)
+                    await db_audit(user_id, "announce", "announcement", None, {"text": text[:100]})
+                if user_id in sessions: del sessions[user_id]
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "✅ Announcement published!", "reply_markup": main_menu_kb()})
+                return {"ok": True}
+            else:
+                ref = cb_data.replace("publish_", "")
+                session = sessions.get(user_id, {})
+                d = session.get("data", {})
+                if not d:
+                    await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "❌ Session expired. Use /add again."})
+                    return {"ok": True}
+                oid = await db_insert_offer(d, user_id)
+                card = format_offer_card(d)
+                kb = inquiry_keyboard(ref)
+                r = await tg_send(CHANNEL_ID, card, kb)
+                if r.get("ok"):
+                    await db_update_channel_msg(oid, r["result"]["message_id"])
+                await db_audit(user_id, "add", "offer", oid, {"ref": ref})
+                if user_id in sessions: del sessions[user_id]
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ Published {ref} to channel!", "reply_markup": main_menu_kb()})
+                return {"ok": True}
+        
+        if cb_data.startswith("applyedit_"):
+            parts = cb_data.split("_", 2)
+            ref, field = parts[1], parts[2]
+            session = sessions.get(user_id, {})
+            new_val = session.get("data", {}).get("new_value", "")
+            if not new_val:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "❌ Session expired."})
+                return {"ok": True}
+            await db_update_field(ref, field, new_val)
+            offer = await db_get_offer(ref)
+            if offer.get("channel_message_id") and offer["status"] == "live":
+                await tg_edit(CHANNEL_ID, offer["channel_message_id"], format_offer_card(offer), inquiry_keyboard(ref))
+            await db_audit(user_id, "edit", "offer", offer.get("id"), {"ref": ref, "field": field})
+            if user_id in sessions: del sessions[user_id]
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ {ref} updated: {field} = {new_val}", "reply_markup": main_menu_kb()})
+            return {"ok": True}
+        
+        if cb_data.startswith("sendreply_"):
+            lid = int(cb_data.replace("sendreply_", ""))
+            session = sessions.get(user_id, {})
+            reply_text = session.get("data", {}).get("reply_text", "")
+            if not reply_text:
+                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "❌ Session expired."})
+                return {"ok": True}
+            lead = await db_get_lead(lid)
+            if not lead: return {"ok": True}
+            r = await tg_send(lead["telegram_user_id"], f"💬 ReadyCo Market:\n\n{reply_text}")
+            if r.get("ok"):
+                await db_store_message(lid, reply_text, "admin_to_client")
+                await db_update_lead_status(lid, "responded")
+                await db_audit(user_id, "reply", "lead", lid, {"text": reply_text[:100]})
+            if user_id in sessions: del sessions[user_id]
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "✅ Reply sent to client!", "reply_markup": main_menu_kb()})
+            return {"ok": True}
+        
+        return {"ok": True}
+    
+    # === MESSAGE ===
     msg = data.get("message") or data.get("edited_message")
     if not msg: return {"ok": True}
     user = msg.get("from", {})
@@ -294,14 +660,16 @@ async def bot_webhook(request: Request):
     username = user.get("username", "")
     first_name = user.get("first_name", "")
     text = msg.get("text", "")
-
+    chat_id = msg.get("chat", {}).get("id")
+    
+    # /start
     if text.startswith("/start"):
         args = text.split()[1:] if len(text.split()) > 1 else []
         offer_ref = None
         if args and args[0].startswith("inquiry_"):
             offer_ref = args[0].replace("inquiry_", "")
         if is_admin(user_id):
-            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nUse Mini App: https://readyco.vercel.app/inbox")
+            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nTap a button.", reply_markup=main_menu_kb())
             return {"ok": True}
         lead_id = await db_create_lead(user_id, username, offer_ref)
         if offer_ref:
@@ -314,11 +682,80 @@ async def bot_webhook(request: Request):
             offers = await db_get_offers("live")
             if offers:
                 kb = {"inline_keyboard": [[{"text": f"{o['ref']} | {o.get('jurisdiction','?')} | {o.get('license_type','')} | {o.get('price','?')}", "callback_data": f"client_offer_{o['ref']}"}] for o in offers]}
-                await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies:\n🏦 FinTech (EMI, PI, PSP)\n₿ Crypto (VASP, CASP, Exchanges)\n♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\nSelect an offer to ask about it 👇", kb)
+                await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies:\n🏦 FinTech (EMI, PI, PSP)\n₿ Crypto (VASP, CASP, Exchanges)\n♠️ iGaming (Casinos, Betting, Gaming Licenses)\n\nSelect an offer 👇", kb)
             else:
                 await tg_send(user_id, "👋 Welcome to ReadyCo Market!\n\nWe help you buy and sell licensed companies.\n\nNo offers available yet. Send your question here — our team will respond privately.")
         return {"ok": True}
-
+    
+    # /menu
+    if text.startswith("/menu") and is_admin(user_id):
+        await tg_send(user_id, "📋 ReadyCo Admin\n\nTap a button.", reply_markup=main_menu_kb())
+        return {"ok": True}
+    
+    # /cancel
+    if text.startswith("/cancel") and is_admin(user_id):
+        if user_id in sessions: del sessions[user_id]
+        await tg_send(user_id, "✅ Cancelled.", reply_markup=main_menu_kb())
+        return {"ok": True}
+    
+    # Admin session messages (add/announce/edit_field/reply)
+    if is_admin(user_id) and user_id in sessions:
+        session = sessions[user_id]
+        action = session.get("action")
+        
+        if action == "add":
+            step = session["step"]
+            field_name, _ = OFFER_FIELDS[step]
+            session["data"][field_name] = text if text.lower() != "skip" else None
+            session["step"] += 1
+            if session["step"] < len(OFFER_FIELDS):
+                next_field, next_prompt = OFFER_FIELDS[session["step"]]
+                await tg_send(user_id, f"Step {session['step'] + 1}/{len(OFFER_FIELDS)}:\n\n{next_prompt}\n\nSend /cancel to abort.")
+            else:
+                d = session["data"]
+                ref = await db_next_ref()
+                d["ref"] = ref
+                HT = {"VASP":"#VASP #Crypto","CASP":"#CASP #Crypto","EMI":"#EMI #FinTech","PI":"#PI #FinTech","iGaming":"#iGaming #Gaming"}
+                ht = HT.get(d.get("license_type",""), "")
+                if ht:
+                    j = (d.get("jurisdiction") or "").split(" ")[0]
+                    d["hashtags"] = f"#{j} {ht} #ForSale"
+                preview = format_offer_card(d)
+                kb = {"inline_keyboard": [[{"text":"✅ Publish","callback_data":f"publish_{ref}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
+                await tg_send(user_id, f"📋 PREVIEW\n\n{preview}\n\nPublish to channel?", kb)
+            return {"ok": True}
+        
+        if action == "announce":
+            sessions[user_id]["data"]["text"] = text
+            formatted = format_announcement(text)
+            kb = {"inline_keyboard": [[{"text":"✅ Publish","callback_data":"publish_announce"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
+            await tg_send(user_id, f"📋 PREVIEW\n\n{formatted}\n\nPublish?", kb)
+            return {"ok": True}
+        
+        if action == "edit_field":
+            ref = session["data"]["ref"]
+            field = session["data"]["field"]
+            session["data"]["new_value"] = text
+            offer = await db_get_offer(ref)
+            old = offer.get(field, "")
+            kb = {"inline_keyboard": [[{"text":"✅ Apply","callback_data":f"applyedit_{ref}_{field}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
+            await tg_send(user_id, f"Editing {ref} → {field}\nOld: {old}\nNew: {text}\n\nApply?", kb)
+            return {"ok": True}
+        
+        if action == "reply":
+            lid = session["data"]["lead_id"]
+            lead = await db_get_lead(lid)
+            if not lead:
+                await tg_send(user_id, "❌ Lead not found.")
+                del sessions[user_id]
+                return {"ok": True}
+            sessions[user_id]["data"]["reply_text"] = text
+            name = lead.get("telegram_username") or f"ID:{lead['telegram_user_id']}"
+            kb = {"inline_keyboard": [[{"text":"✅ Send","callback_data":f"sendreply_{lid}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
+            await tg_send(user_id, f"📋 Reply preview\n\nTo: {name}\nMessage: {text}\n\nSend?", kb)
+            return {"ok": True}
+    
+    # Client message = forward to admins
     if not is_admin(user_id) and text:
         lead_id = await db_create_lead(user_id, username)
         await db_store_message(lead_id, text, "client_to_admin")
@@ -347,12 +784,13 @@ async def bot_webhook(request: Request):
             f"💬 {esc(text)}"
             f"{history_text}\n\n"
             f"Reply: {user_link}")
-        kb = {"inline_keyboard": [[{"text": "💬 Reply", "callback_data": f"reply_{lead_id}"}]]}
+        kb = {"inline_keyboard": [[{"text":"💬 Reply","callback_data":f"reply_{lead_id}"}]]}
         for admin_id in ADMIN_IDS:
             try: await tg_send(admin_id, admin_text, kb, parse_mode="HTML")
             except: pass
         await tg_send(user_id, "✅ Thank you! Our team will respond shortly.")
         return {"ok": True}
+    
     return {"ok": True}
 
 # === PUBLIC ENDPOINTS ===
