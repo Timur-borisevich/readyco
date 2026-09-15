@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="900" viewBox="0 0 390 900">
+<rect width="390" height="900" fill="#F6F8FB"/>
+<text x="20" y="50" font-family="Poppins, Arial, sans-serif" font-size="26" font-weight="500" fill="#0B1220" text-anchor="start">×</text>
+<text x="195" y="50" font-family="Poppins, Arial, sans-serif" font-size="20" font-weight="800" fill="#0B1220" text-anchor="middle">Filters</text>
+<text x="370" y="50" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" fill="#667085" text-anchor="end">Reset</text>
+<text x="20" y="100" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="800" fill="#0B1220" text-anchor="start">Industry</text>
+<rect x="20" y="130" width="92" height="28" rx="14" fill="#00C853"/><text x="66.0" y="149" font-family="Poppins, Arial, sans-serif" font-size="12" font-weight="700" fill="white" text-anchor="middle">Fintech</text>
+<rect x="122" y="130" width="92" height="28" rx="14" fill="#FF8A00"/><text x="168.0" y="149" font-family="Poppins, Arial, sans-serif" font-size="12" font-weight="700" fill="white" text-anchor="middle">Crypto</text>
+<rect x="224" y="130" width="92" height="28" rx="14" fill="#7A3CFF"/><text x="270.0" y="149" font-family="Poppins, Arial, sans-serif" font-size="12" font-weight="700" fill="white" text-anchor="middle">iGaming</text>
+<text x="20" y="205" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="800" fill="#0B1220" text-anchor="start">Jurisdiction</text>
+<rect x="20" y="235" width="350" height="48" rx="13" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+<text x="40" y="266" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="400" fill="#667085" text-anchor="start">⌕  Search jurisdiction...</text>
+<text x="20" y="330" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="800" fill="#0B1220" text-anchor="start">License Type</text>
+<rect x="20" y="360" width="165" height="48" rx="13" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+<text x="40" y="391" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="600" fill="#0B1220" text-anchor="start">VASP</text>
+<rect x="205" y="360" width="165" height="48" rx="13" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+<text x="225" y="391" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="600" fill="#0B1220" text-anchor="start">EMI</text>
+<rect x="20" y="420" width="165" height="48" rx="13" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+<text x="40" y="451" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="600" fill="#0B1220" text-anchor="start">PSP</text>
+<rect x="205" y="420" width="165" height="48" rx="13" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+<text x="225" y="451" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="600" fill="#0B1220" text-anchor="start">CASP</text>
+<text x="20" y="520" font-family="Poppins, Arial, sans-serif" font-size="18" font-weight="800" fill="#0B1220" text-anchor="start">Status</text>
+<text x="20" y="550" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="500" fill="#0B1220" text-anchor="start">□ Active</text>
+<text x="20" y="590" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="500" fill="#0B1220" text-anchor="start">□ Transfer Ready</text>
+<text x="20" y="630" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="500" fill="#0B1220" text-anchor="start">□ Sold</text>
+<rect x="20" y="730" width="350" height="56" rx="15" fill="#FFD400"/>
+<text x="195" y="765" font-family="Poppins, Arial, sans-serif" font-size="15" font-weight="800" fill="#0B1220" text-anchor="middle">Show 120 results</text>
+</svg>

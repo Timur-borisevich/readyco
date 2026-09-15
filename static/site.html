@@ -2,165 +2,163 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReadyCo Market — Buy Licensed Companies | Fintech, Crypto, iGaming</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ReadyCo Market — Buy Licensed Companies</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --yellow: #FFD400;
-    --navy: #0B1220;
-    --green: #00C853;
-    --orange: #FF8A00;
-    --purple: #7A3CFF;
-    --light: #F6F8FB;
-    --white: #FFFFFF;
-    --text: #0B1220;
-    --text-2: #5a6580;
-    --text-3: #939eB8;
-    --border: #E4E8F0;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 2px 12px rgba(11,18,32,0.06);
-    --shadow-lg: 0 8px 32px rgba(11,18,32,0.10);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Poppins',sans-serif; background:var(--light); color:var(--text); -webkit-font-smoothing:antialiased; }
-  a { color:inherit; text-decoration:none; }
-  img { max-width:100%; display:block; }
-  
-  /* Header */
-  .header { background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
-  .header-inner { max-width:1280px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:24px; }
-  .header-logo { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-  .header-logo svg { width:36px; height:36px; }
-  .header-logo-text { font-weight:700; font-size:16px; letter-spacing:-0.3px; }
-  .header-nav { display:flex; gap:24px; align-items:center; }
-  .header-nav a { font-size:14px; font-weight:500; color:var(--text-2); }
-  .header-nav a:hover { color:var(--text); }
-  .header-right { margin-left:auto; display:flex; gap:12px; align-items:center; }
-  .header-search { background:var(--light); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 16px; font-size:13px; color:var(--text-3); cursor:pointer; display:flex; align-items:center; gap:6px; }
-  .header-login { font-size:14px; font-weight:500; color:var(--text-2); }
-  .header-cta { background:var(--navy); color:var(--white); padding:9px 18px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; }
-  .hamburger { display:none; }
-  
-  /* Hero */
-  .hero { background:var(--white); padding:80px 24px 60px; max-width:1280px; margin:0 auto; display:grid; grid-template-columns:1.2fr 1fr; gap:60px; align-items:center; }
-  .hero-eyebrow { font-size:13px; font-weight:600; color:var(--text-2); letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; }
-  .hero h1 { font-size:56px; font-weight:800; line-height:1.05; letter-spacing:-2px; margin-bottom:16px; }
-  .hero-subtitle { font-size:20px; font-weight:500; color:var(--text-2); margin-bottom:32px; line-height:1.4; }
-  .hero-points { display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:28px; }
-  .hero-point { font-size:14px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:6px; }
-  .hero-point::before { content:"✓"; color:var(--green); font-weight:700; }
-  .hero-search { display:flex; gap:8px; margin-bottom:16px; }
-  .hero-search-input { flex:1; background:var(--white); border:2px solid var(--border); border-radius:var(--radius-sm); padding:14px 18px; font-size:15px; font-family:'Poppins',sans-serif; outline:none; }
-  .hero-search-input:focus { border-color:var(--yellow); }
-  .hero-search-btn { background:var(--yellow); color:var(--navy); border:none; padding:14px 24px; border-radius:var(--radius-sm); font-size:15px; font-weight:700; cursor:pointer; font-family:'Poppins',sans-serif; }
-  .hero-tags { display:flex; flex-wrap:wrap; gap:8px; }
-  .hero-tag { background:var(--light); border:1px solid var(--border); padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500; color:var(--text-2); cursor:pointer; }
-  .hero-tag:hover { border-color:var(--text-3); }
-  .hero-logo { display:flex; justify-content:center; }
-  .hero-logo svg { width:320px; height:320px; }
-  
-  /* Categories */
-  .categories { max-width:1280px; margin:0 auto; padding:20px 24px 60px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-  .cat-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:28px; cursor:pointer; transition:transform .15s,box-shadow .15s; }
-  .cat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
-  .cat-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:16px; }
-  .cat-icon.green { background:rgba(0,200,83,0.12); }
-  .cat-icon.orange { background:rgba(255,138,0,0.12); }
-  .cat-icon.purple { background:rgba(122,60,255,0.12); }
-  .cat-title { font-size:18px; font-weight:700; margin-bottom:4px; }
-  .cat-sub { font-size:13px; color:var(--text-2); line-height:1.4; }
-  .cat-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
-  .cat-dot.green { background:var(--green); }
-  .cat-dot.orange { background:var(--orange); }
-  .cat-dot.purple { background:var(--purple); }
-  
-  /* Stats */
-  .stats { background:var(--navy); padding:48px 24px; }
-  .stats-inner { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
-  .stat { text-align:center; }
-  .stat-num { font-size:40px; font-weight:800; color:var(--yellow); letter-spacing:-1px; }
-  .stat-label { font-size:14px; color:rgba(255,255,255,0.6); margin-top:4px; }
-  
-  /* Listings */
-  .listings { max-width:1280px; margin:0 auto; padding:80px 24px; }
-  .section-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; }
-  .section-head h2 { font-size:32px; font-weight:800; letter-spacing:-0.8px; }
-  .section-head p { font-size:15px; color:var(--text-2); margin-top:4px; }
-  .section-head a { font-size:14px; font-weight:600; color:var(--text); }
-  .listing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-  .listing-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:transform .15s,box-shadow .15s; }
-  .listing-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
-  .listing-cover { height:140px; background:var(--light); display:flex; align-items:center; justify-content:center; font-size:48px; position:relative; }
-  .listing-industry { position:absolute; top:12px; left:12px; font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; }
-  .listing-industry.fintech { background:rgba(0,200,83,0.15); color:var(--green); }
-  .listing-industry.crypto { background:rgba(255,138,0,0.15); color:var(--orange); }
-  .listing-industry.igaming { background:rgba(122,60,255,0.15); color:var(--purple); }
-  .listing-featured { position:absolute; top:12px; right:12px; background:var(--yellow); color:var(--navy); font-size:10px; font-weight:700; padding:4px 10px; border-radius:6px; }
-  .listing-body { padding:18px; }
-  .listing-title { font-size:16px; font-weight:700; margin-bottom:6px; letter-spacing:-0.2px; }
-  .listing-location { font-size:13px; color:var(--text-2); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
-  .listing-desc { font-size:13px; color:var(--text-3); line-height:1.4; margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .listing-tags { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
-  .listing-tag { font-size:11px; font-weight:500; padding:3px 8px; border-radius:5px; background:var(--light); color:var(--text-2); }
-  .listing-bottom { display:flex; justify-content:space-between; align-items:center; }
-  .listing-price { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
-  .listing-arrow { font-size:18px; color:var(--text-3); }
-  
-  /* CTA */
-  .cta { max-width:1280px; margin:0 auto; padding:80px 24px; }
-  .cta-box { background:var(--navy); border-radius:20px; padding:60px; text-align:center; }
-  .cta-box h2 { font-size:36px; font-weight:800; color:var(--white); letter-spacing:-0.8px; margin-bottom:12px; }
-  .cta-box p { font-size:16px; color:rgba(255,255,255,0.6); margin-bottom:28px; }
-  .cta-box .btn { background:var(--yellow); color:var(--navy); padding:14px 32px; border-radius:var(--radius-sm); font-size:16px; font-weight:700; display:inline-block; }
-  
-  /* Footer */
-  .footer { background:var(--white); border-top:1px solid var(--border); padding:32px 24px; }
-  .footer-inner { max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
-  .footer-logo { height:32px; }
-  .footer-links { display:flex; gap:20px; }
-  .footer-link { font-size:13px; color:var(--text-2); }
-  .footer-link:hover { color:var(--text); }
-  
-  /* Mobile bottom nav */
-  .bottom-nav { display:none; }
-  
-  /* Empty */
-  .empty { text-align:center; padding:60px 20px; color:var(--text-3); }
-  .empty p { font-size:15px; margin-top:8px; }
-  
-  @media (max-width:1024px) {
-    .header-nav { display:none; }
-    .header-search { display:none; }
-    .listing-grid { grid-template-columns:repeat(2,1fr); }
-    .hero { grid-template-columns:1fr; text-align:center; }
-    .hero-points { justify-content:center; }
-    .hero-search { max-width:500px; margin-left:auto; margin-right:auto; }
-    .hero-tags { justify-content:center; }
-  }
-  @media (max-width:768px) {
-    .header-inner { padding:12px 16px; gap:12px; }
-    .header-login, .header-cta { display:none; }
-    .hamburger { display:block; font-size:24px; cursor:pointer; background:none; border:none; color:var(--text); }
-    .hero { padding:48px 16px 32px; }
-    .hero h1 { font-size:36px; }
-    .hero-subtitle { font-size:16px; }
-    .hero-logo svg { width:220px; height:220px; }
-    .categories { grid-template-columns:1fr; padding:16px 16px 48px; }
-    .stats-inner { grid-template-columns:repeat(2,1fr); gap:20px; }
-    .listing-grid { grid-template-columns:1fr; }
-    .cta-box { padding:40px 24px; }
-    .cta-box h2 { font-size:26px; }
-    .section-head { flex-direction:column; align-items:flex-start; gap:6px; }
-    /* Bottom nav */
-    .bottom-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--white); border-top:1px solid var(--border); padding:8px 16px; padding-bottom:max(8px,env(safe-area-inset-bottom)); justify-content:space-around; z-index:100; }
-    .bottom-nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:var(--text-3); font-weight:500; }
-    .bottom-nav-item.active { color:var(--text); }
-    .bottom-nav-submit { width:44px; height:44px; border-radius:50%; background:var(--yellow); color:var(--navy); border:none; font-size:22px; font-weight:700; display:flex; align-items:center; justify-content:center; }
-  }
+:root {
+  --yellow: #FFD400;
+  --navy: #0B1220;
+  --green: #00C853;
+  --orange: #FF8A00;
+  --purple: #7A3CFF;
+  --light: #F6F8FB;
+  --white: #FFFFFF;
+  --text: #0B1220;
+  --text-2: #5F6B7A;
+  --text-3: #939EB8;
+  --border: #E5E7EB;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Poppins',sans-serif; background:var(--light); color:var(--text); -webkit-font-smoothing:antialiased; }
+a { color:inherit; text-decoration:none; }
+
+/* Header */
+.header { background:var(--white); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+.header-inner { max-width:1280px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:16px; }
+.header-logo { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.header-logo svg { width:34px; height:34px; }
+.header-logo b { font-size:16px; font-weight:700; letter-spacing:-0.3px; }
+.header-logo small { font-size:8px; font-weight:600; letter-spacing:3px; color:var(--text-2); display:block; margin-top:-2px; }
+.header-nav { display:flex; gap:28px; align-items:center; margin-left:20px; }
+.header-nav a { font-size:14px; font-weight:500; color:var(--text-2); }
+.header-nav a:hover { color:var(--text); }
+.header-right { margin-left:auto; display:flex; gap:12px; align-items:center; }
+.header-search { background:var(--light); border:1px solid var(--border); border-radius:12px; padding:8px 14px; font-size:13px; color:var(--text-3); display:flex; align-items:center; gap:6px; cursor:pointer; }
+.header-login { font-size:14px; font-weight:600; color:var(--text); }
+.header-cta { background:var(--navy); color:var(--white); padding:8px 18px; border-radius:999px; font-size:14px; font-weight:600; }
+.hamburger { display:none; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text); }
+
+/* Hero */
+.hero { background:var(--white); padding:64px 20px 48px; max-width:1280px; margin:0 auto; display:grid; grid-template-columns:1.3fr 1fr; gap:48px; align-items:center; }
+.hero-eyebrow { display:inline-block; background:var(--navy); color:var(--white); font-size:11px; font-weight:600; letter-spacing:1px; padding:5px 14px; border-radius:999px; margin-bottom:20px; text-transform:uppercase; }
+.hero h1 { font-size:52px; font-weight:800; line-height:1.05; letter-spacing:-2px; margin-bottom:14px; }
+.hero-sub { font-size:18px; font-weight:400; color:var(--text-2); margin-bottom:28px; line-height:1.4; }
+.hero-points { display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:24px; }
+.hero-point { font-size:14px; font-weight:500; display:flex; align-items:center; gap:6px; }
+.hero-point::before { content:"✓"; color:var(--green); font-weight:700; }
+.hero-search { display:flex; gap:8px; margin-bottom:14px; }
+.hero-search-input { flex:1; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:14px 18px; font-size:15px; font-family:'Poppins',sans-serif; outline:none; color:var(--text); }
+.hero-search-input:focus { border-color:var(--navy); }
+.hero-search-btn { background:var(--yellow); color:var(--navy); border:none; padding:14px 22px; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; font-family:'Poppins',sans-serif; }
+.hero-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.hero-tag { background:var(--white); border:1px solid var(--border); padding:6px 14px; border-radius:999px; font-size:13px; font-weight:500; color:var(--text-2); cursor:pointer; }
+.hero-tag:hover { border-color:var(--text-3); color:var(--text); }
+.hero-logo { display:flex; justify-content:center; }
+.hero-logo svg { width:300px; height:300px; }
+
+/* Categories */
+.cats { max-width:1280px; margin:0 auto; padding:0 20px 48px; display:flex; gap:10px; flex-wrap:wrap; }
+.cat-chip { padding:8px 20px; border-radius:999px; font-size:14px; font-weight:600; color:var(--white); cursor:pointer; border:none; font-family:'Poppins',sans-serif; }
+.cat-chip.green { background:var(--green); }
+.cat-chip.orange { background:var(--orange); }
+.cat-chip.purple { background:var(--purple); }
+
+/* Stats */
+.stats { background:var(--navy); padding:40px 20px; }
+.stats-inner { max-width:1280px; margin:0 auto; display:flex; justify-content:space-around; flex-wrap:wrap; gap:20px; }
+.stat { text-align:center; }
+.stat-num { font-size:36px; font-weight:800; color:var(--yellow); letter-spacing:-1px; }
+.stat-label { font-size:13px; color:rgba(255,255,255,0.5); margin-top:2px; }
+
+/* Listings */
+.listings { max-width:1280px; margin:0 auto; padding:64px 20px; }
+.section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+.section-head h2 { font-size:28px; font-weight:800; letter-spacing:-0.6px; }
+.section-head a { font-size:14px; font-weight:600; color:var(--text); }
+.lgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.lcard { background:var(--white); border:1px solid var(--border); border-radius:16px; overflow:hidden; cursor:pointer; transition:transform .15s, box-shadow .15s; }
+.lcard:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(11,18,32,0.08); }
+.lcard-cover { height:120px; background:var(--light); display:flex; align-items:center; justify-content:center; font-size:40px; position:relative; }
+.lcard-badge { position:absolute; top:10px; left:10px; font-size:11px; font-weight:600; padding:4px 12px; border-radius:999px; color:var(--white); }
+.lcard-badge.fintech { background:var(--green); }
+.lcard-badge.crypto { background:var(--orange); }
+.lcard-badge.igaming { background:var(--purple); }
+.lcard-body { padding:16px; }
+.lcard-title { font-size:16px; font-weight:600; margin-bottom:4px; letter-spacing:-0.2px; }
+.lcard-loc { font-size:13px; color:var(--text-2); margin-bottom:8px; }
+.lcard-desc { font-size:13px; color:var(--text-3); line-height:1.4; margin-bottom:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.lcard-tags { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+.lcard-tag { font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; color:var(--white); }
+.lcard-tag.active { background:var(--green); }
+.lcard-tag.verified { background:var(--navy); }
+.lcard-bottom { display:flex; justify-content:space-between; align-items:center; }
+.lcard-price { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+.lcard-arrow { color:var(--text-3); font-size:16px; }
+
+/* CTA */
+.cta { max-width:1280px; margin:0 auto; padding:64px 20px; }
+.cta-box { background:var(--navy); border-radius:24px; padding:56px 40px; text-align:center; }
+.cta-box h2 { font-size:32px; font-weight:800; color:var(--white); letter-spacing:-0.6px; margin-bottom:10px; }
+.cta-box p { font-size:16px; color:rgba(255,255,255,0.5); margin-bottom:24px; }
+.cta-box .btn { background:var(--yellow); color:var(--navy); padding:14px 36px; border-radius:999px; font-size:16px; font-weight:700; display:inline-block; }
+
+/* Footer */
+.footer { background:var(--white); border-top:1px solid var(--border); padding:24px 20px; }
+.footer-inner { max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; }
+.footer-logo { height:28px; }
+.footer-links { display:flex; gap:20px; }
+.footer-links a { font-size:13px; color:var(--text-2); }
+.footer-links a:hover { color:var(--text); }
+
+/* Bottom nav */
+.bottom-nav { display:none; }
+
+/* Empty */
+.empty { text-align:center; padding:48px 20px; color:var(--text-3); }
+.empty p { font-size:15px; }
+
+/* Mobile */
+@media (max-width:1024px) {
+  .header-nav { display:none; }
+  .header-search { display:none; }
+  .header-login { display:none; }
+  .header-cta { display:none; }
+  .hamburger { display:block; }
+  .hero { grid-template-columns:1fr; gap:32px; padding:40px 20px 32px; }
+  .hero h1 { font-size:36px; }
+  .hero-sub { font-size:16px; }
+  .hero-logo svg { width:220px; height:220px; }
+  .lgrid { grid-template-columns:repeat(2,1fr); }
+  .stats-inner { gap:16px; }
+  .stat-num { font-size:28px; }
+}
+@media (max-width:768px) {
+  .header-inner { padding:10px 16px; gap:8px; }
+  .hero { padding:32px 16px 24px; text-align:left; }
+  .hero h1 { font-size:32px; letter-spacing:-1px; }
+  .hero-points { gap:6px 16px; }
+  .hero-search { flex-direction:row; }
+  .hero-logo { display:none; }
+  .cats { padding:0 16px 32px; }
+  .stats { padding:28px 16px; }
+  .stats-inner { justify-content:space-between; }
+  .stat-num { font-size:24px; }
+  .stat-label { font-size:11px; }
+  .listings { padding:40px 16px; }
+  .section-head h2 { font-size:22px; }
+  .lgrid { grid-template-columns:1fr; }
+  .cta { padding:40px 16px; }
+  .cta-box { padding:40px 24px; }
+  .cta-box h2 { font-size:24px; }
+  .bottom-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--white); border-top:1px solid var(--border); padding:8px 16px; padding-bottom:max(8px,env(safe-area-inset-bottom)); justify-content:space-around; align-items:center; z-index:100; }
+  .bn-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10px; color:var(--text-3); font-weight:500; background:none; border:none; cursor:pointer; font-family:'Poppins',sans-serif; }
+  .bn-item.active { color:var(--text); }
+  .bn-submit { width:44px; height:44px; border-radius:50%; background:var(--yellow); color:var(--navy); border:none; font-size:22px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  body { padding-bottom:60px; }
+}
 </style>
 </head>
 <body>
@@ -169,7 +167,7 @@
   <div class="header-inner">
     <div class="header-logo">
       <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#FFD400"/><path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/><circle cx="212" cy="95" r="24" fill="#fff"/><path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/><text x="256" y="285" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text><circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/></svg>
-      <span class="header-logo-text">ReadyCo Market</span>
+      <div><b>ReadyCo</b><small>MARKET</small></div>
     </div>
     <nav class="header-nav">
       <a href="#listings">Listings</a>
@@ -179,7 +177,7 @@
       <a href="https://t.me/ReadyCoAdminBot">Contact</a>
     </nav>
     <div class="header-right">
-      <div class="header-search">🔍 Search by license, jurisdiction...</div>
+      <div class="header-search">⌕ Search...</div>
       <a class="header-login" href="https://t.me/ReadyCoAdminBot">Login</a>
       <a class="header-cta" href="https://t.me/ReadyCoAdminBot">+ Submit Offer</a>
       <button class="hamburger">☰</button>
@@ -189,9 +187,9 @@
 
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-eyebrow">Established Companies. Real Value.</div>
+    <span class="hero-eyebrow">Established Companies. Real Value.</span>
     <h1>Buy Licensed Companies</h1>
-    <div class="hero-subtitle">Fintech. Crypto. iGaming. Ready for what's next.</div>
+    <p class="hero-sub">Fintech. Crypto. iGaming. Ready for what's next.</p>
     <div class="hero-points">
       <span class="hero-point">Verified Listings</span>
       <span class="hero-point">Real Businesses</span>
@@ -199,8 +197,8 @@
       <span class="hero-point">Direct Deals</span>
     </div>
     <div class="hero-search">
-      <input class="hero-search-input" placeholder="Search by license, jurisdiction, industry..." id="heroSearch">
-      <button class="hero-search-btn" onclick="doSearch()">Search</button>
+      <input class="hero-search-input" placeholder="Search companies..." id="heroSearch">
+      <button class="hero-search-btn" onclick="doSearch()">⌕</button>
     </div>
     <div class="hero-tags">
       <span class="hero-tag" onclick="tagSearch('VASP')">VASP</span>
@@ -218,22 +216,10 @@
   </div>
 </section>
 
-<section class="categories">
-  <div class="cat-card" onclick="tagSearch('fintech')">
-    <div class="cat-icon green">🏦</div>
-    <div class="cat-title"><span class="cat-dot green"></span>Fintech</div>
-    <div class="cat-sub">PSP, EMI, AEMI, Payment Institutions</div>
-  </div>
-  <div class="cat-card" onclick="tagSearch('crypto')">
-    <div class="cat-icon orange">₿</div>
-    <div class="cat-title"><span class="cat-dot orange"></span>Crypto</div>
-    <div class="cat-sub">VASP, CASP, Exchanges, Custody</div>
-  </div>
-  <div class="cat-card" onclick="tagSearch('igaming')">
-    <div class="cat-icon purple">♠️</div>
-    <div class="cat-title"><span class="cat-dot purple"></span>iGaming</div>
-    <div class="cat-sub">Online Casinos, Betting, Gaming Licenses</div>
-  </div>
+<section class="cats">
+  <button class="cat-chip green" onclick="tagSearch('fintech')">🏦 Fintech</button>
+  <button class="cat-chip orange" onclick="tagSearch('crypto')">₿ Crypto</button>
+  <button class="cat-chip purple" onclick="tagSearch('igaming')">♠️ iGaming</button>
 </section>
 
 <section class="stats">
@@ -247,13 +233,10 @@
 
 <section class="listings" id="listings">
   <div class="section-head">
-    <div>
-      <h2>Latest Opportunities</h2>
-      <p>Licensed businesses. Established operations. Ready for the next owner.</p>
-    </div>
+    <h2>Latest Opportunities</h2>
     <a href="https://t.me/readyco">View all →</a>
   </div>
-  <div id="listingGrid" class="listing-grid">
+  <div id="lgrid" class="lgrid">
     <div class="empty"><p>Loading listings…</p></div>
   </div>
 </section>
@@ -270,64 +253,56 @@
   <div class="footer-inner">
     <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" class="footer-logo"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".16"/></filter></defs><g filter="url(#sh2)"><path d="M105 62 L290 62 L310 250 Q312 300 265 310 L105 310 Q65 305 62 265 L55 110 Q53 72 105 62Z" fill="#FFD400"/><path d="M82 82 L282 82" stroke="#F3B900" stroke-width="7" opacity=".45"/><path d="M155 67 C145 10 220 5 228 62" fill="none" stroke="#7C8795" stroke-width="16" stroke-linecap="round"/><circle cx="190" cy="68" r="17" fill="#fff"/><text x="78" y="180" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="800" fill="#0B1220">ReadyCo</text><text x="98" y="218" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="11" fill="#0B1220">MARKET</text><circle cx="105" cy="263" r="27" fill="#00C853"/><path d="M90 273h30M94 268v-24h22v24M91 244h28" stroke="#fff" stroke-width="5" fill="none"/><circle cx="177" cy="263" r="27" fill="#FF8A00"/><text x="177" y="275" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#fff">₿</text><circle cx="249" cy="263" r="27" fill="#7A3CFF"/><path d="M249 239 C238 229 230 240 238 248 C227 244 227 258 249 280 C271 258 271 244 260 248 C268 240 260 229 249 239Z" fill="#fff"/></g><text x="380" y="200" font-family="Poppins, Arial, sans-serif" font-size="52" font-weight="700" fill="#0B1220">ReadyCo Market</text></svg>
     <div class="footer-links">
-      <a class="footer-link" href="https://t.me/readyco">Channel</a>
-      <a class="footer-link" href="https://t.me/ReadyCoAdminBot">Bot</a>
-      <a class="footer-link" href="https://readyco.vercel.app/inbox">Admin</a>
+      <a href="https://t.me/readyco">Channel</a>
+      <a href="https://t.me/ReadyCoAdminBot">Bot</a>
+      <a href="https://readyco.vercel.app/inbox">Admin</a>
     </div>
   </div>
 </footer>
 
 <nav class="bottom-nav">
-  <div class="bottom-nav-item active">🏠 Home</div>
-  <div class="bottom-nav-item">🔍 Search</div>
-  <button class="bottom-nav-submit">+</button>
-  <div class="bottom-nav-item">📑 Saved</div>
-  <div class="bottom-nav-item">👤 Profile</div>
+  <button class="bn-item active">🏠<span>Home</span></button>
+  <button class="bn-item">⌕<span>Search</span></button>
+  <button class="bn-submit">+</button>
+  <button class="bn-item">📑<span>Saved</span></button>
+  <button class="bn-item">👤<span>Profile</span></button>
 </nav>
 
 <script>
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
-const INDUSTRY={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
+const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
-function industryOf(lic){if(!lic)return'fintech';for(const[k,v]of Object.entries(INDUSTRY)){if(lic.toLowerCase().includes(k.toLowerCase()))return v}return'fintech'}
+function indOf(l){if(!l)return'fintech';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'fintech'}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
-
-function doSearch(){const q=document.getElementById('heroSearch').value;if(q)window.location.href='/api/offers?q='+encodeURIComponent(q)}
+function doSearch(){const q=document.getElementById('heroSearch').value;if(q)loadListings(q)}
 function tagSearch(t){document.getElementById('heroSearch').value=t;loadListings(t)}
-
 async function loadListings(q){
   try{
-    const url=q?('/api/offers?status=live'):('/api/offers?status=live');
-    const res=await fetch(url);
+    const res=await fetch('/api/offers?status=live');
     const data=await res.json();
-    const offers=q?data.offers.filter(o=>JSON.stringify(o).toLowerCase().includes(q.toLowerCase())):data.offers;
+    let offers=data.offers;
+    if(q){const ql=q.toLowerCase();offers=offers.filter(o=>JSON.stringify(o).toLowerCase().includes(ql))}
     document.getElementById('stat-count').textContent=offers.length+'+';
-    const grid=document.getElementById('listingGrid');
-    if(!offers.length){grid.innerHTML='<div class="empty"><p>No listings found. Follow @readyco for new arrivals.</p></div>';return}
-    grid.innerHTML=offers.map(o=>{
-      const ind=industryOf(o.license_type);
+    const g=document.getElementById('lgrid');
+    if(!offers.length){g.innerHTML='<div class="empty"><p>No listings yet. Follow @readyco for new arrivals.</p></div>';return}
+    g.innerHTML=offers.map(o=>{
+      const ind=indOf(o.license_type);
       const emoji={fintech:'🏦',crypto:'₿',igaming:'♠️'}[ind];
       const tags=[];
-      if(o.bank_emi_account&&o.bank_emi_account.toLowerCase().includes('yes'))tags.push('Bank Accounts');
-      if(o.license_status)tags.push(o.license_status);
-      if(o.vat_status&&o.vat_status.toLowerCase().includes('active'))tags.push('VAT Active');
-      return `<div class="listing-card" onclick="window.location.href='https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}'">
-        <div class="listing-cover">${emoji}
-          <span class="listing-industry ${ind}">${ind}</span>
-        </div>
-        <div class="listing-body">
-          <div class="listing-title">${esc(o.license_type||'Company')} — ${esc(o.jurisdiction||'')}</div>
-          <div class="listing-location">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
-          ${o.short_description?`<div class="listing-desc">${esc(o.short_description)}</div>`:''}
-          ${tags.length?`<div class="listing-tags">${tags.map(t=>`<span class="listing-tag">${esc(t)}</span>`).join('')}</div>`:''}
-          <div class="listing-bottom">
-            <div class="listing-price">${esc(o.price||'On request')}</div>
-            <div class="listing-arrow">→</div>
-          </div>
+      if(o.license_status)tags.push(`<span class="lcard-tag active">${esc(o.license_status)}</span>`);
+      if(o.bank_emi_account&&o.bank_emi_account.toLowerCase().includes('yes'))tags.push(`<span class="lcard-tag verified">Bank</span>`);
+      return `<div class="lcard" onclick="window.location.href='https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}'">
+        <div class="lcard-cover">${emoji}<span class="lcard-badge ${ind}">${ind}</span></div>
+        <div class="lcard-body">
+          <div class="lcard-title">${esc(o.license_type||'Company')} — ${esc(o.jurisdiction||'')}</div>
+          <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
+          ${o.short_description?`<div class="lcard-desc">${esc(o.short_description)}</div>`:''}
+          ${tags.length?`<div class="lcard-tags">${tags.join('')}</div>`:''}
+          <div class="lcard-bottom"><span class="lcard-price">${esc(o.price||'On request')}</span><span class="lcard-arrow">→</span></div>
         </div>
       </div>`;
     }).join('');
-  }catch(e){document.getElementById('listingGrid').innerHTML='<div class="empty"><p>Could not load listings.</p></div>'}
+  }catch(e){document.getElementById('lgrid').innerHTML='<div class="empty"><p>Could not load listings.</p></div>'}
 }
 loadListings();
 </script>
