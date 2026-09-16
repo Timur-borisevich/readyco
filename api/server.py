@@ -1340,6 +1340,12 @@ async def admin_restore(request: Request):
     return {"ok": True, "restored": {"offers": len(data.get("offers",[])), "leads": len(data.get("leads",[]))}}
 
 # === STATIC ===
+@app.get("/logo.png")
+async def logo():
+    p = os.path.join(STATIC_DIR, "logo.png")
+    if os.path.exists(p): return FileResponse(p, media_type="image/png")
+    raise HTTPException(404, "Not found")
+
 @app.get("/inbox")
 async def mini_app():
     p = os.path.join(STATIC_DIR, "index.html")

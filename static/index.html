@@ -151,7 +151,7 @@ const FIELDS=[{key:'jurisdiction',label:'Jurisdiction',ph:'Poland'},{key:'compan
 async function api(path,opts={}){const h={'Content-Type':'application/json',...opts.headers};h['X-Telegram-Init-Data']=tgUser?tgUser.id.toString():'8339164180';const r=await fetch(API+path,{...opts,headers:h});if(!r.ok)throw new Error(await r.text());return r.json()}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
 function initials(n){return(n||'?')[0].toUpperCase()}
-const LOGO='<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#FFD400"/><path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/><circle cx="212" cy="95" r="24" fill="#fff"/><path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/><text x="256" y="285" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text><circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/></svg>';
+const LOGO='<img src="/logo.png" alt="ReadyCo" style="width:30px;height:30px;border-radius:7px">';
 
 function render(){const app=document.getElementById('app');if(view==='chat')return renderChat(app);if(view==='add')return renderForm(app,'add');if(view==='edit')return renderForm(app,'edit');if(view==='announce')return renderAnnounce(app);renderMain(app)}
 function renderMain(app){const tabs=[{k:'leads',l:'Leads',i:'👤'},{k:'offers',l:'Offers',i:'📋'},{k:'stats',l:'Stats',i:'📊'},{k:'manage',l:'Manage',i:'⚙️'}];
