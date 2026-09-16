@@ -4,195 +4,422 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>ReadyCo Market — Buy Licensed Companies</title>
+<meta name="description" content="Marketplace for licensed companies. Fintech, Crypto, iGaming. Verified, ready for transfer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--yellow:#FFD400;--navy:#0B1220;--green:#00C853;--orange:#FF8A00;--purple:#7A3CFF;--light:#F6F8FB;--white:#fff;--text:#0B1220;--text-2:#5F6B7A;--text-3:#939EB8;--border:#E5E7EB}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Poppins',sans-serif;background:var(--light);color:var(--text);-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
+/* ============================================
+   ReadyCo Market — Apple-level design
+   Light, spacious, confident, minimal
+   ============================================ */
+:root {
+  --yellow: #FFD400;
+  --yellow-hover: #FFE04D;
+  --navy: #0B1220;
+  --navy-soft: #1a2238;
+  --green: #00C853;
+  --orange: #FF8A00;
+  --purple: #7A3CFF;
+  --light: #F6F8FB;
+  --white: #FFFFFF;
+  --text: #0B1220;
+  --text-2: #6B7280;
+  --text-3: #9CA3AF;
+  --border: #E5E7EB;
+  --border-soft: #F0F2F5;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-/* Header */
-.hdr{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.hdr-in{max-width:1280px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:20px}
-.hdr-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.hdr-logo svg{width:34px;height:34px}
-.hdr-logo b{font-size:15px;font-weight:700}
-.hdr-logo small{font-size:8px;font-weight:600;letter-spacing:2px;color:var(--text-2);display:block;margin-top:-3px}
-.hdr-nav{display:flex;gap:28px;margin-left:16px}
-.hdr-nav a{font-size:14px;font-weight:500;color:var(--text-2)}
-.hdr-nav a:hover{color:var(--text)}
-.hdr-r{margin-left:auto;display:flex;gap:12px;align-items:center}
-.hdr-search{background:var(--light);border:1px solid var(--border);border-radius:12px;padding:8px 14px;font-size:13px;color:var(--text-3);cursor:pointer}
-.hdr-login{font-size:14px;font-weight:600}
-.hdr-cta{background:var(--yellow);color:var(--navy);padding:9px 20px;border-radius:999px;font-size:14px;font-weight:600}
-.burger{display:none;background:none;border:none;font-size:22px;cursor:pointer}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', -apple-system, sans-serif;
+  background: var(--white);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  line-height: 1.5;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
 
-/* Hero */
-.hero{background:var(--white);padding:64px 24px 56px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center}
-.hero-eye{display:inline-block;background:var(--navy);color:var(--white);font-size:11px;font-weight:600;letter-spacing:1px;padding:5px 14px;border-radius:999px;margin-bottom:18px;text-transform:uppercase}
-.hero h1{font-size:52px;font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:14px}
-.hero-sub{font-size:18px;color:var(--text-2);margin-bottom:26px;line-height:1.4}
-.hero-pts{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:24px}
-.hero-pt{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px}
-.hero-pt::before{content:"✓";color:var(--green);font-weight:700}
-.hero-search{display:flex;gap:8px;margin-bottom:14px}
-.hero-si{flex:1;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px;font-size:15px;font-family:'Poppins',sans-serif;outline:none;color:var(--text)}
-.hero-si:focus{border-color:var(--navy)}
-.hero-sb{background:var(--yellow);color:var(--navy);border:none;padding:14px 22px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
-.hero-tags{display:flex;flex-wrap:wrap;gap:8px}
-.hero-tag{background:var(--white);border:1px solid var(--border);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer}
-.hero-tag:hover{border-color:var(--text-3);color:var(--text)}
+/* ─── Header ─── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 24px;
+}
+.header-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.header-logo svg { width: 32px; height: 32px; }
+.header-logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+.header-logo-sub { font-size: 8px; font-weight: 600; letter-spacing: 2.5px; color: var(--text-2); }
+.header-nav { display: flex; gap: 32px; margin-left: 20px; }
+.header-nav a {
+  font-size: 14px; font-weight: 500; color: var(--text-2);
+  transition: color 0.2s var(--ease);
+}
+.header-nav a:hover { color: var(--text); }
+.header-right { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+.header-search {
+  background: var(--light); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 16px;
+  font-size: 13px; color: var(--text-3);
+  display: flex; align-items: center; gap: 6px;
+  transition: border-color 0.2s var(--ease);
+}
+.header-search:hover { border-color: var(--text-3); }
+.header-login { font-size: 14px; font-weight: 600; color: var(--text); }
+.header-cta {
+  background: var(--navy); color: var(--white);
+  padding: 9px 20px; border-radius: 999px;
+  font-size: 14px; font-weight: 600;
+  transition: background 0.2s var(--ease);
+}
+.header-cta:hover { background: var(--navy-soft); }
+.hamburger { display: none; background: none; border: none; font-size: 22px; color: var(--text); }
+
+/* ─── Hero ─── */
+.hero {
+  max-width: 1200px; margin: 0 auto;
+  padding: 100px 24px 80px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 64px; align-items: center;
+}
+.hero-eyebrow {
+  display: inline-block;
+  background: var(--navy); color: var(--white);
+  font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+  padding: 6px 16px; border-radius: 999px;
+  margin-bottom: 24px; text-transform: uppercase;
+}
+.hero h1 {
+  font-size: 56px; font-weight: 800;
+  line-height: 1.02; letter-spacing: -2.5px;
+  margin-bottom: 18px;
+}
+.hero-sub {
+  font-size: 20px; font-weight: 400;
+  color: var(--text-2); line-height: 1.4;
+  margin-bottom: 36px; max-width: 480px;
+}
+.hero-points {
+  display: flex; flex-wrap: wrap; gap: 10px 24px;
+  margin-bottom: 32px;
+}
+.hero-point {
+  font-size: 15px; font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-point::before {
+  content: ""; width: 18px; height: 18px;
+  background: var(--green);
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: 12px; background-repeat: no-repeat; background-position: center;
+  flex-shrink: 0;
+}
+.hero-search { display: flex; gap: 10px; margin-bottom: 18px; }
+.hero-search-input {
+  flex: 1; background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 15px 20px;
+  font-size: 15px; font-family: inherit;
+  outline: none; color: var(--text);
+  transition: border-color 0.2s var(--ease);
+}
+.hero-search-input:focus { border-color: var(--navy); }
+.hero-search-btn {
+  background: var(--yellow); color: var(--navy);
+  border: none; padding: 15px 28px;
+  border-radius: 12px; font-size: 15px; font-weight: 700;
+  transition: background 0.2s var(--ease);
+}
+.hero-search-btn:hover { background: var(--yellow-hover); }
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-tag {
+  background: var(--white); border: 1px solid var(--border);
+  padding: 7px 16px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  transition: all 0.2s var(--ease);
+}
+.hero-tag:hover { border-color: var(--navy); color: var(--text); }
 
 /* Hero right */
-.hero-r{display:flex;flex-direction:column;align-items:center;gap:20px}
-.hero-r-logo{width:240px;height:240px}
-.hero-cats{display:flex;flex-direction:column;gap:10px;width:100%}
-.hero-cat{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
-.hero-cat:hover{border-color:var(--text-3);box-shadow:0 4px 16px rgba(11,18,32,0.06)}
-.hero-cat-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.hero-cat-ico.g{background:rgba(0,200,83,0.12)} .hero-cat-ico.o{background:rgba(255,138,0,0.12)} .hero-cat-ico.p{background:rgba(122,60,255,0.12)}
-.hero-cat-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px}
-.hero-cat-dot{width:8px;height:8px;border-radius:50%}
-.hero-cat-dot.g{background:var(--green)} .hero-cat-dot.o{background:var(--orange)} .hero-cat-dot.p{background:var(--purple)}
-.hero-cat-sub{font-size:12px;color:var(--text-2);margin-top:1px}
-
-/* Stats */
-.stats{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:36px 24px}
-.stats-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.stat{display:flex;align-items:center;gap:12px}
-.stat-ico{width:40px;height:40px;border-radius:10px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.stat-num{font-size:24px;font-weight:800;letter-spacing:-0.5px}
-.stat-label{font-size:12px;color:var(--text-2);margin-top:1px}
-
-/* Listings */
-.listings{max-width:1280px;margin:0 auto;padding:64px 24px}
-.sh{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px}
-.sh h2{font-size:28px;font-weight:800;letter-spacing:-0.6px}
-.sh p{font-size:14px;color:var(--text-2);margin-top:4px}
-.sh a{font-size:14px;font-weight:600}
-.lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.lcard{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
-.lcard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(11,18,32,0.08)}
-.lcard-cover{height:130px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative}
-.lcard-cover.fintech{background:linear-gradient(135deg,#E8F5E9,#F1F8E9)}
-.lcard-cover.crypto{background:linear-gradient(135deg,#FFF3E0,#FBE9E7)}
-.lcard-cover.igaming{background:linear-gradient(135deg,#F3E5F5,#EDE7F6)}
-.lcard-cover.none{background:var(--light)}
-.lcard-badge{position:absolute;top:10px;left:10px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;color:var(--white)}
-.lcard-badge.fintech{background:var(--green)} .lcard-badge.crypto{background:var(--orange)} .lcard-badge.igaming{background:var(--purple)}
-.lcard-body{padding:16px}
-.lcard-title{font-size:16px;font-weight:700;margin-bottom:4px;letter-spacing:-0.2px}
-.lcard-loc{font-size:13px;color:var(--text-2);margin-bottom:8px}
-.lcard-desc{font-size:13px;color:var(--text-3);line-height:1.4;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.lcard-tags{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.lcard-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
-.lcard-tag.active{background:rgba(0,200,83,0.12);color:var(--green)}
-.lcard-tag.verified{background:rgba(11,18,32,0.08);color:var(--navy)}
-.lcard-bottom{display:flex;justify-content:space-between;align-items:center}
-.lcard-price{font-size:20px;font-weight:800;letter-spacing:-0.3px}
-.lcard-arrow{color:var(--text-3);font-size:16px}
-
-/* Bottom banner */
-.banner{background:var(--yellow);padding:48px 24px}
-.banner-in{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px}
-.banner-text h3{font-size:24px;font-weight:800;letter-spacing:-0.5px}
-.banner-text p{font-size:14px;color:rgba(11,18,32,0.6);margin-top:4px}
-.banner-btn{background:var(--navy);color:var(--white);padding:14px 28px;border-radius:999px;font-size:15px;font-weight:600;white-space:nowrap}
-
-/* Footer */
-.ftr{background:var(--white);border-top:1px solid var(--border);padding:24px 24px}
-.ftr-in{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
-.ftr-logo{height:28px}
-.ftr-links{display:flex;gap:20px}
-.ftr-links a{font-size:13px;color:var(--text-2)}
-.ftr-links a:hover{color:var(--text)}
-
-/* Bottom nav mobile */
-.bn{display:none}
-
-/* Empty */
-.empty{text-align:center;padding:48px 20px;color:var(--text-3)}
-.empty p{font-size:15px}
-
-/* Mobile */
-@media(max-width:1024px){
-  .hdr-nav{display:none}.hdr-search{display:none}.hdr-login{display:none}.burger{display:block}
-  .hero{grid-template-columns:1fr;gap:32px;padding:40px 20px 32px}
-  .hero h1{font-size:36px}
-  .hero-r{order:-1;flex-direction:row;justify-content:center;gap:16px}
-  .hero-r-logo{width:120px;height:120px}
-  .hero-cats{flex-direction:row;gap:8px}
-  .hero-cat{flex-direction:column;text-align:center;padding:12px 8px;flex:1}
-  .hero-cat-title{flex-direction:column;gap:4px;font-size:13px}
-  .hero-cat-sub{display:none}
-  .lgrid{grid-template-columns:repeat(2,1fr)}
-  .stats-in{grid-template-columns:repeat(2,1fr);gap:16px}
+.hero-right { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.hero-logo-img { width: 200px; height: 200px; }
+.hero-cats { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px; }
+.hero-cat {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px 18px;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 0.25s var(--ease);
 }
-@media(max-width:768px){
-  .hdr-in{padding:10px 16px;gap:8px}
-  .hero{padding:28px 16px 20px;text-align:left}
-  .hero h1{font-size:30px;letter-spacing:-1px}
-  .hero-sub{font-size:15px}
-  .hero-r{flex-direction:column;gap:16px}
-  .hero-r-logo{width:160px;height:160px}
-  .hero-cats{flex-direction:row;gap:8px;width:100%}
-  .hero-cat{flex-direction:column;padding:12px 8px;text-align:center;gap:6px}
-  .hero-cat-title{flex-direction:column;font-size:12px;gap:2px}
-  .hero-cat-ico{width:36px;height:36px;font-size:16px}
-  .hero-cat-sub{display:none}
-  .hero-pts{gap:6px 14px}
-  .hero-search{flex-direction:row}
-  .stats{padding:24px 16px}
-  .stats-in{grid-template-columns:1fr 1fr;gap:12px}
-  .stat{gap:8px}.stat-ico{width:34px;height:34px;font-size:15px}.stat-num{font-size:18px}.stat-label{font-size:11px}
-  .listings{padding:40px 16px}
-  .sh h2{font-size:22px}
-  .lgrid{grid-template-columns:1fr}
-  .banner{padding:32px 16px}
-  .banner-in{flex-direction:column;text-align:center;gap:16px}
-  .banner-text h3{font-size:20px}
-  .bn{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--border);padding:8px 12px;padding-bottom:max(8px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center;z-index:100}
-  .bn-i{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--text-3);font-weight:500;background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif}
-  .bn-i.act{color:var(--navy)}
-  .bn-plus{width:44px;height:44px;border-radius:50%;background:var(--yellow);color:var(--navy);border:none;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center}
-  body{padding-bottom:60px}
+.hero-cat:hover {
+  border-color: var(--text-3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(11,18,32,0.06);
+}
+.hero-cat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.hero-cat-icon.g { background: rgba(0,200,83,0.1); }
+.hero-cat-icon.o { background: rgba(255,138,0,0.1); }
+.hero-cat-icon.p { background: rgba(122,60,255,0.1); }
+.hero-cat-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.hero-cat-dot { width: 8px; height: 8px; border-radius: 50%; }
+.hero-cat-dot.g { background: var(--green); }
+.hero-cat-dot.o { background: var(--orange); }
+.hero-cat-dot.p { background: var(--purple); }
+.hero-cat-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* ─── Stats ─── */
+.stats {
+  background: var(--light);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 48px 24px;
+}
+.stats-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+}
+.stat { display: flex; align-items: center; gap: 14px; }
+.stat-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--white); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.stat-num { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+
+/* ─── Listings ─── */
+.listings { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; }
+.section-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+.section-head h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+.section-head p { font-size: 15px; color: var(--text-2); margin-top: 6px; }
+.section-head a { font-size: 14px; font-weight: 600; color: var(--text); transition: opacity 0.2s; }
+.section-head a:hover { opacity: 0.6; }
+
+.lgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.lcard {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 18px; overflow: hidden;
+  transition: all 0.3s var(--ease);
+}
+.lcard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(11,18,32,0.08);
+  border-color: transparent;
+}
+.lcard-cover {
+  height: 140px; display: flex; align-items: center; justify-content: center;
+  font-size: 44px; position: relative;
+}
+.lcard-cover.fintech { background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); }
+.lcard-cover.crypto { background: linear-gradient(135deg, #FFF3E0 0%, #FBE9E7 100%); }
+.lcard-cover.igaming { background: linear-gradient(135deg, #F3E5F5 0%, #EDE7F6 100%); }
+.lcard-cover.none { background: var(--light); }
+.lcard-badge {
+  position: absolute; top: 12px; left: 12px;
+  font-size: 11px; font-weight: 600;
+  padding: 5px 12px; border-radius: 999px;
+  color: var(--white);
+}
+.lcard-badge.fintech { background: var(--green); }
+.lcard-badge.crypto { background: var(--orange); }
+.lcard-badge.igaming { background: var(--purple); }
+.lcard-body { padding: 18px; }
+.lcard-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.2px; }
+.lcard-loc { font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+.lcard-desc {
+  font-size: 13px; color: var(--text-3); line-height: 1.45;
+  margin-bottom: 14px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lcard-tags { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.lcard-tag { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+.lcard-tag.active { background: rgba(0,200,83,0.1); color: var(--green); }
+.lcard-tag.verified { background: rgba(11,18,32,0.06); color: var(--navy); }
+.lcard-bottom { display: flex; justify-content: space-between; align-items: center; }
+.lcard-price { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.lcard-arrow { color: var(--text-3); font-size: 16px; transition: transform 0.2s var(--ease); }
+.lcard:hover .lcard-arrow { transform: translateX(4px); color: var(--text); }
+
+/* ─── Banner ─── */
+.banner { background: var(--yellow); padding: 64px 24px; }
+.banner-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center; gap: 32px;
+}
+.banner-text h3 { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; line-height: 1.1; }
+.banner-text p { font-size: 15px; color: rgba(11,18,32,0.6); margin-top: 8px; }
+.banner-btn {
+  background: var(--navy); color: var(--white);
+  padding: 15px 32px; border-radius: 999px;
+  font-size: 15px; font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s var(--ease);
+}
+.banner-btn:hover { background: var(--navy-soft); }
+
+/* ─── Footer ─── */
+.footer { background: var(--white); border-top: 1px solid var(--border-soft); padding: 32px 24px; }
+.footer-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-logo { height: 30px; }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: var(--text-2); transition: color 0.2s; }
+.footer-links a:hover { color: var(--text); }
+
+/* ─── Bottom nav ─── */
+.bottom-nav { display: none; }
+
+/* ─── Empty ─── */
+.empty { text-align: center; padding: 80px 20px; color: var(--text-3); }
+.empty p { font-size: 15px; margin-top: 8px; }
+
+/* ─── Animations ─── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.hero-l > * { animation: fadeUp 0.6s var(--ease) backwards; }
+.hero-l > *:nth-child(1) { animation-delay: 0.05s; }
+.hero-l > *:nth-child(2) { animation-delay: 0.1s; }
+.hero-l > *:nth-child(3) { animation-delay: 0.15s; }
+.hero-l > *:nth-child(4) { animation-delay: 0.2s; }
+.hero-l > *:nth-child(5) { animation-delay: 0.25s; }
+.hero-l > *:nth-child(6) { animation-delay: 0.3s; }
+.hero-l > *:nth-child(7) { animation-delay: 0.35s; }
+.hero-right > * { animation: fadeUp 0.6s var(--ease) backwards; }
+.hero-right > *:nth-child(1) { animation-delay: 0.2s; }
+.hero-right > *:nth-child(2) { animation-delay: 0.35s; }
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .header-nav, .header-search, .header-login { display: none; }
+  .hamburger { display: block; }
+  .hero { grid-template-columns: 1fr; gap: 40px; padding: 64px 24px 48px; }
+  .hero h1 { font-size: 40px; letter-spacing: -1.5px; }
+  .hero-right { order: -1; flex-direction: row; justify-content: center; gap: 20px; }
+  .hero-logo-img { width: 100px; height: 100px; }
+  .hero-cats { flex-direction: row; gap: 8px; max-width: none; }
+  .hero-cat { flex-direction: column; text-align: center; padding: 14px 10px; flex: 1; gap: 8px; }
+  .hero-cat-title { flex-direction: column; gap: 4px; font-size: 13px; }
+  .hero-cat-sub { display: none; }
+  .lgrid { grid-template-columns: repeat(2, 1fr); }
+  .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+@media (max-width: 768px) {
+  .header-inner { padding: 12px 16px; gap: 10px; }
+  .header-cta { display: none; }
+  .hero { padding: 40px 16px 32px; }
+  .hero h1 { font-size: 34px; letter-spacing: -1px; }
+  .hero-sub { font-size: 16px; }
+  .hero-right { flex-direction: column; gap: 20px; }
+  .hero-logo-img { width: 140px; height: 140px; }
+  .hero-cats { flex-direction: row; gap: 8px; width: 100%; }
+  .hero-cat { flex-direction: column; padding: 12px 8px; text-align: center; gap: 6px; }
+  .hero-cat-title { flex-direction: column; font-size: 12px; gap: 2px; }
+  .hero-cat-icon { width: 36px; height: 36px; font-size: 15px; }
+  .hero-cat-sub { display: none; }
+  .hero-points { gap: 6px 16px; }
+  .hero-point { font-size: 13px; }
+  .stats { padding: 32px 16px; }
+  .stats-inner { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .stat { gap: 10px; }
+  .stat-icon { width: 36px; height: 36px; font-size: 16px; }
+  .stat-num { font-size: 20px; }
+  .stat-label { font-size: 11px; }
+  .listings { padding: 56px 16px 48px; }
+  .section-head { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 28px; }
+  .section-head h2 { font-size: 24px; }
+  .lgrid { grid-template-columns: 1fr; }
+  .banner { padding: 40px 16px; }
+  .banner-inner { flex-direction: column; text-align: center; gap: 20px; }
+  .banner-text h3 { font-size: 22px; }
+  .footer-inner { flex-direction: column; gap: 16px; }
+  .bottom-nav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid var(--border-soft);
+    padding: 8px 16px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    justify-content: space-around; align-items: center; z-index: 100;
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 9px; color: var(--text-3); font-weight: 500;
+    background: none; border: none;
+  }
+  .bn-item.active { color: var(--navy); }
+  .bn-submit {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--yellow); color: var(--navy);
+    border: none; font-size: 22px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  body { padding-bottom: 70px; }
 }
 </style>
 </head>
 <body>
 
-<header class="hdr">
-  <div class="hdr-in">
-    <div class="hdr-logo">
-      <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#FFD400"/><path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/><circle cx="212" cy="95" r="24" fill="#fff"/><path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/><text x="256" y="285" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text><circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/></svg>
-      <div><b>ReadyCo</b><small>MARKET</small></div>
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#FFD400"/><path d="M170 92 C155 30 245 24 255 88" fill="none" stroke="#7C8795" stroke-width="24" stroke-linecap="round"/><circle cx="212" cy="95" r="24" fill="#fff"/><path d="M150 145 L380 145 L398 375 Q400 420 355 430 L150 430 Q112 425 110 385 L100 190 Q98 152 150 145Z" fill="#FFD400"/><text x="256" y="285" text-anchor="middle" font-family="Poppins,Arial,sans-serif" font-size="66" font-weight="800" fill="#0B1220">R</text><circle cx="178" cy="360" r="25" fill="#00C853"/><circle cx="256" cy="360" r="25" fill="#FF8A00"/><circle cx="334" cy="360" r="25" fill="#7A3CFF"/></svg>
+      <div>
+        <div class="header-logo-text">ReadyCo</div>
+        <div class="header-logo-sub">MARKET</div>
+      </div>
     </div>
-    <nav class="hdr-nav"><a href="#listings">Listings</a><a href="#how">How it works</a><a href="#">About</a><a href="#">Blog</a><a href="https://t.me/ReadyCoAdminBot">Contact</a></nav>
-    <div class="hdr-r">
-      <div class="hdr-search">⌕ Search...</div>
-      <a class="hdr-login" href="https://t.me/ReadyCoAdminBot">Login</a>
-      <a class="hdr-cta" href="https://t.me/ReadyCoAdminBot">+ Submit Offer</a>
-      <button class="burger">☰</button>
+    <nav class="header-nav">
+      <a href="#listings">Listings</a>
+      <a href="#how">How it works</a>
+      <a href="#">About</a>
+      <a href="#">Blog</a>
+      <a href="https://t.me/ReadyCoAdminBot">Contact</a>
+    </nav>
+    <div class="header-right">
+      <div class="header-search">⌕ Search</div>
+      <a class="header-login" href="https://t.me/ReadyCoAdminBot">Login</a>
+      <a class="header-cta" href="https://t.me/ReadyCoAdminBot">+ Submit Offer</a>
+      <button class="hamburger">☰</button>
     </div>
   </div>
 </header>
 
+<!-- Hero -->
 <section class="hero">
   <div class="hero-l">
-    <span class="hero-eye">Established Companies. Real Value.</span>
-    <h1>Buy Licensed Companies</h1>
+    <span class="hero-eyebrow">Established Companies. Real Value.</span>
+    <h1>Buy Licensed<br>Companies</h1>
     <p class="hero-sub">Fintech. Crypto. iGaming. Ready for what's next.</p>
-    <div class="hero-pts">
-      <span class="hero-pt">Verified Listings</span>
-      <span class="hero-pt">Real Businesses</span>
-      <span class="hero-pt">Global Opportunities</span>
-      <span class="hero-pt">Direct Deals</span>
+    <div class="hero-points">
+      <span class="hero-point">Verified Listings</span>
+      <span class="hero-point">Real Businesses</span>
+      <span class="hero-point">Global Opportunities</span>
+      <span class="hero-point">Direct Deals</span>
     </div>
     <div class="hero-search">
-      <input class="hero-si" placeholder="Search by license, jurisdiction, industry..." id="heroSearch">
-      <button class="hero-sb" onclick="doSearch()">Search</button>
+      <input class="hero-search-input" placeholder="Search by license, jurisdiction, industry..." id="heroSearch">
+      <button class="hero-search-btn" onclick="doSearch()">Search</button>
     </div>
     <div class="hero-tags">
       <span class="hero-tag" onclick="tagSearch('VASP')">VASP</span>
@@ -205,57 +432,83 @@ a{color:inherit;text-decoration:none}
       <span class="hero-tag" onclick="tagSearch('Poland')">Poland</span>
     </div>
   </div>
-  <div class="hero-r">
-    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" class="hero-r-logo"><defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".18"/></filter></defs><g filter="url(#s)"><path d="M225 125 L620 125 L665 620 Q670 705 585 725 L220 725 Q145 715 140 640 L125 220 Q122 140 225 125Z" fill="#FFD400"/><path d="M165 160 L605 160" stroke="#F3B900" stroke-width="10" opacity=".45"/><path d="M340 130 C320 45 440 38 455 122" fill="none" stroke="#7C8795" stroke-width="23" stroke-linecap="round"/><circle cx="398" cy="132" r="26" fill="#fff"/><text x="180" y="365" font-family="Poppins, Arial, sans-serif" font-size="91" font-weight="800" fill="#0B1220">ReadyCo</text><text x="220" y="420" font-family="Poppins, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="18" fill="#0B1220">MARKET</text><circle cx="220" cy="560" r="53" fill="#00C853"/><path d="M190 580h60M198 570v-45h44v45M192 525h56" stroke="#fff" stroke-width="9" fill="none"/><circle cx="400" cy="560" r="53" fill="#FF8A00"/><text x="400" y="582" text-anchor="middle" font-family="Arial" font-size="65" font-weight="700" fill="#fff">₿</text><circle cx="580" cy="560" r="53" fill="#7A3CFF"/><path d="M580 510 C558 490 542 510 558 527 C536 519 538 548 580 590 C622 548 624 519 602 527 C618 510 602 490 580 510Z" fill="#fff"/></g></svg>
+  <div class="hero-right">
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" class="hero-logo-img"><defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".18"/></filter></defs><g filter="url(#s)"><path d="M225 125 L620 125 L665 620 Q670 705 585 725 L220 725 Q145 715 140 640 L125 220 Q122 140 225 125Z" fill="#FFD400"/><path d="M165 160 L605 160" stroke="#F3B900" stroke-width="10" opacity=".45"/><path d="M340 130 C320 45 440 38 455 122" fill="none" stroke="#7C8795" stroke-width="23" stroke-linecap="round"/><circle cx="398" cy="132" r="26" fill="#fff"/><text x="180" y="365" font-family="Poppins,Arial,sans-serif" font-size="91" font-weight="800" fill="#0B1220">ReadyCo</text><text x="220" y="420" font-family="Poppins,Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="18" fill="#0B1220">MARKET</text><circle cx="220" cy="560" r="53" fill="#00C853"/><path d="M190 580h60M198 570v-45h44v45M192 525h56" stroke="#fff" stroke-width="9" fill="none"/><circle cx="400" cy="560" r="53" fill="#FF8A00"/><text x="400" y="582" text-anchor="middle" font-family="Arial" font-size="65" font-weight="700" fill="#fff">₿</text><circle cx="580" cy="560" r="53" fill="#7A3CFF"/><path d="M580 510 C558 490 542 510 558 527 C536 519 538 548 580 590 C622 548 624 519 602 527 C618 510 602 490 580 510Z" fill="#fff"/></g></svg>
     <div class="hero-cats">
-      <div class="hero-cat" onclick="tagSearch('fintech')"><div class="hero-cat-ico g">🏦</div><div><div class="hero-cat-title"><span class="hero-cat-dot g"></span>Fintech</div><div class="hero-cat-sub">PSP, EMI, AEMI, Payment Institutions</div></div></div>
-      <div class="hero-cat" onclick="tagSearch('crypto')"><div class="hero-cat-ico o">₿</div><div><div class="hero-cat-title"><span class="hero-cat-dot o"></span>Crypto</div><div class="hero-cat-sub">VASP, CASP, Exchanges, Custody</div></div></div>
-      <div class="hero-cat" onclick="tagSearch('igaming')"><div class="hero-cat-ico p">♠️</div><div><div class="hero-cat-title"><span class="hero-cat-dot p"></span>iGaming</div><div class="hero-cat-sub">Online Casinos, Betting, Gaming Licenses</div></div></div>
+      <div class="hero-cat" onclick="tagSearch('fintech')">
+        <div class="hero-cat-icon g">🏦</div>
+        <div><div class="hero-cat-title"><span class="hero-cat-dot g"></span>Fintech</div><div class="hero-cat-sub">PSP, EMI, AEMI, Payment Institutions</div></div>
+      </div>
+      <div class="hero-cat" onclick="tagSearch('crypto')">
+        <div class="hero-cat-icon o">₿</div>
+        <div><div class="hero-cat-title"><span class="hero-cat-dot o"></span>Crypto</div><div class="hero-cat-sub">VASP, CASP, Exchanges, Custody</div></div>
+      </div>
+      <div class="hero-cat" onclick="tagSearch('igaming')">
+        <div class="hero-cat-icon p">♠️</div>
+        <div><div class="hero-cat-title"><span class="hero-cat-dot p"></span>iGaming</div><div class="hero-cat-sub">Online Casinos, Betting, Gaming Licenses</div></div>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- Stats -->
 <section class="stats">
-  <div class="stats-in">
-    <div class="stat"><div class="stat-ico">🏢</div><div><div class="stat-num" id="stat-count">—</div><div class="stat-label">Companies Listed</div></div></div>
-    <div class="stat"><div class="stat-ico">🌍</div><div><div class="stat-num">35+</div><div class="stat-label">Jurisdictions</div></div></div>
-    <div class="stat"><div class="stat-ico">✓</div><div><div class="stat-num">100%</div><div class="stat-label">Verified Offers</div></div></div>
-    <div class="stat"><div class="stat-ico">📊</div><div><div class="stat-num">↗</div><div class="stat-label">Growing Daily</div></div></div>
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-icon">🏢</div><div><div class="stat-num" id="stat-count">—</div><div class="stat-label">Companies Listed</div></div></div>
+    <div class="stat"><div class="stat-icon">🌍</div><div><div class="stat-num">35+</div><div class="stat-label">Jurisdictions</div></div></div>
+    <div class="stat"><div class="stat-icon">✓</div><div><div class="stat-num">100%</div><div class="stat-label">Verified Offers</div></div></div>
+    <div class="stat"><div class="stat-icon">📊</div><div><div class="stat-num">↗</div><div class="stat-label">Growing Daily</div></div></div>
   </div>
 </section>
 
+<!-- Listings -->
 <section class="listings" id="listings">
-  <div class="sh">
-    <div><h2>Latest Opportunities</h2><p>Verified companies. Real licenses. Global opportunities.</p></div>
+  <div class="section-head">
+    <div>
+      <h2>Latest Opportunities</h2>
+      <p>Verified companies. Real licenses. Global opportunities.</p>
+    </div>
     <a href="https://t.me/readyco">View all listings →</a>
   </div>
-  <div id="lgrid" class="lgrid"><div class="empty"><p>Loading listings…</p></div></div>
+  <div id="lgrid" class="lgrid">
+    <div class="empty"><p>Loading listings…</p></div>
+  </div>
 </section>
 
+<!-- Banner -->
 <section class="banner">
-  <div class="banner-in">
-    <div class="banner-text"><h3>🌍 Global opportunities. Real businesses.</h3><p>Access verified, ready-to-operate companies across top jurisdictions.</p></div>
+  <div class="banner-inner">
+    <div class="banner-text">
+      <h3>🌍 Global opportunities.<br>Real businesses.</h3>
+      <p>Access verified, ready-to-operate companies across top jurisdictions.</p>
+    </div>
     <a class="banner-btn" href="#listings">Explore Listings →</a>
   </div>
 </section>
 
-<footer class="ftr">
-  <div class="ftr-in">
-    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" class="ftr-logo"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".16"/></filter></defs><g filter="url(#sh2)"><path d="M105 62 L290 62 L310 250 Q312 300 265 310 L105 310 Q65 305 62 265 L55 110 Q53 72 105 62Z" fill="#FFD400"/><path d="M82 82 L282 82" stroke="#F3B900" stroke-width="7" opacity=".45"/><path d="M155 67 C145 10 220 5 228 62" fill="none" stroke="#7C8795" stroke-width="16" stroke-linecap="round"/><circle cx="190" cy="68" r="17" fill="#fff"/><text x="78" y="180" font-family="Poppins, Arial, sans-serif" font-size="62" font-weight="800" fill="#0B1220">ReadyCo</text><text x="98" y="218" font-family="Poppins, Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="11" fill="#0B1220">MARKET</text><circle cx="105" cy="263" r="27" fill="#00C853"/><path d="M90 273h30M94 268v-24h22v24M91 244h28" stroke="#fff" stroke-width="5" fill="none"/><circle cx="177" cy="263" r="27" fill="#FF8A00"/><text x="177" y="275" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#fff">₿</text><circle cx="249" cy="263" r="27" fill="#7A3CFF"/><path d="M249 239 C238 229 230 240 238 248 C227 244 227 258 249 280 C271 258 271 244 260 248 C268 240 260 229 249 239Z" fill="#fff"/></g><text x="380" y="200" font-family="Poppins, Arial, sans-serif" font-size="52" font-weight="700" fill="#0B1220">ReadyCo Market</text></svg>
-    <div class="ftr-links"><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Bot</a><a href="https://readyco.vercel.app/inbox">Admin</a></div>
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" class="footer-logo"><defs><filter id="sh2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity=".16"/></filter></defs><g filter="url(#sh2)"><path d="M105 62 L290 62 L310 250 Q312 300 265 310 L105 310 Q65 305 62 265 L55 110 Q53 72 105 62Z" fill="#FFD400"/><path d="M82 82 L282 82" stroke="#F3B900" stroke-width="7" opacity=".45"/><path d="M155 67 C145 10 220 5 228 62" fill="none" stroke="#7C8795" stroke-width="16" stroke-linecap="round"/><circle cx="190" cy="68" r="17" fill="#fff"/><text x="78" y="180" font-family="Poppins,Arial,sans-serif" font-size="62" font-weight="800" fill="#0B1220">ReadyCo</text><text x="98" y="218" font-family="Poppins,Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="11" fill="#0B1220">MARKET</text><circle cx="105" cy="263" r="27" fill="#00C853"/><path d="M90 273h30M94 268v-24h22v24M91 244h28" stroke="#fff" stroke-width="5" fill="none"/><circle cx="177" cy="263" r="27" fill="#FF8A00"/><text x="177" y="275" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#fff">₿</text><circle cx="249" cy="263" r="27" fill="#7A3CFF"/><path d="M249 239 C238 229 230 240 238 248 C227 244 227 258 249 280 C271 258 271 244 260 248 C268 240 260 229 249 239Z" fill="#fff"/></g><text x="380" y="200" font-family="Poppins,Arial,sans-serif" font-size="52" font-weight="700" fill="#0B1220">ReadyCo Market</text></svg>
+    <div class="footer-links">
+      <a href="https://t.me/readyco">Channel</a>
+      <a href="https://t.me/ReadyCoAdminBot">Bot</a>
+      <a href="https://readyco.vercel.app/inbox">Admin</a>
+    </div>
   </div>
 </footer>
 
-<nav class="bn">
-  <button class="bn-i act">🏠<span>Home</span></button>
-  <button class="bn-i">⌕<span>Search</span></button>
-  <button class="bn-plus">+</button>
-  <button class="bn-i">📑<span>Saved</span></button>
-  <button class="bn-i">👤<span>Profile</span></button>
+<!-- Bottom nav (mobile) -->
+<nav class="bottom-nav">
+  <button class="bn-item active">🏠<span>Home</span></button>
+  <button class="bn-item">⌕<span>Search</span></button>
+  <button class="bn-submit">+</button>
+  <button class="bn-item">📑<span>Saved</span></button>
+  <button class="bn-item">👤<span>Profile</span></button>
 </nav>
 
 <script>
-const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
+const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',dubai:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇧',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
 const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
 const COVER={fintech:'🏦',crypto:'₿',igaming:'♠️'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
@@ -269,7 +522,7 @@ async function loadListings(q){
     let offers=data.offers;if(q){const ql=q.toLowerCase();offers=offers.filter(o=>JSON.stringify(o).toLowerCase().includes(ql))}
     document.getElementById('stat-count').textContent=offers.length+'+';
     const g=document.getElementById('lgrid');
-    if(!offers.length){g.innerHTML='<div class="empty"><p>No listings yet. Follow @readyco for new arrivals.</p></div>';return}
+    if(!offers.length){g.innerHTML='<div class="empty"><p>No listings yet. Follow <a href="https://t.me/readyco" style="color:var(--text);font-weight:600">@readyco</a> for new arrivals.</p></div>';return}
     g.innerHTML=offers.map(o=>{
       const ind=indOf(o.license_type);const emoji=COVER[ind]||'🏢';
       const tags=[];
