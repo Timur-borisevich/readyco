@@ -370,18 +370,18 @@ class ReplyReq(BaseModel):
 
 class OfferCreate(BaseModel):
     jurisdiction: str
-    company_type: Optional[str] = None
-    year_established: Optional[str] = None
-    license_type: Optional[str] = None
-    license_status: Optional[str] = None
-    regulator: Optional[str] = None
-    bank_emi_account: Optional[str] = None
-    vat_status: Optional[str] = None
-    turnover_history: Optional[str] = None
-    employees: Optional[str] = None
-    transfer_time: Optional[str] = None
     price: str
-    short_description: Optional[str] = None
+    company_type: str = ''
+    year_established: str = ''
+    license_type: str = ''
+    license_status: str = ''
+    regulator: str = ''
+    bank_emi_account: str = ''
+    vat_status: str = ''
+    turnover_history: str = ''
+    employees: str = ''
+    transfer_time: str = ''
+    short_description: str = ''
 
 class OfferUpdate(BaseModel):
     jurisdiction: Optional[str] = None
