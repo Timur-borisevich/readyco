@@ -19,7 +19,7 @@ BOT_TOKEN = "8817038916:AAH3G9vxsqcptcNkZEBmDIHEIA_JevEXXpk"
 CHANNEL_ID = -1004361452090
 ADMIN_IDS = [8339164180, 143629845, 8585498778, 6277380476]
 # Neon Postgres — serverless, free tier
-DB_HOST = "ep-hidden-lab-b50u559x-pooler.c-7.us-east-2.aws.neon.tech"
+DB_HOST = "ep-hidden-lab-b50u559x.c-7.us-east-2.aws.neon.tech"
 DB_PORT = 5432
 DB_USER = "neondb_owner"
 DB_PASS = "npg_RKEL5XOkS8Zu"
