@@ -18,12 +18,12 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 BOT_TOKEN = "8817038916:AAH3G9vxsqcptcNkZEBmDIHEIA_JevEXXpk"
 CHANNEL_ID = -1004361452090
 ADMIN_IDS = [8339164180, 143629845, 8585498778, 6277380476]
-
-DB_HOST = "aws-0-eu-central-1.pooler.supabase.com"
-DB_PORT = 6543
-DB_USER = "postgres.ztzgtscvyfwhczhjyfyd"
-DB_PASS = "Timmi1047784!"
-DB_NAME = "postgres"
+# Neon Postgres — serverless, free tier
+DB_HOST = "ep-hidden-lab-b50u559x-pooler.c-7.us-east-2.aws.neon.tech"
+DB_PORT = 5432
+DB_USER = "neondb_owner"
+DB_PASS = "npg_RKEL5XOkS8Zu"
+DB_NAME = "neondb"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -34,7 +34,7 @@ ADMIN_NAMES = {8339164180: "Timur", 143629845: "Yaroslav", 8585498778: "CompliCh
 async def get_db():
     conn = await asyncpg.connect(
         host=DB_HOST, port=DB_PORT, user=DB_USER, password=DB_PASS,
-        database=DB_NAME, ssl="require", statement_cache_size=0
+        database=DB_NAME, ssl="require"
     )
     return conn
 
