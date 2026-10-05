@@ -333,6 +333,14 @@ async def tg_send(chat_id, text, reply_markup=None, parse_mode=None):
     async with aiohttp.ClientSession() as s:
         async with s.post(url, json=payload) as r: return await r.json()
 
+
+
+async def tg_set_menu_button(chat_id, text, url):
+    endpoint = f"https://api.telegram.org/bot{BOT_TOKEN}/setChatMenuButton"
+    payload = {"chat_id": chat_id, "menu_button": {"type": "web_app", "text": text, "web_app": {"url": url}}}
+    async with aiohttp.ClientSession() as s:
+        async with s.post(endpoint, json=payload) as r:
+            return await r.json()
 async def tg_edit(chat_id, msg_id, text, reply_markup=None, parse_mode=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
     payload = {"chat_id": chat_id, "message_id": msg_id, "text": text}
@@ -425,11 +433,11 @@ OFFER_FIELDS = [
 
 def main_menu_kb():
     return {"inline_keyboard": [
+        [{"text":"💬 Open Inbox", "web_app":{"url":"https://readyco.vercel.app/inbox"}}],
         [{"text":"📝 Add offer","callback_data":"menu_add"},{"text":"📋 List offers","callback_data":"menu_list"}],
         [{"text":"🔍 Search","callback_data":"menu_search"},{"text":"✏️ Edit","callback_data":"menu_edit"}],
         [{"text":"✅ Mark sold","callback_data":"menu_sold"},{"text":"🗑 Delete","callback_data":"menu_delete"}],
-        [{"text":"📢 Announce","callback_data":"menu_announce"},{"text":"👤 Leads","callback_data":"menu_leads"}],
-        [{"text":"💬 Inbox","web_app":{"url":"https://readyco.vercel.app/inbox"}},{"text":"⚙️ Manage","callback_data":"menu_manage"}],
+        [{"text":"📢 Announce","callback_data":"menu_announce"},{"text":"👤 Leads","callback_data":"menu_leads"},{"text":"⚙️ Manage","callback_data":"menu_manage"}],
     ]}
 
 def status_menu_kb():
@@ -791,8 +799,9 @@ async def bot_webhook(request: Request):
         if args and args[0].startswith("inquiry_"):
             offer_ref = args[0].replace("inquiry_", "")
         if is_admin(user_id):
+            await tg_set_menu_button(user_id, "Inbox", "https://readyco.vercel.app/inbox")
             kb = {"inline_keyboard": [[{"text":"💬 Open Inbox", "web_app":{"url":"https://readyco.vercel.app/inbox"}}]]}
-            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nTap the button below to open the Inbox.", reply_markup=kb)
+            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nTap the button below (or the menu button) to open the Inbox.", reply_markup=kb)
             return {"ok": True}
         lead_id = await db_create_lead(user_id, username, offer_ref)
         if offer_ref:
@@ -813,13 +822,14 @@ async def bot_webhook(request: Request):
     
     # /menu
     if text.startswith("/menu") and is_admin(user_id):
-        await tg_send(user_id, "📋 ReadyCo Admin\n\nTap a button.", reply_markup=main_menu_kb())
+        await tg_send(user_id, "📋 ReadyCo Admin\n\nOpen Inbox for chat & offers, or tap a command below.", reply_markup=main_menu_kb())
         return {"ok": True}
     
     # /inbox — open Mini App in Telegram
     if text.startswith("/inbox") and is_admin(user_id):
+        await tg_set_menu_button(user_id, "Inbox", "https://readyco.vercel.app/inbox")
         kb = {"inline_keyboard": [[{"text":"💬 Open Inbox","web_app":{"url":"https://readyco.vercel.app/inbox"}}]]}
-        await tg_send(user_id, "💬 ReadyCo Inbox\n\nTap to open:", reply_markup=kb)
+        await tg_send(user_id, "💬 ReadyCo Inbox\n\nTap the menu button or the button below to open.", reply_markup=kb)
         return {"ok": True}
     
     # /cancel
