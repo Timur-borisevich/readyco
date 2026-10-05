@@ -169,11 +169,11 @@ body{padding-bottom:0}
 .hero{padding:24px 16px;border-radius:20px}
 .hero-eyebrow{font-size:10px;padding:7px 14px}
 .hero h1{font-size:32px;letter-spacing:-1px}
-.hero-sub{font-size:15px}
+.hero-sub{font-size:15px;word-break:break-word}
 .hero-search{max-width:none}
 .hero-search .search-icon{width:38px}
 .hero-search input{padding:12px 6px;font-size:14px}
-.hero-search-btn{padding:10px 16px;font-size:13px}
+.hero-search-btn{padding:10px 16px;font-size:13px;white-space:nowrap;flex-shrink:0}
 .hero-popular{gap:5px}
 .hero-tag{padding:5px 10px;font-size:10px}
 .hero-cats{display:none}
@@ -194,12 +194,12 @@ body{padding-bottom:0}
 .lcard-price{font-size:17px}
 .cta-map-inner{grid-template-columns:1fr}
 .cta-map-text{padding:28px 16px}
-.cta-map-text h2{font-size:20px;word-break:break-word}
+.cta-map-text h2{font-size:19px;line-height:1.25;word-break:break-word;overflow-wrap:break-word}
 .cta-map-text p{font-size:14px}
 .cta-map-img{height:160px}
 .footer{padding:32px 16px 24px}
-.footer-inner{grid-template-columns:1fr 1fr;gap:28px}
-.footer-brand{grid-column:1 / -1}
+.footer-inner{grid-template-columns:1fr;gap:24px}
+.footer-brand{grid-column:auto}
 .bn{display:flex}
 .header-nav{display:none}
 }
