@@ -3,7 +3,8 @@
   "functions": {
     "api/server.py": {
       "memory": 1024,
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "public/**"
     }
   },
   "routes": [
