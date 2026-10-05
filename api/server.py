@@ -1352,6 +1352,14 @@ async def logo():
     if os.path.exists(p): return FileResponse(p, media_type="image/png")
     raise HTTPException(404, "Not found")
 
+@app.get("/images/{path:path}")
+async def images(path: str):
+    p = os.path.join(STATIC_DIR, "images", path)
+    if os.path.exists(p) and os.path.isfile(p):
+        mt = "image/jpeg" if p.endswith(".jpg") or p.endswith(".jpeg") else "image/png"
+        return FileResponse(p, media_type=mt)
+    raise HTTPException(404, "Not found")
+
 @app.get("/inbox")
 async def mini_app():
     p = os.path.join(STATIC_DIR, "admin.html")
