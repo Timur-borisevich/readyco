@@ -1354,7 +1354,13 @@ async def logo():
 
 @app.get("/inbox")
 async def mini_app():
-    p = os.path.join(STATIC_DIR, "index.html")
+    p = os.path.join(STATIC_DIR, "admin.html")
+    if os.path.exists(p): return FileResponse(p)
+    raise HTTPException(404, "Not found")
+
+@app.get("/admin")
+async def admin_site():
+    p = os.path.join(STATIC_DIR, "admin.html")
     if os.path.exists(p): return FileResponse(p)
     raise HTTPException(404, "Not found")
 
