@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#081220">
-<title>ReadyCo Market — Buy Licensed Companies</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Listings — ReadyCo Market</title>
+<link rel="preload" as="image" href="/images/fintech.jpg">
+<link rel="preload" as="image" href="/images/crypto.jpg">
+<link rel="preload" as="image" href="/images/psp.jpg">
 <style>
 :root{--yellow:#FFD400;--navy:#0B1220;--green:#00C853;--orange:#FF8A00;--purple:#7A3CFF;--border:#E5E7EB;--text:#0B1220;--text-2:#667085;--text-3:#98A2B3;--bg:#F6F8FB;--ease:cubic-bezier(0.16,1,0.3,1)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -202,116 +200,34 @@ body{padding-bottom:0}
 .header-nav{display:none}
 }
 </style>
+<style>
+.listings-page{padding:40px 24px;max-width:1200px;margin:0 auto}
+.listings-page h1{font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+.listings-page p{color:var(--text-2);margin-bottom:32px}
+.listings-search{max-width:520px;margin-bottom:32px}
+@media(max-width:640px){.listings-page{padding:24px 16px}.listings-page h1{font-size:28px}}
+</style>
 </head>
 <body>
-
 <header class="header">
   <div class="header-inner">
-    <a class="header-logo" href="/">
-      <img src="/logo.png" alt="ReadyCo">
-      <div><b>ReadyCo</b><small>MARKET</small></div>
-    </a>
+    <a class="header-logo" href="/"><img src="/logo.png" alt="ReadyCo"><div><b>ReadyCo</b><small>MARKET</small></div></a>
     <!-- nav removed until dedicated pages exist -->
     <a class="header-tg" href="https://t.me/ReadyCoAdminBot" aria-label="Telegram">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.053 5.56-5.023c.242-.213-.054-.334-.373-.121L8.586 13.617l-2.99-.932c-.65-.203-.664-.65.135-.962l11.653-4.49c.538-.196 1.006.132.832.986z"/></svg>
     </a>
-    <!-- account actions removed until auth system is built -->
   </div>
 </header>
-
-<div class="breadcrumb">HOME</div>
-
-<section class="hero-wrap">
-  <div class="hero">
-    <div class="hero-left">
-      <div class="hero-eyebrow">ESTABLISHED COMPANIES. REAL VALUE.</div>
-      <h1>Buy Licensed<br>Companies</h1>
-      <p class="hero-sub">Fintech. Crypto. iGaming. Ready for what’s next.</p>
-      <div class="hero-search">
-        <span class="search-icon">⌕</span>
-        <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()">
-        <button class="hero-search-btn" onclick="doSearch()">Search</button>
-      </div>
-      <div class="hero-popular">
-        <span>Popular:</span>
-        <button class="hero-tag vasp" onclick="tagSearch('VASP')">VASP</button>
-        <button class="hero-tag emi" onclick="tagSearch('EMI')">EMI</button>
-        <button class="hero-tag psp" onclick="tagSearch('PSP')">PSP</button>
-        <button class="hero-tag casp" onclick="tagSearch('CASP')">CASP</button>
-        <button class="hero-tag malta" onclick="tagSearch('Malta')">Malta</button>
-        <button class="hero-tag uae" onclick="tagSearch('UAE')">UAE</button>
-        <button class="hero-tag uk" onclick="tagSearch('UK')">UK</button>
-        <button class="hero-tag poland" onclick="tagSearch('Poland')">Poland</button>
-      </div>
-    </div>
-    <div class="hero-right">
-      <div class="hero-tag-visual">
-        <div class="hero-tag-bg">
-          <div class="rv-logo">ReadyCo</div>
-          <div class="rv-sub">MARKET</div>
-        </div>
-        <div class="hero-ready">Ready for what’s next?</div>
-        <div class="hero-cats">
-          <div class="hero-cat"><span class="dot fintech">🏦</span> Fintech</div>
-          <div class="hero-cat"><span class="dot crypto">₿</span> Crypto</div>
-          <div class="hero-cat"><span class="dot igaming">♠</span> iGaming</div>
-        </div>
-      </div>
-    </div>
+<main class="listings-page">
+  <h1>All Listings</h1>
+  <p>Verified licensed companies. Filter by license, jurisdiction, or industry.</p>
+  <div class="hero-search listings-search">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="hero-search-btn" onclick="doSearch()">Search</button>
   </div>
-</section>
-
-<section class="stats">
-  <div class="stat">
-    <div class="stat-icon">🏛</div>
-    <div class="stat-text">
-      <div class="stat-num" id="stat-count"><span class="a">—</span></div>
-      <div class="stat-label">Companies Listed</div>
-    </div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon">🌍</div>
-    <div class="stat-text"><div class="stat-num">35+</div><div class="stat-label">Jurisdictions</div></div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon">✅</div>
-    <div class="stat-text"><div class="stat-num">100%</div><div class="stat-label">Verified Offers</div></div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon">📊</div>
-    <div class="stat-text"><div class="stat-num">Growing Daily</div><div class="stat-label">New opportunities</div></div>
-  </div>
-</section>
-
-<section class="listings" id="listings">
-  <div class="sh">
-    <div><h2>Latest Opportunities</h2><p>Verified companies. Real licenses. Global opportunities.</p></div>
-    <a href="https://t.me/readyco">View all listings →</a>
-  </div>
-  <div id="lgrid" class="lgrid"><div class="empty"><p>Loading listings…</p></div></div>
-</section>
-
-<section class="cta-map">
-  <div class="cta-map-inner">
-    <div class="cta-map-text">
-      <h2>Global opportunities. Real businesses.</h2>
-      <p>Access verified, ready-to-operate companies across top jurisdictions.</p>
-      <a class="cta-map-btn" href="/listings.html">Explore Listings <span>→</span></a>
-    </div>
-    <div class="cta-map-img">
-      <svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice">
-        <path fill="#C9E4CA" d="M150,180 Q250,120 350,160 T550,140 T700,180 V400 H0 V180 Z"></path>
-        <path fill="#FFE4B5" d="M0,220 Q120,180 250,240 T500,210 T800,260 V400 H0 V220 Z"></path>
-        <path fill="#E1D4F7" d="M400,160 Q520,120 650,170 T800,150 V400 H400 V160 Z"></path>
-        <circle cx="180" cy="230" r="6" fill="#0B1220"></circle>
-        <circle cx="360" cy="190" r="6" fill="#0B1220"></circle>
-        <circle cx="520" cy="210" r="6" fill="#0B1220"></circle>
-        <circle cx="680" cy="180" r="6" fill="#0B1220"></circle>
-      </svg>
-    </div>
-  </div>
-</section>
-
+  <div id="lgrid" class="lgrid"></div>
+</main>
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
@@ -340,10 +256,6 @@ body{padding-bottom:0}
     <span>© 2026 ReadyCo Market. All rights reserved.</span>
   </div>
 </footer>
-
-<!-- bottom nav removed until auth system is built -->
-
-
 <script>
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
 const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
@@ -400,6 +312,4 @@ async function loadListings(q){
 }
 loadListings();
 </script>
-
-</body>
-</html>
+</body></html>
