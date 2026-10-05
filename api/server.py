@@ -1369,3 +1369,9 @@ async def website():
     p = os.path.join(STATIC_DIR, "site.html")
     if os.path.exists(p): return FileResponse(p)
     raise HTTPException(404, "Not found")
+
+@app.get("/offer.html")
+async def offer_page():
+    p = os.path.join(STATIC_DIR, "offer.html")
+    if os.path.exists(p): return FileResponse(p)
+    raise HTTPException(404, "Not found")
