@@ -61,6 +61,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .offer-tag.verified{background:var(--navy);color:#fff}
 .offer-tag.sold{background:#FF3B30;color:#fff;font-size:14px;padding:8px 18px;letter-spacing:0.5px}
 .offer-card.sold .offer-body s,.offer-card.sold .offer-price s,.offer-card.sold .offer-title s,.offer-card.sold .offer-desc s{text-decoration:line-through;opacity:0.55}
+.for-sale-badge{position:absolute;top:16px;left:16px;background:#00CB53;color:#fff;font-size:18px;font-weight:800;padding:10px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px;display:flex;align-items:center;justify-content:center}
 .offer-card.sold .sold-badge{position:absolute;top:16px;left:16px;background:#FF3B30;color:#fff;font-size:12px;font-weight:800;padding:8px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px}
 .offer-price-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .offer-price{font-size:28px;font-weight:800;color:var(--text)}
@@ -142,7 +143,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
         <text x="50" y="66">R</text>
       </svg>
       <span class="offer-cat" id="offer-cat"></span>
-    <div class="sold-badge" id="sold-badge">⏰</div></div>
+    <div class="sold-badge" id="sold-badge">✅ SOLD</div><div class="for-sale-badge" id="for-sale-badge">🟢</div></div>
     <div class="offer-body">
       <h1 id="offer-title"></h1>
       <div class="offer-loc" id="offer-loc"></div>
