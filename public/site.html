@@ -138,33 +138,66 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* Responsive */
 @media(max-width:900px){
-.hero{grid-template-columns:1fr;padding:60px 20px 40px;text-align:center}
+.hero{grid-template-columns:1fr;padding:50px 20px 40px;text-align:center}
 .hero h1{font-size:42px}
 .hero-sub{font-size:17px;max-width:none;margin-left:auto;margin-right:auto}
-.hero-search{max-width:none}
+.hero-search{max-width:none;margin-left:auto;margin-right:auto}
 .hero-tags{justify-content:center}
 .hero-right{display:none}
 .header-nav{display:none}
 .burger{display:block;margin-left:auto}
 }
 @media(max-width:640px){
-body{padding-bottom:60px}
-.hero{padding:40px 16px 30px}
-.hero h1{font-size:34px;letter-spacing:-1px}
-.hero-sub{font-size:16px}
-.stats{padding:28px 16px;gap:16px}
-.stat-num{font-size:28px}
-.listings{padding:30px 16px 60px}
-.sh{flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:24px}
-.sh h2{font-size:26px}
-.lgrid{grid-template-columns:1fr}
+body{padding-bottom:70px}
+.hero{padding:36px 16px 30px}
+.hero h1{font-size:30px;letter-spacing:-1px;line-height:1.1}
+.hero-eyebrow{font-size:10px;padding:7px 14px}
+.hero-sub{font-size:15px;margin-bottom:24px}
+.hero-search{flex-direction:column;background:transparent;border:none;padding:0;gap:8px}
+.hero-search input{background:#fff;border:1px solid var(--border);border-radius:12px;padding:13px 14px;width:100%}
+.hero-search-btn{width:100%;padding:13px 14px;border-radius:12px}
+.hero-tags{gap:6px}
+.hero-tag{font-size:12px;padding:6px 12px}
+.stats{padding:24px 16px;gap:16px;display:grid;grid-template-columns:1fr 1fr;margin:0 16px 60px 16px}
+.stat{min-width:auto}
+.stat-num{font-size:26px}
+.stat-label{font-size:12px}
+.listings{padding:20px 16px 60px}
+.sh{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:24px}
+.sh h2{font-size:24px}
+.sh a{font-size:14px}
+.lgrid{grid-template-columns:1fr;gap:16px}
+.lcard{border-radius:18px}
+.lcard-cover{height:130px}
+.lcard-body{padding:16px}
+.lcard-title{font-size:17px}
+.lcard-loc{font-size:13px}
+.lcard-desc{font-size:13px}
+.lcard-price{font-size:19px}
 .cta{padding:60px 16px}
-.cta h2{font-size:26px}
-.footer-inner{flex-direction:column;align-items:flex-start}
-.mnav{display:flex}
+.cta h2{font-size:24px}
+.cta p{font-size:15px}
+.footer{padding:28px 16px;flex-direction:column;align-items:flex-start;gap:16px}
+.footer img{height:34px}
+.footer-links{gap:16px}
+.bn{display:flex}
 .header-cta{display:none}
 }
-</style>
+@media(max-width:430px){
+.header-inner{padding:12px 14px}
+.header-logo svg{width:30px;height:30px}
+.header-logo b{font-size:14px}
+.hero h1{font-size:28px}
+.hero-sub{font-size:14px}
+.stats{border-radius:18px;padding:20px 14px}
+.stat-num{font-size:24px}
+.lcard-cover{height:120px}
+.lcard-body{padding:14px}
+.lcard-title{font-size:16px}
+.lcard-price{font-size:18px}
+.bn-i{font-size:9px}
+.bn-plus{width:38px;height:38px;font-size:20px}
+}</style>
 </head>
 <body>
 
