@@ -146,7 +146,7 @@ body{font-family:'Poppins',sans-serif;background:var(--light);color:var(--text);
 const API=window.location.origin+'/api';
 let tgUser=null;
 if(window.telegram){const tg=window.telegram.WebApp;tg.ready();tg.expand();tg.setHeaderColor('#FFFFFF');tg.setBackgroundColor('#F6F8FB');tgUser=tg.initDataUnsafe?.user||null}
-let view='leads',currentLeadId=null,leads=[],offers=[],editingOffer=null;
+let view='leads',currentLeadId=null,leads=[],offers=[],editingOffer=null;let chatPollTimer=null;let lastMsgCount=0;
 const FIELDS=[{key:'jurisdiction',label:'Jurisdiction',ph:'Poland'},{key:'company_type',label:'Company type',ph:'Sp. z o.o.'},{key:'year_established',label:'Year',ph:'2023'},{key:'license_type',label:'License type',ph:'VASP / CASP / EMI / PI / iGaming'},{key:'license_status',label:'License status',ph:'Active'},{key:'regulator',label:'Regulator',ph:'KNF'},{key:'bank_emi_account',label:'Bank / EMI',ph:'Yes / No'},{key:'vat_status',label:'VAT',ph:'Active / None'},{key:'turnover_history',label:'Turnover',ph:'Yes / No'},{key:'employees',label:'Employees',ph:'Yes / No / number'},{key:'transfer_time',label:'Transfer time',ph:'5-10 business days'},{key:'price',label:'Price',ph:'EUR 45,000'},{key:'short_description',label:'Description',ph:'Short description'}];
 async function api(path,opts={}){const h={'Content-Type':'application/json',...opts.headers};h['X-Telegram-Init-Data']=tgUser?tgUser.id.toString():'8339164180';const r=await fetch(API+path,{...opts,headers:h});if(!r.ok)throw new Error(await r.text());return r.json()}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
@@ -154,7 +154,11 @@ function initials(n){return(n||'?')[0].toUpperCase()}
 const LOGO='<img src="/logo.png" alt="ReadyCo" style="width:30px;height:30px;border-radius:7px">';
 
 function forceRefresh(){const v=view;const params=new URLSearchParams(window.location.search);const leadId=params.get('lead');document.getElementById('app').innerHTML=`<div class="loading">Loading...</div>`;setTimeout(()=>{if(leadId){currentLeadId=parseInt(leadId,10);activeLead=leads.find(l=>l.id===currentLeadId);view='chat';} if(v==='chat'&&activeLead){loadLead(activeLead.id)}else if(v==='offers'){loadOffers()}else if(v==='leads'){loadLeads()}else{render()}},300)}
-function render(){const app=document.getElementById('app');if(view==='chat')return renderChat(app);if(view==='add')return renderForm(app,'add');if(view==='edit')return renderForm(app,'edit');if(view==='announce')return renderAnnounce(app);renderMain(app)}
+
+function startChatPolling(){stopChatPolling();chatPollTimer=setInterval(async()=>{if(view!=='chat'||!currentLeadId)return;try{const d=await api(`/admin/leads/${currentLeadId}`);const msgs=d.messages||[];const lead=d.lead||{};activeLead=leads.find(l=>l.id===currentLeadId)||lead;if(msgs.length!==lastMsgCount){lastMsgCount=msgs.length;renderChatMessages(msgs);scrollToBottom();}}catch(e){}},4000)}
+function stopChatPolling(){if(chatPollTimer){clearInterval(chatPollTimer);chatPollTimer=null}}
+function scrollToBottom(){const c=document.getElementById('chatMsgs');if(c)c.scrollTop=c.scrollHeight}
+function render(){const app=document.getElementById('app');if(view==='chat'){startChatPolling();return renderChat(app)}stopChatPolling();if(view==='add')return renderForm(app,'add');if(view==='edit')return renderForm(app,'edit');if(view==='announce')return renderAnnounce(app);renderMain(app)}
 function renderMain(app){const tabs=[{k:'leads',l:'Leads',i:'👤'},{k:'offers',l:'Offers',i:'📋'},{k:'stats',l:'Stats',i:'📊'},{k:'manage',l:'Manage',i:'⚙️'}];
 app.innerHTML=`<div class="header">${LOGO}<div><div class="header-title">ReadyCo Admin</div><div class="header-sub">MARKET</div></div></div>
 <div class="tabs">${tabs.map(t=>`<div class="tab ${view===t.k?'active':''}" onclick="switchView('${t.k}')">${t.i} ${t.l}</div>`).join('')}</div>
@@ -190,7 +194,8 @@ function switchView(v){view=v;render()}
 function backToMain(){view='leads';currentLeadId=null;editingOffer=null;loadLeads();render()}
 async function openLead(id){currentLeadId=id;activeLead=leads.find(l=>l.id===id);view='chat';render()}
 async function loadMessages(){const c=document.getElementById('chatMsgs');if(!c)return;c.innerHTML='<div class="empty"><p>Loading...</p></div>';
-try{const d=await api(`/admin/leads/${currentLeadId}`);const msgs=d.messages||[];if(!msgs.length){c.innerHTML='<div class="empty"><div class="icon">💬</div><p>No messages</p></div>';return}
+try{const d=await api(`/admin/leads/${currentLeadId}`);const msgs=d.messages||[];lastMsgCount=msgs.length;await renderChatMessages(msgs);}catch(e){c.innerHTML=`<div class="empty"><p>${e.message}</p></div>`}}
+async function renderChatMessages(msgs){const c=document.getElementById('chatMsgs');if(!c)return;if(!msgs.length){c.innerHTML='<div class="empty"><div class="icon">💬</div><p>No messages</p></div>';return}
 const fm=msgs.filter(m=>m.file_id&&(m.msg_type==='photo'||m.msg_type==='voice'||m.msg_type==='audio'||m.msg_type==='document'));
 await Promise.all(fm.map(async m=>{try{const r=await api(`/admin/file/${encodeURIComponent(m.file_id)}`);if(m.msg_type==='photo')m._img=r.url;else if(m.msg_type==='document')m._img=r.url;else m._aud=r.url}catch(e){}}));
 c.innerHTML=msgs.map(m=>{const cl=m.direction==='client_to_admin'?'client':'admin';const t=m.sent_at?new Date(m.sent_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';let content=esc(m.text);
@@ -198,7 +203,7 @@ if(m.file_id&&m.msg_type==='photo'&&m._img)content=`<img src="${m._img}" style="
 else if(m.file_id&&(m.msg_type==='voice'||m.msg_type==='audio')&&m._aud){const dur=m.duration?` (${Math.floor(m.duration/60)}:${String(m.duration%60).padStart(2,'0')})`:'';content=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">🎤<audio controls style="height:32px;max-width:200px" src="${m._aud}"></audio>${dur}</div>${content}`}
 else if(m.file_id&&m.msg_type==='document'&&m._img)content=`<a href="${m._img}" target="_blank" style="display:flex;align-items:center;gap:8px;color:var(--navy);text-decoration:none;font-size:13px;padding:8px 12px;background:var(--light);border-radius:10px">📎 ${content}</a>`;
 else if(m.msg_type&&m.msg_type!=='text'){const icons={photo:'📷',sticker:'🎨',document:'📎',voice:'🎤',video:'🎬',audio:'🎵',contact:'👤',location:'📍',animation:'🎞️'};content=`${icons[m.msg_type]||'💬'} ${content}`}
-return`<div class="msg ${cl}">${cl==='admin'?'<div class="sender">ReadyCo</div>':''}${content}<div class="time">${t}</div></div>`}).join('');c.scrollTop=c.scrollHeight}catch(e){c.innerHTML=`<div class="empty"><p>${e.message}</p></div>`}}
+return`<div class="msg ${cl}">${cl==='admin'?'<div class="sender">ReadyCo</div>':''}${content}<div class="time">${t}</div></div>`}).join('');c.scrollTop=c.scrollHeight}
 
 async function sendReply(){const input=document.getElementById('replyInput');const btn=document.getElementById('sendBtn');const text=input.value.trim();if(!text||!currentLeadId)return;input.value='';input.style.height='auto';btn.classList.add('sending');try{await api('/admin/reply',{method:'POST',body:JSON.stringify({lead_id:currentLeadId,text})});btn.classList.remove('sending');await loadMessages();loadLeads()}catch(e){btn.classList.remove('sending');alert('Failed: '+e.message)}}
 async function sendFile(input){const file=input.files[0];if(!file||!currentLeadId)return;input.value='';const btn=document.getElementById('sendBtn');btn.classList.add('sending');try{const fd=new FormData();fd.append('file',file);fd.append('lead_id',currentLeadId);const h={};h['X-Telegram-Init-Data']=tgUser?tgUser.id.toString():'8339164180';const r=await fetch(API+'/admin/sendfile',{method:'POST',headers:h,body:fd});if(!r.ok)throw new Error(await r.text());btn.classList.remove('sending');await loadMessages();loadLeads()}catch(e){btn.classList.remove('sending');alert('Failed: '+e.message)}}
