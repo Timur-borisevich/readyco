@@ -98,7 +98,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .footer{padding:28px 16px;flex-direction:column;align-items:flex-start;gap:16px}
 .footer img{height:34px}
 }
-</style>
+.header-tg{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#F3F4F6;color:#0B1220;transition:.2s;margin-left:auto}.header-tg:hover{background:#FFD400;color:#0B1220}
+  </style>
 </head>
 <body>
 
@@ -110,7 +111,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
         <div><b>ReadyCo</b><small>MARKET</small></div>
       </a>
     </div>
-    <nav class="header-nav"><a href="/">Listings</a><a href="/">How it works</a><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Contact</a></nav>
+    <nav class="header-nav"><a href="/">Listings</a></nav>
+    <a class="header-tg" href="https://t.me/ReadyCoAdminBot" aria-label="Telegram">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.053 5.56-5.023c.242-.213-.054-.334-.373-.121L8.586 13.617l-2.99-.932c-.65-.203-.664-.65.135-.962l11.653-4.49c.538-.196 1.006.132.832.986z"/></svg>
+    </a>
     <!-- account actions removed until auth system is built -->
   </div>
 </header>

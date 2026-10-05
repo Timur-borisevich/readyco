@@ -157,8 +157,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 body{padding-bottom:0}
 .breadcrumb{padding:14px 16px 0;font-size:11px}
 .header-inner{padding:12px 16px;gap:16px;justify-content:space-between}
-.header-nav{display:flex;gap:12px;overflow-x:auto;max-width:calc(100% - 120px);white-space:nowrap;padding-bottom:2px}
-.header-nav a{font-size:13px;padding:0}
+.header-inner{justify-content:space-between}
+.header-nav{display:flex;gap:12px;overflow-x:auto;white-space:nowrap;padding-bottom:2px}
+.header-nav a{font-size:14px;padding:0}
 .header-logo img{width:32px;height:32px}
 .header-logo b{font-size:15px}
 .hero-wrap{padding:0 12px;margin:12px auto 20px}
@@ -212,11 +213,10 @@ body{padding-bottom:0}
     </a>
     <nav class="header-nav">
       <a href="/">Listings</a>
-      <a href="/">How it works</a>
-      <a href="/">About</a>
-      <a href="/">Blog</a>
-      <a href="https://t.me/ReadyCoAdminBot">Contact</a>
     </nav>
+    <a class="header-tg" href="https://t.me/ReadyCoAdminBot" aria-label="Telegram">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.053 5.56-5.023c.242-.213-.054-.334-.373-.121L8.586 13.617l-2.99-.932c-.65-.203-.664-.65.135-.962l11.653-4.49c.538-.196 1.006.132.832.986z"/></svg>
+    </a>
     <!-- account actions removed until auth system is built -->
   </div>
 </header>

@@ -791,7 +791,8 @@ async def bot_webhook(request: Request):
         if args and args[0].startswith("inquiry_"):
             offer_ref = args[0].replace("inquiry_", "")
         if is_admin(user_id):
-            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nTap a button.", reply_markup=main_menu_kb())
+            kb = {"inline_keyboard": [[{"text":"💬 Open Inbox", "web_app":{"url":"https://readyco.vercel.app/inbox"}}]]}
+            await tg_send(user_id, f"👋 Welcome back, {first_name}!\n\nReadyCo Admin\nChannel: @readyco\n\nTap the button below to open the Inbox.", reply_markup=kb)
             return {"ok": True}
         lead_id = await db_create_lead(user_id, username, offer_ref)
         if offer_ref:
