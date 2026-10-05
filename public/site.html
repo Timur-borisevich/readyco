@@ -305,11 +305,11 @@ async function loadListings(q){
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${ind}" style="background:${coverBg[ind]||'#E9EEF5'}" aria-label="${ind}">
           <svg class="cover-logo" viewBox="0 0 100 100" width="64" height="64" aria-hidden="true">
-            \u003crect width="100" height="100" rx="22" fill="#FFD400"\u003e\u003c/rect\u003e
-            \u003ctext x="50" y="66" font-family="Poppins, Arial" font-size="58" font-weight="800" text-anchor="middle" fill="#0B1220"\u003eR\u003c/text\u003e
-          \u003c/svg\u003e
-          \u003cspan class="cat-label ${ind}"\u003e${ind}\u003c/span\u003e
-        \u003c/div>
+            <rect width="100" height="100" rx="22" fill="#FFD400"></rect>
+            <text x="50" y="66" font-family="Poppins, Arial" font-size="58" font-weight="800" text-anchor="middle" fill="#0B1220">R</text>
+          </svg>
+          <span class="cat-label ${ind}">${ind}</span>
+        </div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
