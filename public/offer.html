@@ -59,6 +59,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .offer-tag{font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px}
 .offer-tag.active{background:var(--green);color:#fff}
 .offer-tag.verified{background:var(--navy);color:#fff}
+.offer-tag.sold{background:#FF3B30;color:#fff;font-size:14px;padding:8px 18px;letter-spacing:0.5px}
+.offer-card.sold .offer-body s,.offer-card.sold .offer-price s,.offer-card.sold .offer-title s,.offer-card.sold .offer-desc s{text-decoration:line-through;opacity:0.55}
+.offer-card.sold .sold-badge{position:absolute;top:16px;left:16px;background:#FF3B30;color:#fff;font-size:12px;font-weight:800;padding:8px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px}
 .offer-price-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .offer-price{font-size:28px;font-weight:800;color:var(--text)}
 .offer-cta{background:var(--yellow);color:var(--navy);padding:14px 28px;border-radius:999px;font-size:15px;font-weight:700;display:inline-block;transition:transform .1s}
@@ -138,7 +141,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
         <text x="50" y="66">R</text>
       </svg>
       <span class="offer-cat" id="offer-cat"></span>
-    </div>
+    <div class="sold-badge" id="sold-badge">SOLD</div></div>
     <div class="offer-body">
       <h1 id="offer-title"></h1>
       <div class="offer-loc" id="offer-loc"></div>
@@ -214,6 +217,8 @@ async function loadOffer(){
     document.getElementById('offer-loading').style.display='none';
     const card = document.getElementById('offer-card');
     card.style.display='block';
+    const isSold = (o.status || '').toLowerCase() === 'sold';
+    if(isSold) card.classList.add('sold');else card.classList.remove('sold');const soldBadge=document.getElementById('sold-badge');if(soldBadge)soldBadge.style.display=isSold?'block':'none';
 
     const ind = indOf(o.license_type);
     const cover = document.getElementById('offer-cover');
@@ -222,19 +227,26 @@ async function loadOffer(){
     cat.className = 'offer-cat ' + ind;
     cat.textContent = ind === 'none' ? 'Company' : ind;
 
-    document.getElementById('offer-title').textContent = esc(o.license_type || 'Company') + ' Licensed Company';
-    document.getElementById('offer-loc').textContent = flag(o.jurisdiction) + ' ' + esc(o.jurisdiction || '');
-    document.getElementById('offer-desc').textContent = esc(o.short_description || '');
-    document.getElementById('offer-company').textContent = esc(o.company_type || '—');
-    document.getElementById('offer-year').textContent = esc(o.year_established || '—');
-    document.getElementById('offer-status').textContent = esc(o.license_status || '—');
-    document.getElementById('offer-regulator').textContent = esc(o.regulator || '—');
-    document.getElementById('offer-bank').textContent = esc(o.bank_emi_account || '—');
-    document.getElementById('offer-vat').textContent = esc(o.vat_status || '—');
-    document.getElementById('offer-price').textContent = esc(o.price || 'On request');
+    const strike = (s) => isSold ? '<s>' + s + '</s>' : s;
+
+    document.getElementById('offer-title').innerHTML = strike(esc(o.license_type || 'Company') + ' Licensed Company');
+    document.getElementById('offer-loc').innerHTML = strike(flag(o.jurisdiction) + ' ' + esc(o.jurisdiction || ''));
+    document.getElementById('offer-desc').innerHTML = strike(esc(o.short_description || ''));
+    document.getElementById('offer-company').innerHTML = strike(esc(o.company_type || '—'));
+    document.getElementById('offer-year').innerHTML = strike(esc(o.year_established || '—'));
+    document.getElementById('offer-status').innerHTML = strike(esc(o.license_status || '—'));
+    document.getElementById('offer-regulator').innerHTML = strike(esc(o.regulator || '—'));
+    document.getElementById('offer-bank').innerHTML = strike(esc(o.bank_emi_account || '—'));
+    document.getElementById('offer-vat').innerHTML = strike(esc(o.vat_status || '—'));
+    document.getElementById('offer-price').innerHTML = strike(esc(o.price || 'On request'));
+    document.getElementById('offer-ref').innerHTML = strike('Ref: ' + esc(ref));
 
     const tags = document.getElementById('offer-tags');
-    tags.innerHTML = '<span class="offer-tag active">' + esc(o.license_status || 'Active') + '</span><span class="offer-tag verified">Verified</span>';
+    if(isSold){
+      tags.innerHTML = '<span class="offer-tag sold">SOLD</span>';
+    } else {
+      tags.innerHTML = '<span class="offer-tag active">' + esc(o.license_status || 'Active') + '</span><span class="offer-tag verified">Verified</span>';
+    }
 
     document.getElementById('offer-cta').href = 'https://t.me/ReadyCoAdminBot?start=inquiry_' + esc(ref);
   }catch(e){

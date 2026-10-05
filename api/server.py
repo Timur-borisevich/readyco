@@ -93,6 +93,11 @@ async def db_update_channel_msg(oid, mid):
     try: await conn.execute("UPDATE offers SET channel_message_id = $1 WHERE id = $2", mid, oid)
     finally: await release_db(conn)
 
+async def db_set_live(ref):
+    conn = await get_db()
+    try: await conn.execute("UPDATE offers SET status='live', sold_at=NULL WHERE ref=$1", ref)
+    finally: await release_db(conn)
+
 async def db_mark_sold(ref):
     conn = await get_db()
     try: await conn.execute("UPDATE offers SET status='sold', sold_at=now() WHERE ref=$1", ref)
@@ -1200,6 +1205,15 @@ async def admin_sold(ref: str, request: Request):
     await db_audit(uid, "sold", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
 
+
+@app.post("/api/admin/offers/{ref}/live")
+async def admin_live(ref: str, request: Request):
+    uid = await verify_admin(request)
+    o = await db_get_offer(ref)
+    if not o: raise HTTPException(404, "Not found")
+    await db_set_live(ref)
+    await db_audit(uid, "live", "offer", o.get("id"), {"ref": ref})
+    return {"ok": True}
 @app.delete("/api/admin/offers/{ref}")
 async def admin_delete(ref: str, request: Request):
     uid = await verify_admin(request)
