@@ -127,7 +127,7 @@ async def db_create_lead(uid, username, offer_ref=None):
         lid = await conn.fetchval(
             "INSERT INTO leads (telegram_user_id, telegram_username, offer_ref, offer_refs, status, last_contact_at) "
             "VALUES ($1, $2, $3, $4, 'new', now()) RETURNING id",
-            uid, username, offer_ref, offer_ref or "")
+            uid, username, offer_ref or "", offer_ref or "")
         return lid
     finally: await release_db(conn)
 
@@ -624,7 +624,7 @@ async def bot_webhook(request: Request):
         if cb_data == "manage_admins":
             conn = await get_db()
             try:
-                rows = await conn.fetch("SELECT telegram_user_id, role, name FROM admins WHERE is_active=1 ORDER BY created_at")
+                rows = await conn.fetch("SELECT telegram_user_id, role, name FROM admins WHERE is_active=1 ORDER BY added_at")
             finally: await release_db(conn)
             lines = [f"• {ADMIN_NAMES.get(r['telegram_user_id'], r.get('name','?'))} — {r['role']} (ID: {r['telegram_user_id']})" for r in rows]
             await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"],
