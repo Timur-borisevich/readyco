@@ -65,11 +65,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .offer-cta:active{transform:scale(0.97)}
 
 /* Footer */
-.footer{background:#fff;border-top:1px solid var(--border);padding:40px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-.footer img{height:40px;border-radius:8px}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:14px;color:var(--text-2)}
-.footer-links a:hover{color:var(--text)}
+.footer{background:#fff;border-top:1px solid var(--border);padding:48px 24px 24px}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:32px}
+.footer-brand{display:flex;align-items:center;gap:14px}
+.footer-brand img{width:42px;height:42px;border-radius:10px}
+.footer-name{font-weight:800;font-size:18px;color:var(--text);letter-spacing:-0.3px}
+.footer-tagline{font-size:13px;color:var(--text-2);margin-top:4px;max-width:220px}
+.footer-col{display:flex;flex-direction:column;gap:12px}
+.footer-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-3);margin-bottom:4px}
+.footer-col a{color:var(--text-2);font-size:14px;font-weight:500;text-decoration:none}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{max-width:1200px;margin:0 auto;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--text-3);font-size:13px}
 
 /* Empty */
 .empty{text-align:center;padding:80px 20px;color:var(--text-2)}
@@ -95,8 +101,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .offer-price-row{flex-direction:column;align-items:flex-start}
 .offer-price{font-size:24px}
 .offer-cta{width:100%;text-align:center}
-.footer{padding:28px 16px;flex-direction:column;align-items:flex-start;gap:16px}
-.footer img{height:34px}
+.footer{padding:32px 16px 24px}
+.footer-inner{grid-template-columns:1fr 1fr;gap:28px}
+.footer-brand{grid-column:1 / -1}
 }
 .header-tg{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#F3F4F6;color:#0B1220;transition:.2s;margin-left:auto}.header-tg:hover{background:#FFD400;color:#0B1220}
   </style>
