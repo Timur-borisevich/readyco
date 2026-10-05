@@ -212,8 +212,10 @@ async def db_is_blocked(uid):
 
 async def db_audit(uid, action, etype=None, eid=None, details=None):
     conn = await get_db()
-    try: await conn.execute("INSERT INTO audit_log (admin_user_id, action, entity_type, entity_id, details_json) VALUES ($1,$2,$3,$4,$5)",
-        uid, action, etype, eid, json.dumps(details or {}))
+    try:
+        admin_name = ADMIN_NAMES.get(uid, str(uid))
+        await conn.execute("INSERT INTO audit_log (admin_user_id, admin_name, action, entity_type, entity_id, details_json) VALUES ($1,$2,$3,$4,$5,$6)",
+            uid, admin_name, action, etype or "", str(eid) if eid is not None else "", json.dumps(details or {}))
     finally: await release_db(conn)
 
 async def db_insert_announcement(text, mid, uid):
