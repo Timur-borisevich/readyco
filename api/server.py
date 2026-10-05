@@ -218,7 +218,7 @@ async def db_audit(uid, action, etype=None, eid=None, details=None):
 
 async def db_insert_announcement(text, mid, uid):
     conn = await get_db()
-    try: await conn.execute("INSERT INTO announcements (text, channel_message_id, status, published_at, created_by) VALUES ($1,$2,'published',now(),$3)", text, mid, uid)
+    try: await conn.execute("INSERT INTO announcements (text, status, sent_at, created_by) VALUES ($1,'published',now(),$2)", text, uid)
     finally: await release_db(conn)
 
 # === FORMATTING ===
@@ -1166,18 +1166,24 @@ async def admin_create(req: OfferCreate, request: Request):
     ref = await db_next_ref()
     data = req.model_dump()
     data["ref"] = ref
+    # Ensure no None values — Neon schema has NOT NULL on all text columns
+    for k, v in data.items():
+        if v is None:
+            data[k] = ''
     HT = {"VASP":"#VASP #Crypto","CASP":"#CASP #Crypto","EMI":"#EMI #FinTech","PI":"#PI #FinTech","iGaming":"#iGaming #Gaming"}
     ht = HT.get(data.get("license_type",""), "")
     if ht:
         j = (data.get("jurisdiction") or "").split(" ")[0]
         data["hashtags"] = f"#{j} {ht} #ForSale"
+    else:
+        data.setdefault("hashtags", "")
     oid = await db_insert_offer(data, uid)
     card, _ = format_offer_card(data)
     kb = inquiry_keyboard(ref)
     r = await tg_send(CHANNEL_ID, card, kb)
     if r.get("ok"):
         await db_update_channel_msg(oid, r["result"]["message_id"])
-    await db_audit(uid, "add", "offer", oid, {"ref": ref})
+    await db_audit(uid, "add", "offer", str(oid), {"ref": ref})
     return {"ok": True, "ref": ref}
 
 @app.put("/api/admin/offers/{ref}")
