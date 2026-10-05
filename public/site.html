@@ -197,6 +197,7 @@ body{padding-bottom:0}
 .bn-plus{width:38px;height:38px;font-size:20px}
 }
 </style>
+</head>
 <body>
 
 <header class="header">
@@ -297,7 +298,7 @@ async function loadListings(q){
       if(o.license_status)tags.push(`<span class="lcard-tag active">${esc(o.license_status)}</span>`);
       tags.push(`<span class="lcard-tag verified">Verified</span>`);
       const title = esc(o.license_type||'Company') + ' Licensed Company';
-      return `<div class="lcard" onclick="window.location.href='https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}'">
+      return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${ind}"><span class="cat-label ${ind}">${ind}</span></div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>

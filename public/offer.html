@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#081220">
+<title>ReadyCo Market — Offer Details</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--yellow:#FFD400;--navy:#0B1220;--green:#00C853;--orange:#FF8A00;--purple:#7A3CFF;--border:#E5E7EB;--text:#0B1220;--text-2:#667085;--text-3:#98A2B3;--ease:cubic-bezier(0.16,1,0.3,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
+body{font-family:'Poppins',-apple-system,sans-serif;background:#F6F8FB;color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* Header */
+.header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1100px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:24px}
+.header-logo{display:flex;align-items:center;gap:10px}
+.header-logo img{width:34px;height:34px;border-radius:8px}
+.header-logo b{font-size:15px;font-weight:700;color:var(--text)}
+.header-logo small{font-size:8px;font-weight:600;letter-spacing:2px;color:var(--text-2);display:block;margin-top:-2px}
+.header-nav{display:flex;gap:28px;margin-left:20px}
+.header-nav a{font-size:14px;font-weight:500;color:var(--text-2);transition:color .2s}
+.header-nav a:hover{color:var(--text)}
+.header-cta{margin-left:auto;background:var(--yellow);color:var(--navy);padding:9px 20px;border-radius:999px;font-size:14px;font-weight:700;transition:transform .1s}
+.header-cta:active{transform:scale(0.97)}
+.burger{display:none;font-size:22px;color:var(--text)}
+
+/* Offer page */
+.offer-page{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.offer-back{margin-bottom:24px}
+.offer-back a{font-size:14px;font-weight:600;color:var(--text-2)}
+.offer-back a:hover{color:var(--text)}
+.offer-card{background:#fff;border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.04)}
+.offer-cover{height:220px;background:#E9EEF5;display:flex;align-items:center;justify-content:center;position:relative}
+.offer-cover.crypto{background:linear-gradient(135deg,#FFF4E5,#FFFDF9)}
+.offer-cover.fintech{background:linear-gradient(135deg,#E8F8ED,#FDFEFD)}
+.offer-cover.igaming{background:linear-gradient(135deg,#F0EBFF,#FCFBFF)}
+.offer-cat{position:absolute;left:20px;top:20px;font-size:13px;font-weight:700;padding:7px 16px;border-radius:999px;color:#fff;text-transform:capitalize}
+.offer-cat.fintech{background:var(--green)}
+.offer-cat.crypto{background:var(--orange)}
+.offer-cat.igaming{background:var(--purple)}
+.offer-body{padding:28px}
+.offer-body h1{font-size:28px;font-weight:800;line-height:1.2;margin-bottom:8px;letter-spacing:-0.5px}
+.offer-loc{font-size:16px;color:var(--text-2);margin-bottom:18px}
+.offer-desc{font-size:15px;color:var(--text-2);line-height:1.6;margin-bottom:24px}
+.offer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
+.offer-grid div{background:#F6F8FB;border-radius:12px;padding:14px}
+.offer-grid div span{display:block;font-size:12px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+.offer-grid div b{font-size:15px;color:var(--text)}
+.offer-tags{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+.offer-tag{font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px}
+.offer-tag.active{background:var(--green);color:#fff}
+.offer-tag.verified{background:var(--navy);color:#fff}
+.offer-price-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.offer-price{font-size:28px;font-weight:800;color:var(--text)}
+.offer-cta{background:var(--yellow);color:var(--navy);padding:14px 28px;border-radius:999px;font-size:15px;font-weight:700;display:inline-block;transition:transform .1s}
+.offer-cta:active{transform:scale(0.97)}
+
+/* Footer */
+.footer{background:#fff;border-top:1px solid var(--border);padding:40px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.footer img{height:40px;border-radius:8px}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:14px;color:var(--text-2)}
+.footer-links a:hover{color:var(--text)}
+
+/* Empty */
+.empty{text-align:center;padding:80px 20px;color:var(--text-2)}
+
+/* Responsive */
+@media(max-width:900px){
+.header-nav{display:none}
+.burger{display:block;margin-left:auto}
+.offer-page{padding:30px 20px 60px}
+.offer-body h1{font-size:24px}
+.offer-grid{grid-template-columns:1fr}
+.offer-price{font-size:24px}
+}
+@media(max-width:640px){
+.header-inner{padding:12px 16px}
+.header-cta{display:none}
+.offer-page{padding:24px 16px 40px}
+.offer-cover{height:180px}
+.offer-body{padding:20px}
+.offer-body h1{font-size:22px}
+.offer-desc{font-size:14px}
+.offer-grid div{padding:12px}
+.offer-price-row{flex-direction:column;align-items:flex-start}
+.offer-price{font-size:24px}
+.offer-cta{width:100%;text-align:center}
+.footer{padding:28px 16px;flex-direction:column;align-items:flex-start;gap:16px}
+.footer img{height:34px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <a href="/">
+        <img src="/logo.png" alt="ReadyCo">
+        <div><b>ReadyCo</b><small>MARKET</small></div>
+      </a>
+    </div>
+    <nav class="header-nav"><a href="/">Listings</a><a href="/">How it works</a><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Contact</a></nav>
+    <a class="header-cta" href="https://t.me/ReadyCoAdminBot">Submit Offer</a>
+    <button class="burger" onclick="window.location.href='/'">☰</button>
+  </div>
+</header>
+
+<main class="offer-page">
+  <div class="offer-back"><a href="/">← Back to listings</a></div>
+
+  <div id="offer-loading" class="empty"><p>Loading offer…</p></div>
+
+  <article id="offer-card" class="offer-card" style="display:none">
+    <div class="offer-cover" id="offer-cover">
+      <span class="offer-cat" id="offer-cat"></span>
+    </div>
+    <div class="offer-body">
+      <h1 id="offer-title"></h1>
+      <div class="offer-loc" id="offer-loc"></div>
+      <p class="offer-desc" id="offer-desc"></p>
+
+      <div class="offer-grid">
+        <div><span>Company type</span><b id="offer-company"></b></div>
+        <div><span>Year established</span><b id="offer-year"></b></div>
+        <div><span>License status</span><b id="offer-status"></b></div>
+        <div><span>Regulator</span><b id="offer-regulator"></b></div>
+        <div><span>Bank / EMI account</span><b id="offer-bank"></b></div>
+        <div><span>VAT status</span><b id="offer-vat"></b></div>
+      </div>
+
+      <div class="offer-tags" id="offer-tags"></div>
+
+      <div class="offer-price-row">
+        <span class="offer-price" id="offer-price"></span>
+        <a class="offer-cta" id="offer-cta" href="#">Contact via Telegram</a>
+      </div>
+    </div>
+  </article>
+
+  <div id="offer-error" class="empty" style="display:none"><p>Offer not found.</p><a href="/">Back to listings</a></div>
+</main>
+
+<footer class="footer">
+  <a href="/"><img src="/logo.png" alt="ReadyCo Market"></a>
+  <div class="footer-links"><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Bot</a></div>
+</footer>
+
+<script>
+const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
+const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
+function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
+function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
+function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
+
+const params = new URLSearchParams(window.location.search);
+const ref = params.get('ref');
+
+async function loadOffer(){
+  if(!ref){document.getElementById('offer-loading').style.display='none';document.getElementById('offer-error').style.display='block';return}
+  try{
+    const res = await fetch('/api/offers/'+encodeURIComponent(ref));
+    if(!res.ok) throw new Error('not found');
+    const o = await res.json();
+    document.getElementById('offer-loading').style.display='none';
+    const card = document.getElementById('offer-card');
+    card.style.display='block';
+
+    const ind = indOf(o.license_type);
+    const cover = document.getElementById('offer-cover');
+    cover.className = 'offer-cover ' + ind;
+    const cat = document.getElementById('offer-cat');
+    cat.className = 'offer-cat ' + ind;
+    cat.textContent = ind === 'none' ? 'Company' : ind;
+
+    document.getElementById('offer-title').textContent = esc(o.license_type || 'Company') + ' Licensed Company';
+    document.getElementById('offer-loc').textContent = flag(o.jurisdiction) + ' ' + esc(o.jurisdiction || '');
+    document.getElementById('offer-desc').textContent = esc(o.short_description || '');
+    document.getElementById('offer-company').textContent = esc(o.company_type || '—');
+    document.getElementById('offer-year').textContent = esc(o.year_established || '—');
+    document.getElementById('offer-status').textContent = esc(o.license_status || '—');
+    document.getElementById('offer-regulator').textContent = esc(o.regulator || '—');
+    document.getElementById('offer-bank').textContent = esc(o.bank_emi_account || '—');
+    document.getElementById('offer-vat').textContent = esc(o.vat_status || '—');
+    document.getElementById('offer-price').textContent = esc(o.price || 'On request');
+
+    const tags = document.getElementById('offer-tags');
+    tags.innerHTML = '<span class="offer-tag active">' + esc(o.license_status || 'Active') + '</span><span class="offer-tag verified">Verified</span>';
+
+    document.getElementById('offer-cta').href = 'https://t.me/ReadyCoAdminBot?start=inquiry_' + esc(ref);
+  }catch(e){
+    document.getElementById('offer-loading').style.display='none';
+    document.getElementById('offer-error').style.display='block';
+  }
+}
+loadOffer();
+</script>
+
+</body>
+</html>
