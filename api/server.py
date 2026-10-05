@@ -1358,14 +1358,10 @@ async def mini_app():
     if os.path.exists(p): return FileResponse(p)
     raise HTTPException(404, "Not found")
 
-@app.get("/{path:path}")
-async def catch_all(path: str):
-    if path == "inbox" or path == "admin":
-        p = os.path.join(STATIC_DIR, "admin.html")
-        if os.path.exists(p): return FileResponse(p)
-    if path == "":
-        p = os.path.join(STATIC_DIR, "site.html")
-        if os.path.exists(p): return FileResponse(p)
+@app.get("/admin")
+async def admin_site():
+    p = os.path.join(STATIC_DIR, "admin.html")
+    if os.path.exists(p): return FileResponse(p)
     raise HTTPException(404, "Not found")
 
 @app.get("/")
