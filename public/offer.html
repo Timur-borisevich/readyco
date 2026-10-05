@@ -37,9 +37,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .offer-back a:hover{color:var(--text)}
 .offer-card{background:#fff;border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.04)}
 .offer-cover{height:220px;background:#E9EEF5;display:flex;align-items:center;justify-content:center;position:relative}
-.offer-cover.crypto{background:linear-gradient(135deg,#FFF4E5,#FFFDF9)}
-.offer-cover.fintech{background:linear-gradient(135deg,#E8F8ED,#FDFEFD)}
-.offer-cover.igaming{background:linear-gradient(135deg,#F0EBFF,#FCFBFF)}
+.offer-cover.crypto{background:linear-gradient(135deg,#FFF4E6 0%,#FFFCF8 100%)}
+.offer-cover.fintech{background:linear-gradient(135deg,#E8F8ED 0%,#F4FBF7 100%)}
+.offer-cover.igaming{background:linear-gradient(135deg,#F0EBFF 0%,#FBFAFF 100%)}
+.offer-cover .cover-logo{width:110px;height:110px;opacity:0.95}
+.offer-cover .cover-logo rect{fill:#FFD400}
+.offer-cover .cover-logo text{fill:#0B1220;font-family:Poppins,Arial;font-weight:800;font-size:58px;text-anchor:middle}
 .offer-cat{position:absolute;left:20px;top:20px;font-size:13px;font-weight:700;padding:7px 16px;border-radius:999px;color:#fff;text-transform:capitalize}
 .offer-cat.fintech{background:var(--green)}
 .offer-cat.crypto{background:var(--orange)}
@@ -109,7 +112,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     </div>
     <nav class="header-nav"><a href="/">Listings</a><a href="/">How it works</a><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Contact</a></nav>
     <a class="header-cta" href="https://t.me/ReadyCoAdminBot">Submit Offer</a>
-    <button class="burger" onclick="window.location.href='/'">☰</button>
   </div>
 </header>
 
@@ -120,6 +122,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
   <article id="offer-card" class="offer-card" style="display:none">
     <div class="offer-cover" id="offer-cover">
+      <svg class="cover-logo" viewBox="0 0 100 100">
+        <rect width="100" height="100" rx="22"></rect>
+        <text x="50" y="66">R</text>
+      </svg>
       <span class="offer-cat" id="offer-cat"></span>
     </div>
     <div class="offer-body">
