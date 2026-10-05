@@ -285,8 +285,9 @@ function getCoverSvg(type){
   return svgs[type] || svgs.Fintech;
 }
 async function loadListings(q){
+  const loadingTimer=setTimeout(()=>{const g=document.getElementById('lgrid');if(g&&g.textContent.includes('Loading'))g.innerHTML='<div class="empty"><p>Could not load listings. <a href="https://t.me/ReadyCoAdminBot" style="color:var(--yellow)">Contact us</a></p></div>';},6000);
   try{
-    const res=await fetch('/api/offers?status=live');const data=await res.json();
+    const res=await fetch('/api/offers?status=live');const data=await res.json();clearTimeout(loadingTimer);
     let offers=data.offers;if(q){const ql=q.toLowerCase();offers=offers.filter(o=>JSON.stringify(o).toLowerCase().includes(ql))}
     const stat=document.getElementById('stat-count');if(stat)stat.innerHTML='<span class="a">120+</span>';
     const g=document.getElementById('lgrid');

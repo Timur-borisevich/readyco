@@ -169,7 +169,7 @@ body{padding-bottom:0}
 .hero{padding:24px 16px;border-radius:20px}
 .hero-eyebrow{font-size:10px;padding:7px 14px}
 .hero h1{font-size:32px;letter-spacing:-1px}
-.hero-sub{font-size:15px;word-break:break-word}
+.hero-sub{font-size:15px;line-height:1.4;word-break:break-word;overflow-wrap:break-word}
 .hero-search{max-width:none}
 .hero-search .search-icon{width:38px}
 .hero-search input{padding:12px 6px;font-size:14px}
@@ -194,7 +194,7 @@ body{padding-bottom:0}
 .lcard-price{font-size:17px}
 .cta-map-inner{grid-template-columns:1fr}
 .cta-map-text{padding:28px 16px}
-.cta-map-text h2{font-size:19px;line-height:1.25;word-break:break-word;overflow-wrap:break-word}
+.cta-map-text h2{font-size:18px;line-height:1.25;word-break:break-word;overflow-wrap:break-word;hyphens:auto}
 .cta-map-text p{font-size:14px}
 .cta-map-img{height:160px}
 .footer{padding:32px 16px 24px}
@@ -266,7 +266,7 @@ body{padding-bottom:0}
   <div class="stat">
     <div class="stat-icon">🏛</div>
     <div class="stat-text">
-      <div class="stat-num" id="stat-count"><span class="a">—</span></div>
+      <div class="stat-num" id="stat-count"><span class="a">120+</span></div>
       <div class="stat-label">Companies Listed</div>
     </div>
   </div>
@@ -370,8 +370,9 @@ function getCoverSvg(type){
   return svgs[type] || svgs.Fintech;
 }
 async function loadListings(q){
+  const loadingTimer=setTimeout(()=>{const g=document.getElementById('lgrid');if(g&&g.textContent.includes('Loading'))g.innerHTML='<div class="empty"><p>Loading took too long. <a href="/listings.html" style="color:var(--yellow)">View all listings</a></p></div>';},6000);
   try{
-    const res=await fetch('/api/offers?status=live');const data=await res.json();
+    const res=await fetch('/api/offers?status=live');const data=await res.json();clearTimeout(loadingTimer);
     let offers=data.offers;if(q){const ql=q.toLowerCase();offers=offers.filter(o=>JSON.stringify(o).toLowerCase().includes(ql))}
     document.getElementById('stat-count').innerHTML='<span class="a">120+</span>';
     const g=document.getElementById('lgrid');
