@@ -264,7 +264,7 @@ const BADGE2={fintech:'Transfer Ready',crypto:'Bank Accounts',igaming:'Turnkey S
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
 function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
-function doSearch(){const q=document.getElementById('heroSearch').value.trim();loadListings(q);document.getElementById('listings').scrollIntoView({behavior:'smooth'});if(!q){document.getElementById('heroSearch').focus()}}
+function doSearch(){const q=document.getElementById('heroSearch').value.trim();loadListings(q);if(!q){document.getElementById('heroSearch').focus()}}
 function tagSearch(t){document.getElementById('heroSearch').value=t;loadListings(t)}
 function getCoverSvg(type){
   const svgs = {
