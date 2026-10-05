@@ -111,7 +111,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .footer-links a:hover{color:var(--text)}
 
 /* Bottom nav */
-.bn{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:101;justify-content:space-around;align-items:center}
+.bn{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:101;justify-content:center;gap:40px;align-items:center}
 .bn-i{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:600;color:var(--text-3);background:none;border:none}
 .bn-i.act{color:var(--navy)}
 .bn-plus{width:42px;height:42px;border-radius:50%;background:var(--yellow);color:var(--navy);font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translateY(-8px);box-shadow:0 4px 12px rgba(255,212,0,0.4)}
@@ -271,15 +271,13 @@ body{padding-bottom:70px}
 
 <footer class="footer">
   <img src="/logo.png" alt="ReadyCo Market" style="height:40px;border-radius:8px">
-  <div class="footer-links"><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Bot</a><a href="https://readyco.vercel.app/inbox">Admin</a></div>
+  <div class="footer-links"><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Bot</a></div>
 </footer>
 
 <nav class="bn">
-  <button class="bn-i act">🏠<span>Home</span></button>
-  <button class="bn-i">⌕<span>Search</span></button>
-  <button class="bn-plus">+</button>
-  <button class="bn-i">📑<span>Saved</span></button>
-  <button class="bn-i">👤<span>Profile</span></button>
+  <button class="bn-i act" onclick="window.location.href='/'">🏠<span>Home</span></button>
+  <button class="bn-plus" onclick="window.location.href='https://t.me/ReadyCoAdminBot'">+</button>
+  <button class="bn-i" onclick="window.location.href='https://t.me/readyco'">📢<span>Channel</span></button>
 </nav>
 
 <script>
