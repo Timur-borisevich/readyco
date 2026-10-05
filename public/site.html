@@ -30,6 +30,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .header-cta:active{transform:scale(0.97)}
 .burger{display:none;font-size:22px;color:var(--text)}
 
+/* Cover logo */
+.lcard-cover .cover-logo{opacity:0.95}
+.lcard-cover .cover-watermark{position:absolute;right:18px;bottom:14px;font-size:40px;opacity:0.08;font-weight:800}
+
 /* Hero */
 .hero{max-width:1100px;margin:0 auto;padding:80px 24px 60px;display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:center}
 .hero-eyebrow{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--navy);letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;border-radius:999px;margin-bottom:20px}
@@ -208,7 +212,6 @@ body{padding-bottom:0}
     </div>
     <nav class="header-nav"><a href="#listings">Listings</a><a href="#how">How it works</a><a href="https://t.me/readyco">Channel</a><a href="https://t.me/ReadyCoAdminBot">Contact</a></nav>
     <a class="header-cta" href="https://t.me/ReadyCoAdminBot">Submit Offer</a>
-    <button class="burger">☰</button>
   </div>
 </header>
 
@@ -280,6 +283,7 @@ body{padding-bottom:0}
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇧',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
 const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
 const COVER={fintech:'🏦',crypto:'₿',igaming:'♠️'};
+const coverBg={fintech:'linear-gradient(135deg,#E8F8ED 0%,#F4FBF7 100%)',crypto:'linear-gradient(135deg,#FFF4E6 0%,#FFFCF8 100%)',igaming:'linear-gradient(135deg,#F0EBFF 0%,#FBFAFF 100%)',none:'#E9EEF5'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
 function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
@@ -299,7 +303,13 @@ async function loadListings(q){
       tags.push(`<span class="lcard-tag verified">Verified</span>`);
       const title = esc(o.license_type||'Company') + ' Licensed Company';
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
-        <div class="lcard-cover ${ind}"><span class="cat-label ${ind}">${ind}</span></div>
+        <div class="lcard-cover ${ind}" style="background:${coverBg[ind]||'#E9EEF5'}" aria-label="${ind}">
+          <svg class="cover-logo" viewBox="0 0 100 100" width="64" height="64" aria-hidden="true">
+            \u003crect width="100" height="100" rx="22" fill="#FFD400"\u003e\u003c/rect\u003e
+            \u003ctext x="50" y="66" font-family="Poppins, Arial" font-size="58" font-weight="800" text-anchor="middle" fill="#0B1220"\u003eR\u003c/text\u003e
+          \u003c/svg\u003e
+          \u003cspan class="cat-label ${ind}"\u003e${ind}\u003c/span\u003e
+        \u003c/div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
