@@ -219,7 +219,7 @@ async function loadOffer(){
     const card = document.getElementById('offer-card');
     card.style.display='block';document.getElementById('offer-error').style.display='none';
     const isSold = (o.status || '').toLowerCase() === 'sold';
-    if(isSold) card.classList.add('sold');else card.classList.remove('sold');const soldBadge=document.getElementById('sold-badge');if(soldBadge)soldBadge.style.display=isSold?'block':'none';
+    if(isSold) card.classList.add('sold');else card.classList.remove('sold');const soldBadge=document.getElementById('sold-badge');if(soldBadge)soldBadge.style.display=isSold?'block':'none';const forSaleBadge=document.getElementById('for-sale-badge');if(forSaleBadge)forSaleBadge.style.display=isSold?'none':'block';
 
     const ind = indOf(o.license_type);
     const cover = document.getElementById('offer-cover');
