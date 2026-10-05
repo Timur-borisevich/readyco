@@ -9,8 +9,8 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "api/server.py" },
     { "src": "/inbox", "dest": "api/server.py" },
-    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/admin", "dest": "api/server.py" },
     { "src": "/(site.html|admin.html|logo.png|brandbook/.*|figma_kit/.*)", "dest": "/$1" },
-    { "src": "/(.*)", "dest": "/site.html" }
+    { "src": "/(.*)", "dest": "api/server.py" }
   ]
 }
