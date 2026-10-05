@@ -60,7 +60,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .offer-tag.active{background:var(--green);color:#fff}
 .offer-tag.verified{background:var(--navy);color:#fff}
 .offer-tag.sold{background:#FF3B30;color:#fff;font-size:14px;padding:8px 18px;letter-spacing:0.5px}
-.offer-card.sold .offer-body s,.offer-card.sold .offer-price s,.offer-card.sold .offer-title s,.offer-card.sold .offer-desc s{text-decoration:line-through;opacity:0.55}
+.offer-card.sold .offer-cover,.offer-card.sold .offer-title,.offer-card.sold .offer-loc,.offer-card.sold .offer-desc,.offer-card.sold .offer-meta,.offer-card.sold .offer-price,.offer-card.sold .offer-ref,.offer-card.sold .offer-grid b,.offer-card.sold .offer-grid span,.offer-card.sold .offer-cat{text-decoration:line-through;color:rgba(11,18,32,0.45)}
+.offer-card.sold .offer-cta{text-decoration:none !important;color:#fff !important;opacity:1}
 .for-sale-badge{position:absolute;top:16px;left:16px;background:#00CB53;color:#fff;font-size:18px;font-weight:800;padding:10px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px;display:flex;align-items:center;justify-content:center}
 .offer-card.sold .sold-badge{position:absolute;top:16px;left:16px;background:#FF3B30;color:#fff;font-size:12px;font-weight:800;padding:8px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px}
 .offer-price-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
@@ -145,11 +146,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <span class="offer-cat" id="offer-cat"></span>
     <div class="sold-badge" id="sold-badge">✅ SOLD</div><div class="for-sale-badge" id="for-sale-badge">🟢</div></div>
     <div class="offer-body">
-      <h1 id="offer-title"></h1>
+      <h1 id="offer-title" class="offer-title"></h1>
       <div class="offer-loc" id="offer-loc"></div>
       <p class="offer-desc" id="offer-desc"></p>
 
-      <div class="offer-grid">
+      <div class="offer-grid offer-meta">
         <div><span>Company type</span><b id="offer-company"></b></div>
         <div><span>Year established</span><b id="offer-year"></b></div>
         <div><span>License status</span><b id="offer-status"></b></div>
@@ -229,19 +230,17 @@ async function loadOffer(){
     cat.className = 'offer-cat ' + ind;
     cat.textContent = ind === 'none' ? 'Company' : ind;
 
-    const strike = (s) => isSold ? '<s>' + s + '</s>' : s;
-
-    document.getElementById('offer-title').innerHTML = strike(esc(o.license_type || 'Company') + ' Licensed Company');
-    document.getElementById('offer-loc').innerHTML = strike(flag(o.jurisdiction) + ' ' + esc(o.jurisdiction || ''));
-    document.getElementById('offer-desc').innerHTML = strike(esc(o.short_description || ''));
-    document.getElementById('offer-company').innerHTML = strike(esc(o.company_type || '—'));
-    document.getElementById('offer-year').innerHTML = strike(esc(o.year_established || '—'));
-    document.getElementById('offer-status').innerHTML = strike(esc(o.license_status || '—'));
-    document.getElementById('offer-regulator').innerHTML = strike(esc(o.regulator || '—'));
-    document.getElementById('offer-bank').innerHTML = strike(esc(o.bank_emi_account || '—'));
-    document.getElementById('offer-vat').innerHTML = strike(esc(o.vat_status || '—'));
-    document.getElementById('offer-price').innerHTML = strike(esc(o.price || 'On request'));
-    document.getElementById('offer-ref').innerHTML = strike('Ref: ' + esc(ref));
+    document.getElementById('offer-title').textContent = esc(o.license_type || 'Company') + ' Licensed Company';
+    document.getElementById('offer-loc').textContent = flag(o.jurisdiction) + ' ' + esc(o.jurisdiction || '');
+    document.getElementById('offer-desc').textContent = esc(o.short_description || '');
+    document.getElementById('offer-company').textContent = esc(o.company_type || '—');
+    document.getElementById('offer-year').textContent = esc(o.year_established || '—');
+    document.getElementById('offer-status').textContent = esc(o.license_status || '—');
+    document.getElementById('offer-regulator').textContent = esc(o.regulator || '—');
+    document.getElementById('offer-bank').textContent = esc(o.bank_emi_account || '—');
+    document.getElementById('offer-vat').textContent = esc(o.vat_status || '—');
+    document.getElementById('offer-price').textContent = esc(o.price || 'On request');
+    document.getElementById('offer-ref').textContent = 'Ref: ' + esc(ref);
 
     const tags = document.getElementById('offer-tags');
     if(isSold){
