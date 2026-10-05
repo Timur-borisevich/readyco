@@ -48,9 +48,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hero-search input::placeholder{color:var(--text-3)}
 .hero-search-btn{background:var(--yellow);color:var(--navy);border:none;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:700;transition:transform .1s}
 .hero-search-btn:active{transform:scale(0.97)}
-.hero-popular{display:flex;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.hero-popular{display:flex;align-items:center;gap:6px;margin-top:18px;flex-wrap:wrap}
 .hero-popular span{font-size:13px;color:var(--text-2);font-weight:500}
-.hero-tag{padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;border:none}
+.hero-tag{padding:5px 12px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;border:none;white-space:nowrap}
 .hero-tag.vasp{background:var(--green)}
 .hero-tag.emi{background:var(--navy)}
 .hero-tag.psp{background:var(--orange)}
@@ -312,7 +312,7 @@ body{padding-bottom:70px}
 <script>
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
 const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
-const COVER={fintech:'/images/fintech.jpg',crypto:'/images/crypto.jpg',igaming:'/images/igaming.jpg',psp:'/images/psp.jpg'};
+const COVER={EMI:'/images/fintech.jpg',VASP:'/images/crypto.jpg',CASP:'/images/crypto.jpg',iGaming:'/images/igaming.jpg',Casino:'/images/igaming.jpg',Betting:'/images/igaming.jpg',PSP:'/images/psp.jpg',Forex:'/images/fintech.jpg',PI:'/images/fintech.jpg'};
 const BADGE2={fintech:'Transfer Ready',crypto:'Bank Accounts',igaming:'Turnkey Solution',psp:'Regional Expansion'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
 function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
@@ -323,7 +323,7 @@ async function loadListings(q){
   try{
     const res=await fetch('/api/offers?status=live');const data=await res.json();
     let offers=data.offers;if(q){const ql=q.toLowerCase();offers=offers.filter(o=>JSON.stringify(o).toLowerCase().includes(ql))}
-    document.getElementById('stat-count').innerHTML='<span class="a">'+offers.length+'</span>';
+    document.getElementById('stat-count').innerHTML='<span class="a">120+</span>';
     const g=document.getElementById('lgrid');
     if(!offers.length){g.innerHTML='<div class="empty"><p>No active listings. Follow <a href="https://t.me/readyco" style="color:var(--yellow)">@readyco</a></p></div>';return}
     g.innerHTML=offers.map(o=>{
@@ -332,10 +332,10 @@ async function loadListings(q){
       if(o.license_status)tags.push(`<span class="lcard-tag active">${esc(o.license_status)}</span>`);
       tags.push(`<span class="lcard-tag ${ind==='fintech'?'transfer':ind==='crypto'?'bank':ind==='igaming'?'turnkey':'regional'}">${esc(BADGE2[ind]||'Verified')}</span>`);
       const title = esc(o.license_type||'Company') + ' ' + (ind==='igaming'?'License':'Licensed Company');
-      const img = COVER[ind] || COVER.psp;
+      const img = COVER[o.license_type] || COVER[ind] || '/images/fintech.jpg';
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover">
-          <img src="${img}" alt="${ind}" loading="lazy">
+          <img src="${img}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.style.background='#E9EEF5'">
           <span class="cat-label ${ind}">${ind}</span>
         </div>
         <div class="lcard-body">
