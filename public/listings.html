@@ -284,7 +284,7 @@ async function loadListings(q){
   try{
     const res=await fetch('/api/offers?status=live');const data=await res.json();
     let offers=data.offers;if(q){const ql=q.toLowerCase();offers=offers.filter(o=>JSON.stringify(o).toLowerCase().includes(ql))}
-    document.getElementById('stat-count').innerHTML='<span class="a">120+</span>';
+    const stat=document.getElementById('stat-count');if(stat)stat.innerHTML='<span class="a">120+</span>';
     const g=document.getElementById('lgrid');
     if(!offers.length){g.innerHTML=`<div class="empty"><p>No listings match “${esc(q)}”. Try a different keyword or <a href="https://t.me/ReadyCoAdminBot" style="color:var(--yellow)">contact us</a>.</p></div>`;return}
     g.innerHTML=offers.map(o=>{
