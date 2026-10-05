@@ -98,8 +98,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .lcard-cover .cat-label.crypto{background:var(--orange)}
 .lcard-cover .cat-label.igaming{background:var(--purple)}
 .lcard-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.25),transparent 60%)}
-.lcard-cover.igaming-gradient{background:linear-gradient(135deg,#2D1B4E 0%,#1A0F2E 50%,#0D0618 100%)}
-.lcard-cover.igaming-gradient .cover-svg{opacity:0.9;z-index:1}
+.cover-illustration svg{width:100%;height:100%;display:block;border-radius:16px 16px 0 0}
 .lcard-body{padding:18px}
 .lcard-title{font-size:17px;font-weight:700;margin-bottom:5px;color:var(--text);line-height:1.3}
 .lcard-loc{font-size:13px;color:var(--text-2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
@@ -338,13 +337,21 @@ body{padding-bottom:70px}
 <script>
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
 const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
-const COVER={EMI:'/images/fintech.jpg',VASP:'/images/crypto.jpg',CASP:'/images/crypto.jpg',iGaming:'gradient',Casino:'gradient',Betting:'gradient',PSP:'/images/psp.jpg',Forex:'/images/fintech.jpg',PI:'/images/fintech.jpg'};
+const COVER={EMI:'svg',VASP:'svg',CASP:'svg',iGaming:'svg',Casino:'svg',Betting:'svg',PSP:'svg',Forex:'svg',PI:'svg'};
 const BADGE2={fintech:'Transfer Ready',crypto:'Bank Accounts',igaming:'Turnkey Solution',psp:'Regional Expansion'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
 function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
 function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
 function doSearch(){loadListings(document.getElementById('heroSearch').value)}
 function tagSearch(t){document.getElementById('heroSearch').value=t;loadListings(t)}
+function getCoverSvg(ind){
+  const svgs = {
+    Fintech: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#ftg)"></rect><defs><linearGradient id="ftg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E8F8ED"></stop><stop offset="100%" stop-color="#D0F0D8"></stop></linearGradient></defs><path d="M20 120 L20 60 L50 60 L50 35 L90 35 L90 70 L130 70 L130 20 L170 20 L170 120 Z" fill="#00CB53" opacity="0.85"></path><path d="M170 120 L170 45 L200 45 L200 120 Z" fill="#081220" opacity="0.12"></path><g fill="#081220" opacity="0.08"><rect x="60" y="15" width="12" height="40" rx="2"></rect><rect x="78" y="22" width="12" height="33" rx="2"></rect><rect x="96" y="10" width="12" height="45" rx="2"></rect></g></svg>`,
+    Crypto: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#cg)"></rect><defs><linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFF4E6"></stop><stop offset="100%" stop-color="#FFE8CC"></stop></linearGradient></defs><circle cx="100" cy="60" r="34" fill="#FF8A00"></circle><text x="100" y="72" font-family="Poppins,Arial" font-size="34" font-weight="800" text-anchor="middle" fill="#fff">₿</text><polyline points="20,100 60,70 100,85 140,55 180,40 200,30" fill="none" stroke="#00CB53" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>`,
+    iGaming: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#ig)"></rect><defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2D1B4E"></stop><stop offset="100%" stop-color="#1A0F2E"></stop></linearGradient></defs><circle cx="100" cy="60" r="38" fill="none" stroke="#7A3CFF" stroke-width="4"></circle><circle cx="100" cy="60" r="30" fill="none" stroke="#7A3CFF" stroke-width="1"></circle><g fill="#7A3CFF"><path d="M96 18 h8 v20 h-8 z M96 82 h8 v20 h-8 z M18 56 h20 v8 H18 z M162 56 h20 v8 H162 z M41 33 L50 42 L44 48 L35 39 z M149 87 L140 78 L146 72 L155 81 z M149 33 L140 42 L146 48 L155 39 z M41 87 L50 78 L44 72 L35 81 z"></path></g><circle cx="100" cy="60" r="14" fill="#FFD400"></circle><circle cx="100" cy="60" r="6" fill="#0B1220"></circle></svg>`
+  };
+  return svgs[ind] || svgs.Fintech;
+}
 async function loadListings(q){
   try{
     const res=await fetch('/api/offers?status=live');const data=await res.json();
@@ -362,7 +369,7 @@ async function loadListings(q){
       const isGradient = img === 'gradient';
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${isGradient ? 'igaming-gradient' : ''}">
-          ${isGradient ? `<svg class="cover-svg" viewBox="0 0 100 100" width="88" height="88"><circle cx="50" cy="50" r="47" fill="#1A0F2E" stroke="#7A3CFF" stroke-width="2"></circle><circle cx="50" cy="50" r="40" fill="#2D1B4E" stroke="#7A3CFF" stroke-width="1"></circle><g fill="#7A3CFF"><path d="M48 8 h4 v22 h-4 z M48 70 h4 v22 h-4 z M8 48 h22 v4 H8 z M70 48 h22 v4 H70 z M21 21 L29 29 L26 32 L18 24 z M71 71 L63 63 L66 60 L74 68 z M79 21 L71 29 L74 32 L82 24 z M21 79 L29 71 L26 68 L18 76 z"></path></g><circle cx="50" cy="50" r="16" fill="#FFD400"></circle><circle cx="50" cy="50" r="6" fill="#0B1220"></circle></svg>` : `<img src="${img}" alt="" onerror="this.style.display='none';this.parentElement.style.background='#E9EEF5'">`}
+          ${`<div class="cover-illustration ${ind}">${getCoverSvg(ind)}</div>`}
           <span class="cat-label ${ind}">${ind}</span>
         </div>
         <div class="lcard-body">
