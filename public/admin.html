@@ -153,7 +153,7 @@ function esc(t){const d=document.createElement('div');d.textContent=t||'';return
 function initials(n){return(n||'?')[0].toUpperCase()}
 const LOGO='<img src="/logo.png" alt="ReadyCo" style="width:30px;height:30px;border-radius:7px">';
 
-function forceRefresh(){const v=view;document.getElementById('app').innerHTML=`<div class="loading">Loading...</div>`;setTimeout(()=>{if(v==='chat'&&activeLead){loadLead(activeLead.id)}else if(v==='offers'){loadOffers()}else if(v==='leads'){loadLeads()}else{render()}},300)}
+function forceRefresh(){const v=view;const params=new URLSearchParams(window.location.search);const leadId=params.get('lead');document.getElementById('app').innerHTML=`<div class="loading">Loading...</div>`;setTimeout(()=>{if(leadId){currentLeadId=parseInt(leadId,10);activeLead=leads.find(l=>l.id===currentLeadId);view='chat';} if(v==='chat'&&activeLead){loadLead(activeLead.id)}else if(v==='offers'){loadOffers()}else if(v==='leads'){loadLeads()}else{render()}},300)}
 function render(){const app=document.getElementById('app');if(view==='chat')return renderChat(app);if(view==='add')return renderForm(app,'add');if(view==='edit')return renderForm(app,'edit');if(view==='announce')return renderAnnounce(app);renderMain(app)}
 function renderMain(app){const tabs=[{k:'leads',l:'Leads',i:'👤'},{k:'offers',l:'Offers',i:'📋'},{k:'stats',l:'Stats',i:'📊'},{k:'manage',l:'Manage',i:'⚙️'}];
 app.innerHTML=`<div class="header">${LOGO}<div><div class="header-title">ReadyCo Admin</div><div class="header-sub">MARKET</div></div></div>
@@ -188,7 +188,7 @@ function renderAnnounce(app){app.innerHTML=`<div class="chat-header"><div class=
 
 function switchView(v){view=v;render()}
 function backToMain(){view='leads';currentLeadId=null;editingOffer=null;loadLeads();render()}
-async function openLead(id){currentLeadId=id;view='chat';render()}
+async function openLead(id){currentLeadId=id;activeLead=leads.find(l=>l.id===id);view='chat';render()}
 async function loadMessages(){const c=document.getElementById('chatMsgs');if(!c)return;c.innerHTML='<div class="empty"><p>Loading...</p></div>';
 try{const d=await api(`/admin/leads/${currentLeadId}`);const msgs=d.messages||[];if(!msgs.length){c.innerHTML='<div class="empty"><div class="icon">💬</div><p>No messages</p></div>';return}
 const fm=msgs.filter(m=>m.file_id&&(m.msg_type==='photo'||m.msg_type==='voice'||m.msg_type==='audio'||m.msg_type==='document'));
@@ -221,7 +221,12 @@ function doBackup(){const h={};h['X-Telegram-Init-Data']=tgUser?tgUser.id.toStri
 async function doRestore(input){const file=input.files[0];if(!file)return;input.value='';if(!confirm('Restore will replace all data. Continue?'))return;try{const fd=new FormData();fd.append('file',file);const h={};h['X-Telegram-Init-Data']=tgUser?tgUser.id.toString():'8339164180';const r=await fetch(API+'/admin/restore',{method:'POST',headers:h,body:fd});if(!r.ok)throw new Error(await r.text());const d=await r.json();alert('Restored: '+d.restored.offers+' offers, '+d.restored.leads+' leads');loadLeads();loadOffers()}catch(e){alert('Restore failed: '+e.message)}}
 document.addEventListener('input',e=>{if(e.target.id==='replyInput'){e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,80)+'px'}});
 document.addEventListener('keydown',e=>{if(e.target.id==='replyInput'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendReply()}});
-async function initLoad(){await Promise.all([loadLeads(),loadOffers()]);render()}
+async function initLoad(){await Promise.all([loadLeads(),loadOffers()]);
+const params=new URLSearchParams(window.location.search);
+const leadId=params.get('lead');
+if(leadId){currentLeadId=parseInt(leadId,10);activeLead=leads.find(l=>l.id===currentLeadId);view='chat';}
+render();
+}
 initLoad();
 </script>
 </body>

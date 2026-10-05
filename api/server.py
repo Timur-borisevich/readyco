@@ -592,26 +592,16 @@ async def bot_webhook(request: Request):
         
         if cb_data.startswith("leadview_"):
             lid = int(cb_data.replace("leadview_", ""))
-            lead = await db_get_lead(lid)
-            if not lead: return {"ok": True}
-            msgs = await db_get_messages(lid)
-            name = lead.get("telegram_username") or f"ID:{lead['telegram_user_id']}"
-            lines = [f"👤 {name} — {len(msgs)} messages\n"]
-            for m in msgs[-10:]:
-                d = "👤" if m["direction"] == "client_to_admin" else "💬"
-                ts = str(m["sent_at"])[:16] if m.get("sent_at") else ""
-                lines.append(f"{d} [{ts}] {esc(m['text'][:100])}")
-            kb = {"inline_keyboard": [[{"text":"💬 Reply","callback_data":f"reply_{lid}"},{"text":"🔙 Back to leads","callback_data":"menu_leads"}]]}
-            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "\n".join(lines), "reply_markup": kb, "parse_mode": "HTML"})
+            miniapp_url = f"https://readyco.vercel.app/inbox?lead={lid}"
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "💬 Open this lead in the Mini App Inbox.", "reply_markup": {"inline_keyboard": [[{"text":"Open Inbox", "web_app":{"url": miniapp_url}}], [{"text":"🔙 Back to leads","callback_data":"menu_leads"}]]}})
             return {"ok": True}
         
         if cb_data.startswith("reply_"):
             lid = int(cb_data.replace("reply_", ""))
             lead = await db_get_lead(lid)
             if not lead: return {"ok": True}
-            sessions[user_id] = {"action": "reply", "data": {"lead_id": lid}}
-            name = lead.get("telegram_username") or f"ID:{lead['telegram_user_id']}"
-            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"💬 Replying to {name}\n\nSend your reply text:"})
+            miniapp_url = f"https://readyco.vercel.app/inbox?lead={lid}"
+            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "💬 Open this lead in the Mini App Inbox to reply.", "reply_markup": {"inline_keyboard": [[{"text":"Open Inbox", "web_app":{"url": miniapp_url}}]]}})
             return {"ok": True}
         
         if cb_data == "menu_manage":
@@ -762,26 +752,7 @@ async def bot_webhook(request: Request):
             await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": f"✅ {ref} updated: {field} = {new_val}", "reply_markup": main_menu_kb()})
             return {"ok": True}
         
-        if cb_data.startswith("sendreply_"):
-            lid = int(cb_data.replace("sendreply_", ""))
-            session = sessions.get(user_id, {})
-            reply_text = session.get("data", {}).get("reply_text", "")
-            if not reply_text:
-                await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "❌ Session expired."})
-                return {"ok": True}
-            lead = await db_get_lead(lid)
-            if not lead: return {"ok": True}
-            r = await tg_send(lead["telegram_user_id"], f"💬 ReadyCo Market:\n\n{reply_text}")
-            if r.get("ok"):
-                await db_store_message(lid, reply_text, "admin_to_client")
-                await db_update_lead_status(lid, "responded")
-                await db_audit(user_id, "reply", "lead", lid, {"text": reply_text[:100]})
-            if user_id in sessions: del sessions[user_id]
-            await aiohttp_request("editMessageText", {"chat_id": chat_id, "message_id": msg["message_id"], "text": "✅ Reply sent to client!", "reply_markup": main_menu_kb()})
-            return {"ok": True}
         
-        return {"ok": True}
-    
     # === MESSAGE ===
     msg = data.get("message") or data.get("edited_message")
     if not msg: return {"ok": True}
@@ -889,10 +860,10 @@ async def bot_webhook(request: Request):
                 await tg_send(user_id, "❌ Lead not found.")
                 del sessions[user_id]
                 return {"ok": True}
-            sessions[user_id]["data"]["reply_text"] = text
-            name = lead.get("telegram_username") or f"ID:{lead['telegram_user_id']}"
-            kb = {"inline_keyboard": [[{"text":"✅ Send","callback_data":f"sendreply_{lid}"},{"text":"❌ Cancel","callback_data":"cancel_action"}]]}
-            await tg_send(user_id, f"📋 Reply preview\n\nTo: {name}\nMessage: {text}\n\nSend?", kb)
+            miniapp_url = f"https://readyco.vercel.app/inbox?lead={lid}"
+            kb = {"inline_keyboard": [[{"text":"💬 Reply in Inbox","web_app":{"url": miniapp_url}}]]}
+            await tg_send(user_id, "Please use the Mini App Inbox to send replies reliably.", kb)
+            if user_id in sessions: del sessions[user_id]
             return {"ok": True}
     
     # Client message = forward to admins (unless blocked)
@@ -974,6 +945,7 @@ async def bot_webhook(request: Request):
         
         type_icon = {"photo":"📷","sticker":"🎨","document":"📎","voice":"🎤","video":"🎬","audio":"🎵","contact":"👤","location":"📍","animation":"🎞️","text":"💬"}.get(msg_type, "💬")
         
+        miniapp_url = f"https://readyco.vercel.app/inbox?lead={lead_id}"
         admin_text = (
             f"👤 <b>New inquiry</b>\n"
             f"From: {user_disp}\n"
@@ -981,8 +953,8 @@ async def bot_webhook(request: Request):
             f"{offer_info}\n\n"
             f"{type_icon} {esc(msg_content)}"
             f"{history_text}\n\n"
-            f"Reply: {user_link}")
-        kb = {"inline_keyboard": [[{"text":"💬 Reply","callback_data":f"reply_{lead_id}"}]]}
+            f"Open in Mini App to reply.")
+        kb = {"inline_keyboard": [[{"text":"💬 Reply in Inbox","web_app":{"url": miniapp_url}}]]}
         
         for admin_id in ADMIN_IDS:
             try:
