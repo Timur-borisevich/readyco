@@ -174,7 +174,8 @@ async function loadOffer(){
   try{
     const res = await fetch('/api/offers/'+encodeURIComponent(ref));
     if(!res.ok) throw new Error('not found');
-    const o = await res.json();
+    const payload = await res.json();
+    const o = payload.offer || payload;
     document.getElementById('offer-loading').style.display='none';
     const card = document.getElementById('offer-card');
     card.style.display='block';
