@@ -79,8 +79,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .lcard:hover{border-color:var(--border);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.08)}
 .lcard:active{transform:scale(0.99)}
 .lcard-cover{height:140px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;background:#E9EEF5}
-.lcard-cover .emoji{position:absolute;font-size:56px;opacity:0.15;left:50%;top:50%;transform:translate(-50%,-50%)}
-.lcard-cover .cat-label{position:absolute;left:16px;top:16px;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;color:#fff;z-index:2}
+.lcard-cover .emoji{display:none}
+.lcard-cover .cat-label{position:absolute;left:16px;top:16px;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;color:#fff;z-index:2;text-transform:capitalize}
 .lcard-cover .cat-label.fintech{background:var(--green)}
 .lcard-cover .cat-label.crypto{background:var(--orange)}
 .lcard-cover .cat-label.igaming{background:var(--purple)}
@@ -271,10 +271,9 @@ async function loadListings(q){
       const tags=[];
       if(o.license_status)tags.push(`<span class="lcard-tag active">${esc(o.license_status)}</span>`);
       tags.push(`<span class="lcard-tag verified">Verified</span>`);
-      if(o.bank_emi_account&&o.bank_emi_account.toLowerCase().includes('yes'))tags.push(`<span class="lcard-tag bank">Bank</span>`);
       const title = esc(o.license_type||'Company') + ' Licensed Company';
       return `<div class="lcard" onclick="window.location.href='https://t.me/ReadyCoAdminBot?start=inquiry_${o.ref}'">
-        <div class="lcard-cover ${ind}">${emoji}<span class="cat-label ${ind}">${ind}</span></div>
+        <div class="lcard-cover ${ind}"><span class="cat-label ${ind}">${ind}</span></div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
