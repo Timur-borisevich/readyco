@@ -1107,7 +1107,9 @@ async def admin_send_file(request: Request):
     # Read file
     contents = await file.read()
     filename = file.filename or "file"
+    
     is_image = file.content_type and file.content_type.startswith("image/")
+    is_video = file.content_type and file.content_type.startswith("video/")
     
     # Send to client via Telegram
     if is_image:
@@ -1116,6 +1118,12 @@ async def admin_send_file(request: Request):
         data.add_field("chat_id", str(lead["telegram_user_id"]))
         data.add_field("caption", f"💬 ReadyCo Market")
         data.add_field("photo", contents, filename=filename, content_type=file.content_type)
+    elif is_video:
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendVideo"
+        data = aiohttp.FormData()
+        data.add_field("chat_id", str(lead["telegram_user_id"]))
+        data.add_field("caption", f"💬 ReadyCo Market")
+        data.add_field("video", contents, filename=filename, content_type=file.content_type)
     else:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
         data = aiohttp.FormData()
@@ -1135,8 +1143,10 @@ async def admin_send_file(request: Request):
                 file_id = result["photo"][-1]["file_id"]
             elif "document" in result:
                 file_id = result["document"]["file_id"]
+            elif "video" in result:
+                file_id = result["video"]["file_id"]
     
-    msg_type = "photo" if is_image else "document"
+    msg_type = "photo" if is_image else ("video" if is_video else "document")
     await db_store_message(lead_id, f"[{msg_type}: {filename}]", "admin_to_client", file_id=file_id, msg_type=msg_type)
     await db_update_lead_status(lead_id, "responded")
     await db_audit(uid, "sendfile", "lead", lead_id, {"file": filename, "admin": admin_name})
