@@ -368,7 +368,7 @@ function getCoverSvg(type){
     Forex: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#ftg)"></rect><defs><linearGradient id="ftg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E8F8ED"></stop><stop offset="100%" stop-color="#D0F0D8"></stop></linearGradient></defs><path d="M20 120 L20 60 L50 60 L50 35 L90 35 L90 70 L130 70 L130 20 L170 20 L170 120 Z" fill="#00CB53" opacity="0.85"></path><path d="M170 120 L170 45 L200 45 L200 120 Z" fill="#081220" opacity="0.12"></path><g fill="#081220" opacity="0.08"><rect x="60" y="15" width="12" height="40" rx="2"></rect><rect x="78" y="22" width="12" height="33" rx="2"></rect><rect x="96" y="10" width="12" height="45" rx="2"></rect></g></svg>`,
     PI: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#emig)"></rect><defs><linearGradient id="emig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E6F4FF"></stop><stop offset="100%" stop-color="#CFE8FC"></stop></linearGradient></defs><rect x="35" y="20" width="20" height="100" rx="3" fill="#0082F3" opacity="0.9"></rect><rect x="65" y="40" width="20" height="80" rx="3" fill="#0082F3" opacity="0.75"></rect><rect x="95" y="30" width="20" height="90" rx="3" fill="#0082F3" opacity="0.85"></rect><rect x="125" y="50" width="20" height="70" rx="3" fill="#0082F3" opacity="0.65"></rect><rect x="155" y="15" width="20" height="105" rx="3" fill="#0082F3" opacity="0.9"></rect></svg>`
   };
-  svgs['MSB'] = svgs.PSP; svgs['Fintech'] = svgs.PSP; return svgs[type] || svgs.PSP;
+  return svgs[type] || svgs.PSP;
 }
 async function loadListings(q){
   const loadingTimer=setTimeout(()=>{const g=document.getElementById('lgrid');if(g&&g.textContent.includes('Loading'))g.innerHTML='<div class="empty"><p>Loading took too long. <a href="/listings.html" style="color:var(--yellow)">View all listings</a></p></div>';},6000);
@@ -389,7 +389,7 @@ async function loadListings(q){
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${isGradient ? 'igaming-gradient' : ''}">
           ${`<div class="cover-illustration ${ind === 'none' ? 'fintech' : ind}">${getCoverSvg(o.license_type || 'Fintech')}</div>`}
-          <span class="cat-label ${ind === 'none' ? 'fintech' : ind}">${ind === 'none' ? 'fintech' : ind}</span>
+          <span class="cat-label ${ind === 'none' ? 'fintech' : ind}">${esc(o.license_type || (ind === 'none' ? 'fintech' : ind))}</span>
         </div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>

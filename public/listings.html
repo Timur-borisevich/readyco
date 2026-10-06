@@ -303,7 +303,7 @@ async function loadListings(q){
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${isGradient ? 'igaming-gradient' : ''}">
           ${`<div class="cover-illustration ${ind === 'none' ? 'fintech' : ind}">${getCoverSvg(o.license_type || 'Fintech')}</div>`}
-          <span class="cat-label ${ind === 'none' ? 'fintech' : ind}">${ind === 'none' ? 'fintech' : ind}</span>
+          <span class="cat-label ${ind === 'none' ? 'fintech' : ind}">${esc(o.license_type || (ind === 'none' ? 'fintech' : ind))}</span>
         </div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>
