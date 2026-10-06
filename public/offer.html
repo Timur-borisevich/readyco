@@ -1,174 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#081220">
-<title>ReadyCo Market — Offer Details</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--yellow:#FFD400;--navy:#0B1220;--green:#00C853;--orange:#FF8A00;--purple:#7A3CFF;--border:#E5E7EB;--text:#0B1220;--text-2:#667085;--text-3:#98A2B3;--ease:cubic-bezier(0.16,1,0.3,1)}
-*{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
-body{font-family:'Poppins',-apple-system,sans-serif;background:#F6F8FB;color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5}
-a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer;border:none;background:none}
-
-/* Header */
-.header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.header-inner{max-width:1100px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:24px}
-.header-logo{display:flex;align-items:center;gap:10px}
-.header-logo img{width:34px;height:34px;border-radius:8px}
-.header-logo b{font-size:15px;font-weight:700;color:var(--text)}
-.header-logo small{font-size:8px;font-weight:600;letter-spacing:2px;color:var(--text-2);display:block;margin-top:-2px}
-.header-nav{display:flex;gap:28px;margin-left:20px}
-.header-nav a{font-size:14px;font-weight:500;color:var(--text-2);transition:color .2s}
-.header-nav a:hover{color:var(--text)}
-.header-cta{margin-left:auto;background:var(--yellow);color:var(--navy);padding:9px 20px;border-radius:999px;font-size:14px;font-weight:700;transition:transform .1s}
-.header-cta:active{transform:scale(0.97)}
-.burger{display:none;font-size:22px;color:var(--text)}
-
-/* Offer page */
-.offer-page{max-width:720px;margin:0 auto;padding:40px 24px 80px}
-.offer-back{margin-bottom:24px}
-.offer-back a{font-size:14px;font-weight:600;color:var(--text-2)}
-.offer-back a:hover{color:var(--text)}
-.offer-card{background:#fff;border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.04)}
-.offer-cover{height:220px;background:#E9EEF5;display:flex;align-items:center;justify-content:center;position:relative}
-.offer-cover.crypto{background:linear-gradient(135deg,#FFF4E6 0%,#FFFCF8 100%)}
-.offer-cover.fintech{background:linear-gradient(135deg,#E8F8ED 0%,#F4FBF7 100%)}
-.offer-cover.igaming{background:linear-gradient(135deg,#F0EBFF 0%,#FBFAFF 100%)}
-.offer-cover .cover-logo{width:110px;height:110px;opacity:0.95}
-.offer-cover .cover-logo rect{fill:#FFD400}
-.offer-cover .cover-logo text{fill:#0B1220;font-family:Poppins,Arial;font-weight:800;font-size:58px;text-anchor:middle}
-.offer-cat{position:absolute;left:20px;top:20px;font-size:13px;font-weight:700;padding:7px 16px;border-radius:999px;color:#fff;text-transform:capitalize}
-.offer-cat.fintech{background:var(--green)}
-.offer-cat.crypto{background:var(--orange)}
-.offer-cat.igaming{background:var(--purple)}
-.offer-body{padding:28px}
-.offer-body h1{font-size:28px;font-weight:800;line-height:1.2;margin-bottom:8px;letter-spacing:-0.5px}
-.offer-loc{font-size:16px;color:var(--text-2);margin-bottom:18px}
-.offer-desc{font-size:15px;color:var(--text-2);line-height:1.6;margin-bottom:24px}
-.offer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
-.offer-grid div{background:#F6F8FB;border-radius:12px;padding:14px}
-.offer-grid div span{display:block;font-size:12px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
-.offer-grid div b{font-size:15px;color:var(--text)}
-.offer-tags{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
-.offer-tag{font-size:12px;font-weight:700;padding:6px 14px;border-radius:999px}
-.offer-tag.active{background:var(--green);color:#fff}
-.offer-tag.verified{background:var(--navy);color:#fff}
-.offer-tag.sold{background:#FF3B30;color:#fff;font-size:14px;padding:8px 18px;letter-spacing:0.5px}
-.offer-card.sold .offer-cover,.offer-card.sold .offer-title,.offer-card.sold .offer-loc,.offer-card.sold .offer-desc,.offer-card.sold .offer-meta,.offer-card.sold .offer-price,.offer-card.sold .offer-ref,.offer-card.sold .offer-grid b,.offer-card.sold .offer-grid span,.offer-card.sold .offer-cat{text-decoration:line-through;color:rgba(11,18,32,0.45)}
-.offer-card.sold .offer-cta{text-decoration:none !important;color:#fff !important;opacity:1}
-.for-sale-badge{position:absolute;top:16px;left:16px;background:#00CB53;color:#fff;font-size:18px;font-weight:800;padding:10px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px}
-.offer-card.sold .sold-badge{position:absolute;top:16px;left:16px;background:#FF3B30;color:#fff;font-size:12px;font-weight:800;padding:8px 14px;border-radius:8px;z-index:2;letter-spacing:0.5px}
-.offer-price-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-.offer-price{font-size:28px;font-weight:800;color:var(--text)}
-.offer-ref{font-size:13px;color:var(--text-2);margin-top:4px}
-.offer-cta{background:var(--yellow);color:var(--navy);padding:14px 28px;border-radius:999px;font-size:15px;font-weight:700;display:inline-block;transition:transform .1s}
-.offer-cta:active{transform:scale(0.97)}
-
-/* Footer */
-.footer{background:#fff;border-top:1px solid var(--border);padding:48px 24px 24px}
-.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:32px}
-.footer-brand{display:flex;align-items:center;gap:14px}
-.footer-brand img{width:42px;height:42px;border-radius:10px}
-.footer-name{font-weight:800;font-size:18px;color:var(--text);letter-spacing:-0.3px}
-.footer-tagline{font-size:13px;color:var(--text-2);margin-top:4px;max-width:220px}
-.footer-col{display:flex;flex-direction:column;gap:12px}
-.footer-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-3);margin-bottom:4px}
-.footer-col a{color:var(--text-2);font-size:14px;font-weight:500;text-decoration:none;word-break:break-word}
-.footer-col a:hover{color:var(--text)}
-.footer-bottom{max-width:1200px;margin:0 auto;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--text-3);font-size:13px}
-
-/* Empty */
-.empty{text-align:center;padding:80px 20px;color:var(--text-2)}
-
-/* Responsive */
-@media(max-width:900px){
-.header-nav{display:none}
-.burger{display:block;margin-left:auto}
-.offer-page{padding:30px 20px 60px}
-.offer-body h1{font-size:24px}
-.offer-grid{grid-template-columns:1fr}
-.offer-price{font-size:24px}
-}
-@media(max-width:640px){
-.header-inner{padding:12px 16px}
-.header-cta{display:none}
-.offer-page{padding:24px 16px 40px}
-.offer-cover{height:180px}
-.offer-body{padding:20px}
-.offer-body h1{font-size:22px}
-.offer-desc{font-size:14px}
-.offer-grid div{padding:12px}
-.offer-price-row{flex-direction:column;align-items:flex-start}
-.offer-price{font-size:24px}
-.offer-cta{width:100%;text-align:center}
-.footer{padding:32px 16px 24px}
-.footer-inner{grid-template-columns:1fr;gap:24px}
-.footer-brand{grid-column:auto}
-}
-.header-tg{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#F3F4F6;color:#0B1220;transition:.2s;margin-left:auto}.header-tg:hover{background:#FFD400;color:#0B1220}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReadyCo Market — Offer Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#081220;
+      --yellow:#FFD400;
+      --green:#00CB53;
+      --orange:#FF8A00;
+      --purple:#7A3CFF;
+      --text:#0B1220;
+      --text-2:#5A6478;
+      --text-3:#8E99AB;
+      --border:#E6E9EF;
+      --light:#F7F8FA;
+      --ease:cubic-bezier(0.22,1,0.36,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Poppins,Arial,sans-serif;background:#F7F8FA;color:var(--text);line-height:1.5}
+    .header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+    .header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .header-logo{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none}
+    .header-logo img{width:38px;height:38px;border-radius:10px}
+    .header-logo div{line-height:1.1}
+    .header-logo b{font-size:17px;font-weight:800;letter-spacing:-0.5px}
+    .header-logo small{font-size:9px;font-weight:700;letter-spacing:3px;color:var(--text-2);display:block;margin-top:-2px}
+    .header-tg{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.2s}
+    .header-tg:hover{background:var(--light);color:var(--text)}
+    .offer-page{max-width:680px;margin:0 auto;padding:24px 16px 60px}
+    .offer-back{margin-bottom:16px}
+    .offer-back a{color:var(--text-2);font-size:14px;font-weight:600;text-decoration:none}
+    .offer-card{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.04)}
+    .status-bar{padding:16px 20px;font-size:15px;font-weight:800;letter-spacing:0.5px;display:flex;align-items:center;gap:8px}
+    .status-bar.for-sale{background:#E8F8ED;color:#007A3D;border-bottom:1px solid #D1EBDC}
+    .status-bar.sold{background:#FFE5E5;color:#C62828;border-bottom:1px solid #FFD1D1}
+    .offer-body{padding:22px 20px 28px}
+    .divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+    .offer-line{display:flex;align-items:flex-start;gap:10px;margin:10px 0;font-size:15px;color:var(--text)}
+    .offer-line .emoji{font-size:17px;flex-shrink:0;width:24px;text-align:center}
+    .offer-line .label{color:var(--text-2);font-weight:500}
+    .offer-line .value{font-weight:600}
+    .offer-desc{margin-top:18px;font-size:15px;color:var(--text);line-height:1.65}
+    .offer-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+    .offer-tag{font-size:13px;font-weight:600;color:var(--text-2);background:var(--light);padding:6px 12px;border-radius:999px}
+    .offer-cta{display:block;margin-top:22px;background:var(--navy);color:#fff;text-align:center;padding:14px 20px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;transition:.2s}
+    .offer-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(8,18,32,0.18)}
+    .offer-ref{margin-top:14px;font-size:13px;color:var(--text-3);text-align:center}
+    .offer-card.sold .status-bar.sold{text-decoration:none;color:#C62828}
+    .offer-card.sold .offer-body,.offer-card.sold .offer-line,.offer-card.sold .offer-desc,.offer-card.sold .offer-tags,.offer-card.sold .offer-ref{text-decoration:line-through;color:rgba(11,18,32,0.45)}
+    .offer-card.sold .offer-cta{display:none}
+    .offer-card.sold .contact-admin{display:block;margin-top:22px;color:var(--text-2);font-size:14px;text-align:center}
+    .offer-card.sold .contact-admin a{color:var(--navy);font-weight:700;text-decoration:none}
+    @media(max-width:640px){
+      .offer-page{padding:16px 12px 40px}
+      .offer-body{padding:18px 16px 24px}
+      .status-bar{font-size:14px;padding:14px 16px}
+      .offer-line{font-size:14px}
+    }
+    .footer{background:#fff;border-top:1px solid var(--border);padding:48px 24px 24px}
+    .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:32px}
+    .footer-brand{display:flex;align-items:center;gap:14px}
+    .footer-brand img{width:42px;height:42px;border-radius:10px}
+    .footer-name{font-weight:800;font-size:18px;color:var(--text);letter-spacing:-0.3px}
+    .footer-tagline{font-size:13px;color:var(--text-2);margin-top:4px;max-width:220px}
+    .footer-col{display:flex;flex-direction:column;gap:12px}
+    .footer-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-3);margin-bottom:4px}
+    .footer-col a{color:var(--text-2);font-size:14px;font-weight:500;text-decoration:none;word-break:break-word}
+    .footer-col a:hover{color:var(--text)}
+    .footer-bottom{max-width:1200px;margin:0 auto;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--text-3);font-size:13px}
+    @media(max-width:640px){
+      .footer{padding:32px 16px 24px}
+      .footer-inner{grid-template-columns:1fr;gap:24px}
+      .footer-brand{grid-column:auto}
+    }
   </style>
 </head>
 <body>
 
 <header class="header">
   <div class="header-inner">
-    <div class="header-logo">
-      <a href="/">
-        <img src="/logo.png" alt="ReadyCo">
-        <div><b>ReadyCo</b><small>MARKET</small></div>
-      </a>
-    </div>
-    
+    <a class="header-logo" href="/">
+      <img src="/logo.png" alt="ReadyCo">
+      <div><b>ReadyCo</b><small>MARKET</small></div>
+    </a>
     <a class="header-tg" href="https://t.me/ReadyCoAdminBot" aria-label="Telegram">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.053 5.56-5.023c.242-.213-.054-.334-.373-.121L8.586 13.617l-2.99-.932c-.65-.203-.664-.65.135-.962l11.653-4.49c.538-.196 1.006.132.832.986z"/></svg>
     </a>
-    <!-- account actions removed until auth system is built -->
   </div>
 </header>
 
 <main class="offer-page">
-  <div class="offer-back"><a href="/">← Back to listings</a></div>
+  <div class="offer-back"><a href="/listings.html">← Back to listings</a></div>
 
-  <div id="offer-loading" class="empty"><p>Loading offer…</p></div>
+  <div id="offer-loading" class="empty" style="text-align:center;padding:40px 0;color:var(--text-2)"><p>Loading offer…</p></div>
 
   <article id="offer-card" class="offer-card" style="display:none">
-    <div class="offer-cover" id="offer-cover">
-      <svg class="cover-logo" viewBox="0 0 100 100">
-        <rect width="100" height="100" rx="22"></rect>
-        <text x="50" y="66">R</text>
-      </svg>
-      <span class="offer-cat" id="offer-cat"></span>
-    <div class="sold-badge" id="sold-badge">✅ SOLD</div><div class="for-sale-badge" id="for-sale-badge">🟢</div></div>
+    <div class="status-bar" id="status-bar">🟢 FOR SALE</div>
     <div class="offer-body">
-      <h1 id="offer-title" class="offer-title"></h1>
-      <div class="offer-loc" id="offer-loc"></div>
+      <div id="offer-lines"></div>
+      <hr class="divider">
       <p class="offer-desc" id="offer-desc"></p>
-
-      <div class="offer-grid offer-meta">
-        <div><span>Company type</span><b id="offer-company"></b></div>
-        <div><span>Year established</span><b id="offer-year"></b></div>
-        <div><span>License status</span><b id="offer-status"></b></div>
-        <div><span>Regulator</span><b id="offer-regulator"></b></div>
-        <div><span>Bank / EMI account</span><b id="offer-bank"></b></div>
-        <div><span>VAT status</span><b id="offer-vat"></b></div>
-      </div>
-
       <div class="offer-tags" id="offer-tags"></div>
-
-      <div class="offer-price-row">
-        <div><span class="offer-price" id="offer-price"></span><div class="offer-ref" id="offer-ref"></div></div>
-        <a class="offer-cta" id="offer-cta" href="#">Contact via Telegram</a>
-      </div>
+      <a class="offer-cta" id="offer-cta" href="#">💬 Contact via Telegram</a>
+      <div class="contact-admin" id="contact-admin" style="display:none">Contact: <a href="https://t.me/ReadyCoAdminBot">@ReadyCoAdminBot</a></div>
+      <div class="offer-ref" id="offer-ref"></div>
     </div>
   </article>
 
-  <div id="offer-error" class="empty" style="display:none"><p>Offer not found.</p><a href="/">Back to listings</a></div>
+  <div id="offer-error" class="empty" style="display:none;text-align:center;padding:40px 0"><p>Offer not found.</p><a href="/listings.html">Back to listings</a></div>
 </main>
 
 <footer class="footer">
@@ -192,7 +136,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     </div>
     <div class="footer-col">
       <div class="footer-title">Follow</div>
-      <a href="https://t.me/readyco" aria-label="Telegram">Telegram</a>
+      <a href="https://t.me/readyco">Telegram</a>
     </div>
   </div>
   <div class="footer-bottom">
@@ -201,17 +145,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 </footer>
 
 <script>
-const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
-const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
-function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
-function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
-function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML}
-
-const params = new URLSearchParams(window.location.search);
-const ref = params.get('ref');
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function flag(j){const F={curaçao:'🇨🇼',uae:'🇦🇪',malta:'🇲🇹',uk:'🇬🇧',poland:'🇵🇱',lithuania:'🇱🇹',estonia:'🇪🇪',cyprus:'🇨🇾',gibraltar:'🇬🇮'};return F[(j||'').toLowerCase()]||'🌍'}
 
 async function loadOffer(){
-  if(!ref){document.getElementById('offer-loading').style.display='none';document.getElementById('offer-error').style.display='block';return}
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if(!ref){showError();return;}
   try{
     const res = await fetch('/api/offers/'+encodeURIComponent(ref));
     if(!res.ok) throw new Error('not found');
@@ -219,41 +159,59 @@ async function loadOffer(){
     const o = payload.offer || payload;
     document.getElementById('offer-loading').style.display='none';
     const card = document.getElementById('offer-card');
-    card.style.display='block';document.getElementById('offer-error').style.display='none';
+    card.style.display='block';
     const isSold = (o.status || '').toLowerCase() === 'sold';
-    if(isSold) card.classList.add('sold');else card.classList.remove('sold');const soldBadge=document.getElementById('sold-badge');if(soldBadge)soldBadge.style.display=isSold?'block':'none';const forSaleBadge=document.getElementById('for-sale-badge');if(forSaleBadge)forSaleBadge.style.display=isSold?'none':'block';
+    if(isSold) card.classList.add('sold');
+    else card.classList.remove('sold');
 
-    const ind = indOf(o.license_type);
-    const cover = document.getElementById('offer-cover');
-    cover.className = 'offer-cover ' + ind;
-    const cat = document.getElementById('offer-cat');
-    cat.className = 'offer-cat ' + ind;
-    cat.textContent = ind === 'none' ? 'Company' : ind;
-
-    document.getElementById('offer-title').textContent = esc(o.license_type || 'Company') + ' Licensed Company';
-    document.getElementById('offer-loc').textContent = flag(o.jurisdiction) + ' ' + esc(o.jurisdiction || '');
-    document.getElementById('offer-desc').textContent = esc(o.short_description || '');
-    document.getElementById('offer-company').textContent = esc(o.company_type || '—');
-    document.getElementById('offer-year').textContent = esc(o.year_established || '—');
-    document.getElementById('offer-status').textContent = esc(o.license_status || '—');
-    document.getElementById('offer-regulator').textContent = esc(o.regulator || '—');
-    document.getElementById('offer-bank').textContent = esc(o.bank_emi_account || '—');
-    document.getElementById('offer-vat').textContent = esc(o.vat_status || '—');
-    document.getElementById('offer-price').textContent = esc(o.price || 'On request');
-    document.getElementById('offer-ref').textContent = 'Ref: ' + esc(ref);
-
-    const tags = document.getElementById('offer-tags');
+    const statusBar = document.getElementById('status-bar');
     if(isSold){
-      tags.innerHTML = '';
+      statusBar.className = 'status-bar sold';
+      statusBar.textContent = '🔴 SOLD';
     } else {
-      tags.innerHTML = '<span class="offer-tag active">' + esc(o.license_status || 'Active') + '</span><span class="offer-tag verified">Verified</span>';
+      statusBar.className = 'status-bar for-sale';
+      statusBar.textContent = '🟢 FOR SALE';
     }
 
-    document.getElementById('offer-cta').href = 'https://t.me/ReadyCoAdminBot?start=inquiry_' + esc(ref);
+    const lines = document.getElementById('offer-lines');
+    const fmt = (emoji, label, value) => `<div class="offer-line"><span class="emoji">${emoji}</span><span class="value">${esc(label ? label + ': ' : '')}${esc(value || '—')}</span></div>`;
+    lines.innerHTML = [
+      fmt('🌍', '', o.jurisdiction),
+      fmt('📦', 'Company type', o.company_type),
+      fmt('📅', 'Established', o.year_established),
+      fmt('♠️', 'License', o.license_type),
+      fmt('', 'Status', o.license_status),
+      fmt('🏛️', 'Regulator', o.regulator),
+      fmt('🏦', 'Bank/EMI', o.bank_emi_account),
+      fmt('📋', 'VAT', o.vat_status),
+      fmt('💰', 'Price', o.price)
+    ].join('');
+
+    document.getElementById('offer-desc').textContent = o.short_description || '';
+
+    const tags = (o.hashtags || '').split(/[#\s]+/).filter(Boolean);
+    if(!tags.length && o.jurisdiction && o.license_type){
+      tags.push(o.jurisdiction, o.license_type, 'ForSale');
+    }
+    document.getElementById('offer-tags').innerHTML = tags.map(t => `<span class="offer-tag">#${esc(t)}</span>`).join('');
+
+    if(isSold){
+      document.getElementById('offer-cta').style.display='none';
+      document.getElementById('contact-admin').style.display='block';
+    } else {
+      document.getElementById('offer-cta').style.display='block';
+      document.getElementById('contact-admin').style.display='none';
+      document.getElementById('offer-cta').href = 'https://t.me/ReadyCoAdminBot?start=inquiry_' + esc(ref);
+    }
+
+    document.getElementById('offer-ref').textContent = 'Ref: ' + esc(ref);
   }catch(e){
-    document.getElementById('offer-loading').style.display='none';
-    document.getElementById('offer-error').style.display='block';
+    showError();
   }
+}
+function showError(){
+  document.getElementById('offer-loading').style.display='none';
+  document.getElementById('offer-error').style.display='block';
 }
 loadOffer();
 </script>
