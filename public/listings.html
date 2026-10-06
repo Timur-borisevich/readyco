@@ -310,7 +310,7 @@ async function loadListings(q){
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
           <div class="lcard-desc">${esc(o.short_description||'Licensed business with established operations and infrastructure.')}</div>
           <div class="lcard-tags">${tags.join('')}</div>
-          <div class="lcard-bottom"><span class="lcard-price">${esc(o.price||'On request')}</span><span class="lcard-arrow">→</span></div>
+          <div class="lcard-bottom"><span class="lcard-price">${esc((o.price||'On request').replace(/^eur\s*/i, '€ '))}</span><span class="lcard-arrow">→</span></div>
         </div></div>`;
     }).join('');
   }catch(e){document.getElementById('lgrid').innerHTML='<div class="empty"><p>Could not load.</p></div>'}

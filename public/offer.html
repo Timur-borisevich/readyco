@@ -184,7 +184,7 @@ async function loadOffer(){
       fmt('🏛️', 'Regulator', o.regulator),
       fmt('🏦', 'Bank/EMI', o.bank_emi_account),
       fmt('📋', 'VAT', o.vat_status),
-      fmt('💰', 'Price', o.price)
+      fmt('💰', 'Price', (o.price||'').replace(/^eur\s*/i, '€ '))
     ].join('');
 
     document.getElementById('offer-desc').textContent = o.short_description || '';
