@@ -167,14 +167,14 @@ body{padding-bottom:0}
 .header-logo b{font-size:15px}
 .header-tg{width:36px;height:36px}
 .hero-wrap{padding:0 12px;margin:12px auto 20px}
-.hero{padding:24px 16px;border-radius:20px}
+.hero{padding:20px 12px;border-radius:20px;overflow:hidden}
 .hero-eyebrow{font-size:10px;padding:7px 14px}
 .hero h1{font-size:32px;letter-spacing:-1px}
 .hero-sub{font-size:15px;line-height:1.4;word-break:break-word;overflow-wrap:break-word}
-.hero-search{max-width:none}
-.hero-search .search-icon{width:38px}
-.hero-search input{padding:12px 6px;font-size:14px}
-.hero-search-btn{padding:10px 16px;font-size:13px;white-space:nowrap;flex-shrink:0}
+.hero-search{position:relative;width:100%;max-width:100%;box-sizing:border-box;padding:3px 58px 3px 3px;border-radius:12px;display:flex;align-items:center;overflow:visible}
+.hero-search .search-icon{display:none}
+.hero-search input{flex:1;min-width:0;width:100%;padding:11px 8px;font-size:14px;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;border-radius:10px}
+.hero-search-btn{position:absolute;right:3px;top:3px;bottom:3px;width:52px;padding:0;font-size:12px;font-weight:700;white-space:nowrap;border-radius:9px;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
 .hero-popular{gap:5px}
 .hero-tag{padding:5px 10px;font-size:10px}
 .hero-cats{display:none}
