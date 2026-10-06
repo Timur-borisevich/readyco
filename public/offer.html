@@ -30,8 +30,7 @@
     .header-logo div{line-height:1.1}
     .header-logo b{font-size:17px;font-weight:800;letter-spacing:-0.5px}
     .header-logo small{font-size:9px;font-weight:700;letter-spacing:3px;color:var(--text-2);display:block;margin-top:-2px}
-    .header-tg{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.2s;position:relative}
-    .header-tg svg{width:22px;height:22px;display:block;shape-rendering:geometricPrecision}
+    .header-tg{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:.2s}
     .header-tg:hover{background:var(--light);color:var(--text)}
     .offer-page{max-width:680px;margin:0 auto;padding:24px 16px 60px}
     .offer-back{margin-bottom:16px}
@@ -57,19 +56,11 @@
     .offer-card.sold .offer-cta{display:none}
     .offer-card.sold .contact-admin{display:block;margin-top:22px;color:var(--text-2);font-size:14px;text-align:center}
     .offer-card.sold .contact-admin a{color:var(--navy);font-weight:700;text-decoration:none}
-    .empty{text-align:center;padding:40px 0;color:var(--text-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;max-width:480px;margin:0 auto}
-    .empty p{margin:0;line-height:1.5}
-    .empty a{color:var(--navy);font-weight:600;text-decoration:none}
-    .empty a:hover{text-decoration:underline}
     @media(max-width:640px){
       .offer-page{padding:16px 12px 40px}
       .offer-body{padding:18px 16px 24px}
       .status-bar{font-size:14px;padding:14px 16px}
       .offer-line{font-size:14px}
-      .header-tg{width:36px;height:36px}
-      .header-tg svg{width:20px;height:20px}
-      .offer-back{margin-bottom:12px}
-      .offer-back a{font-size:13px}
     }
     .footer{background:#fff;border-top:1px solid var(--border);padding:48px 24px 24px}
     .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:32px}
@@ -106,7 +97,7 @@
 <main class="offer-page">
   <div class="offer-back"><a href="/listings.html">← Back to listings</a></div>
 
-  <div id="offer-loading" class="empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 0"><p>Loading offer…</p></div>
+  <div id="offer-loading" class="empty" style="text-align:center;padding:40px 0;color:var(--text-2)"><p>Loading offer…</p></div>
 
   <article id="offer-card" class="offer-card" style="display:none">
     <div class="status-bar" id="status-bar">🟢 FOR SALE</div>
@@ -121,7 +112,7 @@
     </div>
   </article>
 
-  <div id="offer-error" class="empty" style="display:none;padding:40px 0"><p>Offer not found.</p><a href="/listings.html">Back to listings</a></div>
+  <div id="offer-error" class="empty" style="display:none;text-align:center;padding:40px 0"><p>Offer not found.</p><a href="/listings.html">Back to listings</a></div>
 </main>
 
 <footer class="footer">
