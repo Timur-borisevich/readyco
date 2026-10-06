@@ -51,8 +51,17 @@ def esc(text):
 async def db_next_ref():
     conn = await get_db()
     try:
-        n = await conn.fetchval("SELECT COUNT(*) + 1 FROM offers")
-        return f"RC{n:03d}"
+        # Find highest existing RCxxx number, including deleted offers, to avoid collisions
+        rows = await conn.fetch("SELECT ref FROM offers WHERE ref ~ '^RC[0-9]+$'")
+        max_n = 0
+        for row in rows:
+            try:
+                n = int(row['ref'].replace('RC', ''))
+                if n > max_n:
+                    max_n = n
+            except ValueError:
+                continue
+        return f"RC{max_n + 1:03d}"
     finally: await release_db(conn)
 
 async def db_get_offer(ref):
