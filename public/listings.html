@@ -211,17 +211,6 @@ body{padding-bottom:0}
 .listings-search{max-width:520px;margin-bottom:32px}
 @media(max-width:640px){.listings-page{padding:24px 16px}.listings-page h1{font-size:28px}}
 </style>
-
-<style>
-@media(max-width:640px){
-  .hero-search{position:relative;width:100%;max-width:100%;box-sizing:border-box;padding:2px 42px 2px 2px;border-radius:12px;display:flex;align-items:center}
-  .hero-search .search-icon{display:none !important}
-  .hero-search input{flex:1;min-width:0;width:100%;padding:12px 10px;font-size:14px;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;border-radius:10px}
-  .hero-search-btn{position:absolute;right:2px;top:2px;bottom:2px;width:36px;height:36px;padding:0;font-size:18px;border-radius:10px;display:flex;align-items:center;justify-content:center}
-  .hero-search-btn .btn-text{display:none !important}
-  .hero-search-btn .btn-icon{display:block !important}
-}
-</style>
 </head>
 <body>
 <header class="header">
@@ -274,7 +263,7 @@ body{padding-bottom:0}
 <script>
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
 const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
-const COVER={EMI:'svg',VASP:'svg',CASP:'svg',iGaming:'svg',Casino:'svg',Betting:'svg',PSP:'svg',Forex:'svg',PI:'svg'};
+const COVER={EMI:'svg',VASP:'svg',CASP:'svg',iGaming:'svg',Casino:'svg',Betting:'svg',PSP:'svg',Forex:'svg',PI:'svg',MSB:'svg',Fintech:'svg'};
 const BADGE2={fintech:'Transfer Ready',crypto:'Bank Accounts',igaming:'Turnkey Solution',psp:'Regional Expansion'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
 function indOf(l){if(!l)return'none';for(const[k,v]of Object.entries(IND)){if(l.toLowerCase().includes(k.toLowerCase()))return v}return'none'}
@@ -293,7 +282,7 @@ function getCoverSvg(type){
     Forex: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#ftg)"></rect><defs><linearGradient id="ftg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E8F8ED"></stop><stop offset="100%" stop-color="#D0F0D8"></stop></linearGradient></defs><path d="M20 120 L20 60 L50 60 L50 35 L90 35 L90 70 L130 70 L130 20 L170 20 L170 120 Z" fill="#00CB53" opacity="0.85"></path><path d="M170 120 L170 45 L200 45 L200 120 Z" fill="#081220" opacity="0.12"></path><g fill="#081220" opacity="0.08"><rect x="60" y="15" width="12" height="40" rx="2"></rect><rect x="78" y="22" width="12" height="33" rx="2"></rect><rect x="96" y="10" width="12" height="45" rx="2"></rect></g></svg>`,
     PI: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#emig)"></rect><defs><linearGradient id="emig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E6F4FF"></stop><stop offset="100%" stop-color="#CFE8FC"></stop></linearGradient></defs><rect x="35" y="20" width="20" height="100" rx="3" fill="#0082F3" opacity="0.9"></rect><rect x="65" y="40" width="20" height="80" rx="3" fill="#0082F3" opacity="0.75"></rect><rect x="95" y="30" width="20" height="90" rx="3" fill="#0082F3" opacity="0.85"></rect><rect x="125" y="50" width="20" height="70" rx="3" fill="#0082F3" opacity="0.65"></rect><rect x="155" y="15" width="20" height="105" rx="3" fill="#0082F3" opacity="0.9"></rect></svg>`
   };
-  return svgs[type] || svgs.Fintech;
+  svgs['MSB'] = svgs.PSP; svgs['Fintech'] = svgs.PSP; return svgs[type] || svgs.PSP;
 }
 async function loadListings(q){
   const loadingTimer=setTimeout(()=>{const g=document.getElementById('lgrid');if(g&&g.textContent.includes('Loading'))g.innerHTML='<div class="empty"><p>Could not load listings. <a href="https://t.me/ReadyCoAdminBot" style="color:var(--yellow)">Contact us</a></p></div>';},6000);
@@ -313,15 +302,15 @@ async function loadListings(q){
       const isGradient = img === 'gradient';
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${isGradient ? 'igaming-gradient' : ''}">
-          ${`<div class="cover-illustration ${ind}">${getCoverSvg(o.license_type)}</div>`}
-          <span class="cat-label ${ind}">${ind}</span>
+          ${`<div class="cover-illustration ${ind === 'none' ? 'fintech' : ind}">${getCoverSvg(o.license_type || 'Fintech')}</div>`}
+          <span class="cat-label ${ind === 'none' ? 'fintech' : ind}">${ind === 'none' ? 'fintech' : ind}</span>
         </div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
           <div class="lcard-desc">${esc(o.short_description||'Licensed business with established operations and infrastructure.')}</div>
           <div class="lcard-tags">${tags.join('')}</div>
-          <div class="lcard-bottom"><span class="lcard-price">${esc(o.price||'On request')}</span><span class="lcard-arrow">→</span></div>
+          <div class="lcard-bottom"><span class="lcard-price">${esc((o.price||'On request').replace(/^eur\s*/i, '€ '))}</span><span class="lcard-arrow">→</span></div>
         </div></div>`;
     }).join('');
   }catch(e){document.getElementById('lgrid').innerHTML='<div class="empty"><p>Could not load.</p></div>'}
