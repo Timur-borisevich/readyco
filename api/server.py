@@ -330,9 +330,9 @@ def format_announcement(text): return f"📢 {text}"
 
 def inquiry_keyboard(ref):
     return {"inline_keyboard": [[
-        {"text": "💬 Ask about this offer", "url": f"https://readyco.vercel.app/offer.html?ref={ref}"},
+        {"text": "💬 Ask about this offer", "url": f"https://t.me/ReadyCoAdminBot?start=inquiry_{ref}"},
     ],[
-        {"text": "🌐 readyco.market", "url": "https://readyco.vercel.app"},
+        {"text": "🌐 readyco.market", "url": f"https://readyco.vercel.app/offer.html?ref={ref}"},
     ]]}
 
 # === TG API ===
