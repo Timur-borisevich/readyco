@@ -330,7 +330,7 @@ def format_announcement(text): return f"📢 {text}"
 
 def inquiry_keyboard(ref):
     return {"inline_keyboard": [[
-        {"text": "💬 Ask about this offer", "url": f"https://t.me/ReadyCoAdminBot?start=inquiry_{ref}"},
+        {"text": "💬 Ask about this offer", "url": f"https://readyco.vercel.app/offer.html?ref={ref}"},
     ],[
         {"text": "🌐 readyco.market", "url": "https://readyco.vercel.app"},
     ]]}
@@ -1209,13 +1209,11 @@ async def admin_sold(ref: str, request: Request):
     o = await db_get_offer(ref)
     if not o: raise HTTPException(404, "Not found")
     card, parse_mode = format_offer_card(o, sold=True)
-    # For sold offers: delete old channel post and repost without buttons
-    old_msg_id = o.get("channel_message_id")
-    if old_msg_id:
-        await tg_delete(CHANNEL_ID, old_msg_id)
-    r = await tg_send(CHANNEL_ID, card, parse_mode=parse_mode)
-    if r.get("ok"):
-        await db_update_channel_msg(o.get("id"), r["result"]["message_id"])
+    kb = inquiry_keyboard(ref)  # keep buttons, they link to offer.html which shows SOLD
+    if o.get("channel_message_id"):
+        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, kb, parse_mode=parse_mode)
+        if not r.get("ok"):
+            await tg_send(CHANNEL_ID, card, kb, parse_mode=parse_mode)
     await db_mark_sold(ref)
     await db_audit(uid, "sold", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
