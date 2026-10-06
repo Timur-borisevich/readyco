@@ -176,7 +176,7 @@ body{padding-bottom:0}
 .hero-search input{flex:1;min-width:0;padding:12px 8px;font-size:14px;border-radius:12px}
 .hero-search-btn{padding:10px 20px;font-size:13px;white-space:nowrap;flex:0 0 auto;border-radius:10px;min-width:62px}
 .hero-search-btn .btn-icon{display:none}
-@media(max-width:480px){.hero-search-btn{padding:10px 12px;min-width:40px}.hero-search-btn .btn-text{display:none}.hero-search-btn .btn-icon{display:block;font-size:18px}}
+@media(max-width:480px){.hero h1{font-size:26px}}
 .hero-popular{gap:6px;row-gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-right:-8px;-webkit-overflow-scrolling:touch}
 .hero-popular::-webkit-scrollbar{display:none}
 .hero-tag{padding:5px 10px;font-size:10px;line-height:1;flex:0 0 auto}
@@ -234,7 +234,7 @@ body{padding-bottom:0}
       <p class="hero-sub">Fintech. Crypto. iGaming. Ready for what’s next.</p>
       <div class="hero-search">
         <span class="search-icon">⌕</span>
-        <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()">
+        <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()" data-mobile-placeholder="Search offers...">
         <button class="hero-search-btn" onclick="doSearch()"><span class="btn-text">Search</span><span class="btn-icon">⌕</span></button>
       </div>
       <div class="hero-popular">
@@ -405,6 +405,19 @@ async function loadListings(q){
   }catch(e){document.getElementById('lgrid').innerHTML='<div class="empty"><p>Could not load.</p></div>'}
 }
 loadListings();
+if(window.innerWidth<=640){
+  const hs=document.getElementById("heroSearch");
+  if(hs && hs.dataset.mobilePlaceholder) hs.placeholder=hs.dataset.mobilePlaceholder;
+}
+window.addEventListener("resize",()=>{
+  const hs=document.getElementById("heroSearch");
+  if(!hs)return;
+  if(window.innerWidth<=640){
+    if(hs.dataset.mobilePlaceholder) hs.placeholder=hs.dataset.mobilePlaceholder;
+  }else{
+    hs.placeholder="Search by license, jurisdiction, industry...";
+  }
+});
 </script>
 
 </body>
