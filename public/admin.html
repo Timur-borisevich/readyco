@@ -213,6 +213,21 @@ function editOffer(ref){const o=offers.find(x=>x.ref===ref);if(o){editingOffer=o
 async function submitEdit(){const data={};FIELDS.forEach(f=>{const el=document.getElementById('f_'+f.key);if(el&&el.value.trim())data[f.key]=el.value.trim()});try{await api(`/admin/offers/${editingOffer.ref}`,{method:'PUT',body:JSON.stringify(data)});alert('Updated!');forceRefresh()}catch(e){alert(e.message)}}
 function markSold(ref){showConfirm(`Mark ${ref} as SOLD?`,'Channel post will be edited.',async()=>{try{await api(`/admin/offers/${ref}/sold`,{method:'POST'});alert('Sold!');forceRefresh()}catch(e){alert(e.message)}})}
 function deleteOffer(ref){showConfirm(`Delete ${ref}?`,'Permanent removal.',async()=>{try{await api(`/admin/offers/${ref}`,{method:'DELETE'});alert('Deleted!');forceRefresh()}catch(e){alert(e.message)}})}
+async function loadAnnounceList(){
+  const c=document.getElementById('annList');
+  try{
+    const data=await api('/admin/announcements');
+    if(!data.announcements||!data.announcements.length){c.innerHTML='<div style="color:var(--text-2);font-size:13px">No announcements yet.</div>';return;}
+    c.innerHTML=data.announcements.map(a=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--light);border-radius:10px;margin-bottom:8px">
+      <div style="font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%">${esc(a.text)}</div>
+      <button class="form-cancel" style="margin:0" onclick="deleteAnn(${a.id})">Delete</button>
+    </div>`).join('');
+  }catch(e){c.innerHTML='<div style="color:red;font-size:13px">'+esc(e.message)+'</div>';}
+}
+async function deleteAnn(id){
+  if(!confirm('Delete this announcement from DB and channel?'))return;
+  try{await api('/admin/announcements/'+id,{method:'DELETE'});loadAnnounceList();}catch(e){alert(e.message);}
+}
 async function submitAnnounce(){const t=document.getElementById('annText').value.trim();if(!t)return;try{await api('/admin/announce',{method:'POST',body:JSON.stringify({text:t})});alert('Published!');backToMain()}catch(e){alert(e.message)}}
 function showConfirm(title,body,onConfirm){const m=document.createElement('div');m.className='modal-bg';m.innerHTML=`<div class="modal"><h3>${title}</h3><p>${body}</p><div class="modal-btns" style="flex-direction:row"><button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button><button class="modal-btn confirm" id="cfBtn">Confirm</button></div></div>`;document.body.appendChild(m);m.querySelector('#cfBtn').onclick=()=>{m.remove();onConfirm()}}
 function showLeadActions(lid,un,uid){const link=un?`https://t.me/${un}`:`tg://user?id=${uid}`;const m=document.createElement('div');m.className='modal-bg';m.innerHTML=`<div class="modal"><h3>Lead actions</h3><p>Manage this lead</p><div class="modal-btns"><a href="${link}" target="_blank" class="modal-btn confirm" style="text-decoration:none">👤 Open profile</a><div style="display:flex;gap:6px"><button class="modal-btn" style="background:var(--orange);color:#fff" onclick="setTag(${lid},'hot')">🔥 Hot</button><button class="modal-btn" style="background:var(--purple);color:#fff" onclick="setTag(${lid},'warm')">Warm</button></div><div style="display:flex;gap:6px"><button class="modal-btn" style="background:var(--text-3);color:#fff" onclick="setTag(${lid},'cold')">❄️ Cold</button><button class="modal-btn" style="background:var(--green);color:#fff" onclick="setTag(${lid},'closed')">✅ Closed</button></div><button class="modal-btn" style="background:var(--light);color:var(--text-2)" onclick="setTag(${lid},null)">Remove tag</button><button class="modal-btn danger" onclick="this.closest('.modal-bg').remove();blockLead(${lid})">🚫 Block</button><button class="modal-btn danger" onclick="this.closest('.modal-bg').remove();deleteLead(${lid})">🗑 Delete chat</button><button class="modal-btn cancel" onclick="this.closest('.modal-bg').remove()">Cancel</button></div></div>`;document.body.appendChild(m)}

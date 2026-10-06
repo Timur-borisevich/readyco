@@ -1264,6 +1264,17 @@ async def admin_announce(req: AnnounceReq, request: Request):
         return {"ok": True}
     raise HTTPException(500, f"TG error: {r.get('description')}")
 
+@app.get("/api/admin/announcements")
+async def admin_list_announcements(request: Request):
+    await verify_admin(request)
+    conn = await get_db()
+    try:
+        rows = await conn.fetch("SELECT id, text, channel_message_id, created_at, status FROM announcements ORDER BY created_at DESC")
+        announcements = [{"id": r["id"], "text": r["text"], "channel_message_id": r["channel_message_id"], "created_at": str(r["created_at"]), "status": r["status"]} for r in rows]
+        return {"announcements": announcements}
+    finally:
+        await release_db(conn)
+
 @app.delete("/api/admin/announcements/{ann_id}")
 async def admin_delete_announcement(ann_id: int, request: Request):
     uid = await verify_admin(request)
