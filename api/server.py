@@ -1264,6 +1264,23 @@ async def admin_announce(req: AnnounceReq, request: Request):
         return {"ok": True}
     raise HTTPException(500, f"TG error: {r.get('description')}")
 
+@app.delete("/api/admin/announcements/{ann_id}")
+async def admin_delete_announcement(ann_id: int, request: Request):
+    uid = await verify_admin(request)
+    conn = await get_db()
+    try:
+        row = await conn.fetchrow("SELECT channel_message_id FROM announcements WHERE id = $1", ann_id)
+        if not row:
+            raise HTTPException(404, "Announcement not found")
+        msg_id = row.get("channel_message_id")
+        if msg_id:
+            await tg_delete(CHANNEL_ID, msg_id)
+        await conn.execute("DELETE FROM announcements WHERE id = $1", ann_id)
+    finally:
+        await release_db(conn)
+    await db_audit(uid, "delete_announcement", "announcement", ann_id, {})
+    return {"ok": True}
+
 @app.get("/api/admin/backup")
 async def admin_backup(request: Request):
     """Export full DB as JSON, optionally send to Telegram."""
