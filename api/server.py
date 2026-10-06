@@ -277,37 +277,54 @@ def format_offer_card(offer, sold=False):
     desc = offer.get('short_description', '')
     hashtags = offer.get('hashtags', '')
     
-    def st(s): return f"<s>{s}</s>" if sold else s
+    if sold:
+        lines = [
+            "<s>🔴 SOLD</s>",
+            "<s>━━━━━━━━━━━━━━━━━</s>",
+            "",
+            f"<s>{flag} {jurisdiction}</s>",
+            f"<s>📦 {company_type}</s>" if company_type else "",
+            f"<s>📅 Established: {year}</s>" if year else "",
+            f"<s>{lic_emoji} License: {license_type}</s>" if license_type else "",
+            f"<s>   Status: {license_status}</s>" if license_status else "",
+            f"<s>🏛️ Regulator: {regulator}</s>" if regulator else "",
+            "",
+            f"<s>🏦 Bank/EMI: {bank}</s>" if bank else "",
+            f"<s>📋 VAT: {vat}</s>" if vat else "",
+            "",
+            f"<s>💰 Price: {price}</s>",
+            "<s>━━━━━━━━━━━━━━━━━</s>",
+        ]
+        if desc:
+            lines += [f"<s>{desc}</s>", "<s>━━━━━━━━━━━━━━━━━</s>"]
+        if hashtags:
+            lines += ["", f"<s>{hashtags}</s>", "<s>━━━━━━━━━━━━━━━━━</s>"]
+        lines += [f"<s>Ref: {ref}</s>", "", "Contact: @ReadyCoAdminBot"]
+        return ("\n".join([l for l in lines if l != ""]), "HTML")
     
-    lines = []
-    lines.append(st("🔴 FOR SALE" if not sold else "🔴 SOLD"))
-    lines.append(st("━━━━━━━━━━━━━━━━━"))
-    lines.append("")
-    lines.append(st(f"{flag} {jurisdiction}"))
-    if company_type: lines.append(st(f"📦 {company_type}"))
-    if year: lines.append(st(f"📅 Established: {year}"))
-    if license_type: lines.append(st(f"{lic_emoji} License: {license_type}"))
-    if license_status: lines.append(st(f"   Status: {license_status}"))
-    if regulator: lines.append(st(f"🏛️ Regulator: {regulator}"))
-    lines.append("")
-    if bank: lines.append(st(f"🏦 Bank/EMI: {bank}"))
-    if vat: lines.append(st(f"📋 VAT: {vat}"))
-    if turnover: lines.append(st(f"📊 Turnover: {turnover}"))
-    if employees: lines.append(st(f"👤 Employees: {employees}"))
-    if transfer: lines.append(st(f"⏱️ Transfer: {transfer}"))
-    lines.append("")
-    lines.append(st(f"💰 Price: {price}"))
-    lines.append(st("━━━━━━━━━━━━━━━━━"))
+    lines = [
+        "🟢 FOR SALE",
+        "━━━━━━━━━━━━━━━━━",
+        "",
+        f"{flag} {jurisdiction}",
+        f"📦 {company_type}" if company_type else "",
+        f"📅 Established: {year}" if year else "",
+        f"{lic_emoji} License: {license_type}" if license_type else "",
+        f"   Status: {license_status}" if license_status else "",
+        f"🏛️ Regulator: {regulator}" if regulator else "",
+        "",
+        f"🏦 Bank/EMI: {bank}" if bank else "",
+        f"📋 VAT: {vat}" if vat else "",
+        "",
+        f"💰 Price: {price}",
+        "━━━━━━━━━━━━━━━━━",
+    ]
     if desc:
-        lines.append(st(desc))
-        lines.append(st("━━━━━━━━━━━━━━━━━"))
+        lines += [desc, "━━━━━━━━━━━━━━━━━"]
     if hashtags:
-        lines.append("")
-        lines.append(st(hashtags))
-        lines.append(st("━━━━━━━━━━━━━━━━━"))
-    lines.append(f"<s>Ref: {ref}</s>" if sold else f"Ref: {ref}")
-    lines.append("Contact: @ReadyCoAdminBot" if sold else "💬 @ReadyCoAdminBot")
-    return ("\n".join(lines), "HTML" if sold else None)
+        lines += ["", hashtags, "━━━━━━━━━━━━━━━━━"]
+    lines += [f"Ref: {ref}", "", "💬 @ReadyCoAdminBot"]
+    return ("\n".join([l for l in lines if l != ""]), None)
 
 def format_announcement(text): return f"📢 {text}"
 
@@ -321,9 +338,9 @@ def inquiry_keyboard(ref):
 # === TG API ===
 async def tg_send(chat_id, text, reply_markup=None, parse_mode=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": chat_id, "text": text}
-    if parse_mode: payload["parse_mode"] = parse_mode
-    if reply_markup: payload["reply_markup"] = reply_markup
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": parse_mode or "HTML"}
+    if reply_markup is not None:
+        payload["reply_markup"] = reply_markup
     async with aiohttp.ClientSession() as s:
         async with s.post(url, json=payload) as r: return await r.json()
 
@@ -337,9 +354,9 @@ async def tg_set_menu_button(chat_id, text, url):
             return await r.json()
 async def tg_edit(chat_id, msg_id, text, reply_markup=None, parse_mode=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
-    payload = {"chat_id": chat_id, "message_id": msg_id, "text": text}
-    if reply_markup: payload["reply_markup"] = reply_markup
-    if parse_mode: payload["parse_mode"] = parse_mode
+    payload = {"chat_id": chat_id, "message_id": msg_id, "text": text, "parse_mode": parse_mode or "HTML"}
+    if reply_markup is not None:
+        payload["reply_markup"] = reply_markup
     async with aiohttp.ClientSession() as s:
         async with s.post(url, json=payload) as r: return await r.json()
 
@@ -1203,7 +1220,7 @@ async def admin_live(ref: str, request: Request):
     card, parse_mode = format_offer_card(o, sold=False)
     kb = inquiry_keyboard(ref)
     if o.get("channel_message_id"):
-        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, kb)
+        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, kb, parse_mode=parse_mode)
         if not r.get("ok"):
             await tg_send(CHANNEL_ID, card, kb, parse_mode=parse_mode)
     await db_set_live(ref)
