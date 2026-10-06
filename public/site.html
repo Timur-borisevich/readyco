@@ -41,7 +41,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hero{background:#fff;border:1px solid var(--border);border-radius:28px;padding:50px 60px;display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:center;box-shadow:0 4px 24px rgba(0,0,0,0.04)}
 .hero-eyebrow{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--navy);letter-spacing:1.5px;text-transform:uppercase;padding:8px 18px;border-radius:999px;margin-bottom:20px}
 .hero h1{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:18px;color:var(--text)}
-.hero-sub{font-size:20px;color:var(--text-2);margin-bottom:28px;max-width:520px;line-height:1.5;overflow-wrap:break-word}
+.hero-sub{font-size:20px;color:var(--text-2);margin-bottom:28px;max-width:520px;line-height:1.5}
 .hero-search{display:flex;gap:0;margin-bottom:16px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;padding:4px;max-width:520px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
 .hero-search .search-icon{width:44px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:18px;padding-left:6px}
 .hero-search input{flex:1;background:transparent;border:none;padding:13px 8px;font-size:15px;font-family:inherit;outline:none;color:var(--text)}
@@ -79,15 +79,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .stat{display:flex;align-items:center;gap:14px;min-width:200px}
 .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#F6F8FB}
 .stat-text{text-align:left}
-.stat-num{font-size:28px;font-weight:800;letter-spacing:-0.8px;color:var(--text);line-height:1;white-space:nowrap}
-.stat-label{font-size:13px;color:var(--text-2);margin-top:2px;white-space:nowrap}
+.stat-num{font-size:28px;font-weight:800;letter-spacing:-0.8px;color:var(--text);line-height:1}
+.stat-label{font-size:13px;color:var(--text-2);margin-top:2px;text-align:center;width:100%}
 
 /* Listings */
 .listings{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
 .sh{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px}
 .sh h2{font-size:30px;font-weight:800;letter-spacing:-0.8px;color:var(--text)}
-.sh p{font-size:14px;color:var(--text-2);margin-top:4px;line-height:1.4;max-width:420px}
-.sh a{font-size:14px;color:var(--navy);font-weight:700;white-space:nowrap}
+.sh p{font-size:14px;color:var(--text-2);margin-top:4px;line-height:1.4}
+.sh a{font-size:14px;color:var(--navy);font-weight:700}
 .lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .lcard{background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer;transition:all .3s var(--ease);position:relative}
 .lcard:hover{border-color:var(--border);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.1)}
@@ -166,28 +166,25 @@ body{padding-bottom:0}
 .header-logo img{width:32px;height:32px}
 .header-logo b{font-size:15px}
 .header-tg{width:36px;height:36px}
-.hero-wrap{padding:0 16px;margin:12px auto 20px;max-width:100%;box-sizing:border-box}
-.hero{padding:20px 12px;border-radius:20px;overflow:hidden}
+.hero-wrap{padding:0 12px;margin:12px auto 20px}
+.hero{padding:24px 16px;border-radius:20px}
 .hero-eyebrow{font-size:10px;padding:7px 14px}
-.hero h1{font-size:30px;letter-spacing:-1px;line-height:1.1}
-.hero-sub{font-size:15px;line-height:1.4;word-break:normal;overflow-wrap:break-word}
+.hero h1{font-size:32px;letter-spacing:-1px}
+.hero-sub{font-size:15px;line-height:1.4;word-break:break-word;overflow-wrap:break-word}
 .hero-search{max-width:none}
-.hero-search .search-icon{width:28px;font-size:16px;flex-shrink:0;padding-left:4px}
-.hero-search input{flex:1;min-width:0;padding:12px 8px;font-size:14px;border-radius:12px}
-.hero-search-btn{padding:10px 20px;font-size:13px;white-space:nowrap;flex:0 0 auto;border-radius:10px;min-width:62px}
-.hero-search-btn .btn-icon{display:none}
-@media(max-width:480px){.hero h1{font-size:26px}}
-.hero-popular{gap:6px;row-gap:8px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-right:-8px;-webkit-overflow-scrolling:touch}
-.hero-popular::-webkit-scrollbar{display:none}
-.hero-tag{padding:5px 10px;font-size:10px;line-height:1;flex:0 0 auto}
+.hero-search .search-icon{width:38px}
+.hero-search input{padding:12px 6px;font-size:14px}
+.hero-search-btn{padding:10px 16px;font-size:13px;white-space:nowrap;flex-shrink:0}
+.hero-popular{gap:5px}
+.hero-tag{padding:5px 10px;font-size:10px}
 .hero-cats{display:none}
 .stats{padding:20px 14px;gap:16px;display:grid;grid-template-columns:repeat(2,1fr);margin:0 12px 32px 12px;border-radius:18px}
 .stat{min-width:auto;flex-direction:column;text-align:center;gap:6px;align-items:center}
 .stat-icon{width:38px;height:38px;font-size:18px}
-.stat-num{font-size:20px;white-space:nowrap}
-.stat-label{font-size:11px;white-space:nowrap}
+.stat-num{font-size:22px}
+.stat-label{font-size:11px;text-align:center;width:100%}
 .listings{padding:16px 12px 70px}
-.sh{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:20px;max-width:100%}
+.sh{flex-direction:row;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .sh h2{font-size:20px;flex:1;min-width:0}
 .lgrid{grid-template-columns:1fr;gap:14px}
 .lcard{border-radius:16px}
@@ -198,7 +195,7 @@ body{padding-bottom:0}
 .lcard-price{font-size:17px}
 .cta-map-inner{grid-template-columns:1fr}
 .cta-map-text{padding:28px 16px}
-.cta-map-text h2{font-size:18px;line-height:1.25;word-break:normal;overflow-wrap:normal}
+.cta-map-text h2{font-size:18px;line-height:1.25;word-break:break-word;overflow-wrap:break-word;hyphens:auto}
 .cta-map-text p{font-size:14px}
 .cta-map-img{height:160px}
 .footer{padding:32px 16px 24px}
@@ -234,11 +231,11 @@ body{padding-bottom:0}
       <p class="hero-sub">Fintech. Crypto. iGaming. Ready for what’s next.</p>
       <div class="hero-search">
         <span class="search-icon">⌕</span>
-        <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()" data-mobile-placeholder="Search offers...">
-        <button class="hero-search-btn" onclick="doSearch()"><span class="btn-text">Search</span><span class="btn-icon">⌕</span></button>
+        <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()">
+        <button class="hero-search-btn" onclick="doSearch()">Search</button>
       </div>
       <div class="hero-popular">
-        <span>Popular:</span>
+
         <button class="hero-tag vasp" onclick="tagSearch('VASP')">VASP</button>
         <button class="hero-tag emi" onclick="tagSearch('EMI')">EMI</button>
         <button class="hero-tag psp" onclick="tagSearch('PSP')">PSP</button>
@@ -351,7 +348,7 @@ body{padding-bottom:0}
 
 <script>
 const FLAGS={poland:'🇵🇱',lithuania:'🇱🇹',cyprus:'🇨🇾',curacao:'🇨🇼',uae:'🇦🇪',uk:'🇬🇧',usa:'🇺🇸',germany:'🇩🇪',estonia:'🇪🇪',latvia:'🇱🇻',malta:'🇲🇹',ireland:'🇮🇪',netherlands:'🇳🇱',switzerland:'🇨🇭',singapore:'🇸🇬',belize:'🇧🇿',panama:'🇵🇦',gibraltar:'🇬🇮',seychelles:'🇸🇨',australia:'🇦🇺',canada:'🇨🇦'};
-const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',MSB:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech',Money:'fintech'};
+const IND={VASP:'crypto',CASP:'crypto',EMI:'fintech',PI:'fintech',PSP:'fintech',iGaming:'igaming',Casino:'igaming',Betting:'igaming',Forex:'fintech'};
 const COVER={EMI:'svg',VASP:'svg',CASP:'svg',iGaming:'svg',Casino:'svg',Betting:'svg',PSP:'svg',Forex:'svg',PI:'svg'};
 const BADGE2={fintech:'Transfer Ready',crypto:'Bank Accounts',igaming:'Turnkey Solution',psp:'Regional Expansion'};
 function flag(j){if(!j)return'🌍';j=j.toLowerCase();for(const[k,v]of Object.entries(FLAGS)){if(j.includes(k.toLowerCase()))return v}return'🌍'}
@@ -371,7 +368,7 @@ function getCoverSvg(type){
     Forex: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#ftg)"></rect><defs><linearGradient id="ftg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E8F8ED"></stop><stop offset="100%" stop-color="#D0F0D8"></stop></linearGradient></defs><path d="M20 120 L20 60 L50 60 L50 35 L90 35 L90 70 L130 70 L130 20 L170 20 L170 120 Z" fill="#00CB53" opacity="0.85"></path><path d="M170 120 L170 45 L200 45 L200 120 Z" fill="#081220" opacity="0.12"></path><g fill="#081220" opacity="0.08"><rect x="60" y="15" width="12" height="40" rx="2"></rect><rect x="78" y="22" width="12" height="33" rx="2"></rect><rect x="96" y="10" width="12" height="45" rx="2"></rect></g></svg>`,
     PI: `<svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="url(#emig)"></rect><defs><linearGradient id="emig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E6F4FF"></stop><stop offset="100%" stop-color="#CFE8FC"></stop></linearGradient></defs><rect x="35" y="20" width="20" height="100" rx="3" fill="#0082F3" opacity="0.9"></rect><rect x="65" y="40" width="20" height="80" rx="3" fill="#0082F3" opacity="0.75"></rect><rect x="95" y="30" width="20" height="90" rx="3" fill="#0082F3" opacity="0.85"></rect><rect x="125" y="50" width="20" height="70" rx="3" fill="#0082F3" opacity="0.65"></rect><rect x="155" y="15" width="20" height="105" rx="3" fill="#0082F3" opacity="0.9"></rect></svg>`
   };
-  svgs['Fintech'] = svgs.PSP; return svgs[type] || svgs.PSP || svgs.EMI;
+  return svgs[type] || svgs.Fintech;
 }
 async function loadListings(q){
   const loadingTimer=setTimeout(()=>{const g=document.getElementById('lgrid');if(g&&g.textContent.includes('Loading'))g.innerHTML='<div class="empty"><p>Loading took too long. <a href="/listings.html" style="color:var(--yellow)">View all listings</a></p></div>';},6000);
@@ -391,33 +388,20 @@ async function loadListings(q){
       const isGradient = img === 'gradient';
       return `<div class="lcard" onclick="window.location.href='/offer.html?ref=${o.ref}'">
         <div class="lcard-cover ${isGradient ? 'igaming-gradient' : ''}">
-          ${`<div class="cover-illustration ${ind === 'none' ? 'fintech' : ind}">${getCoverSvg(o.license_type)}</div>`}
-          <span class="cat-label ${ind}">${ind === 'none' ? 'fintech' : ind}</span>
+          ${`<div class="cover-illustration ${ind}">${getCoverSvg(o.license_type)}</div>`}
+          <span class="cat-label ${ind}">${ind}</span>
         </div>
         <div class="lcard-body">
           <div class="lcard-title">${title}</div>
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
           <div class="lcard-desc">${esc(o.short_description||'Licensed business with established operations and infrastructure.')}</div>
           <div class="lcard-tags">${tags.join('')}</div>
-          <div class="lcard-bottom"><span class="lcard-price">${esc((o.price||'On request').replace(/^eur\s*/i, '€ '))}</span><span class="lcard-arrow">→</span></div>
+          <div class="lcard-bottom"><span class="lcard-price">${esc(o.price||'On request')}</span><span class="lcard-arrow">→</span></div>
         </div></div>`;
     }).join('');
   }catch(e){document.getElementById('lgrid').innerHTML='<div class="empty"><p>Could not load.</p></div>'}
 }
 loadListings();
-if(window.innerWidth<=640){
-  const hs=document.getElementById("heroSearch");
-  if(hs && hs.dataset.mobilePlaceholder) hs.placeholder=hs.dataset.mobilePlaceholder;
-}
-window.addEventListener("resize",()=>{
-  const hs=document.getElementById("heroSearch");
-  if(!hs)return;
-  if(window.innerWidth<=640){
-    if(hs.dataset.mobilePlaceholder) hs.placeholder=hs.dataset.mobilePlaceholder;
-  }else{
-    hs.placeholder="Search by license, jurisdiction, industry...";
-  }
-});
 </script>
 
 </body>

@@ -79,7 +79,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#F6F8FB}
 .stat-text{text-align:left}
 .stat-num{font-size:28px;font-weight:800;letter-spacing:-0.8px;color:var(--text);line-height:1}
-.stat-label{font-size:13px;color:var(--text-2);margin-top:2px}
+.stat-label{font-size:13px;color:var(--text-2);margin-top:2px;text-align:center;width:100%}
 
 /* Listings */
 .listings{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
@@ -181,9 +181,9 @@ body{padding-bottom:0}
 .stat{min-width:auto;flex-direction:column;text-align:center;gap:6px;align-items:center}
 .stat-icon{width:38px;height:38px;font-size:18px}
 .stat-num{font-size:22px}
-.stat-label{font-size:11px}
+.stat-label{font-size:11px;text-align:center;width:100%}
 .listings{padding:16px 12px 70px}
-.sh{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:20px;max-width:100%}
+.sh{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:20px}
 .sh h2{font-size:22px}
 .lgrid{grid-template-columns:1fr;gap:14px}
 .lcard{border-radius:16px}
@@ -227,8 +227,8 @@ body{padding-bottom:0}
   <p>Verified licensed companies. Filter by license, jurisdiction, or industry.</p>
   <div class="hero-search listings-search">
     <span class="search-icon">⌕</span>
-    <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()" data-mobile-placeholder="Search offers...">
-    <button class="hero-search-btn" onclick="doSearch()"><span class="btn-text">Search</span><span class="btn-icon">⌕</span></button>
+    <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="hero-search-btn" onclick="doSearch()">Search</button>
   </div>
   <div id="lgrid" class="lgrid"></div>
 </main>
@@ -310,7 +310,7 @@ async function loadListings(q){
           <div class="lcard-loc">${flag(o.jurisdiction)} ${esc(o.jurisdiction||'')}</div>
           <div class="lcard-desc">${esc(o.short_description||'Licensed business with established operations and infrastructure.')}</div>
           <div class="lcard-tags">${tags.join('')}</div>
-          <div class="lcard-bottom"><span class="lcard-price">${esc((o.price||'On request').replace(/^eur\s*/i, '€ '))}</span><span class="lcard-arrow">→</span></div>
+          <div class="lcard-bottom"><span class="lcard-price">${esc(o.price||'On request')}</span><span class="lcard-arrow">→</span></div>
         </div></div>`;
     }).join('');
   }catch(e){document.getElementById('lgrid').innerHTML='<div class="empty"><p>Could not load.</p></div>'}
