@@ -352,6 +352,13 @@ async def tg_set_menu_button(chat_id, text, url):
     async with aiohttp.ClientSession() as s:
         async with s.post(endpoint, json=payload) as r:
             return await r.json()
+async def tg_delete(chat_id, msg_id):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/deleteMessage"
+    payload = {"chat_id": chat_id, "message_id": msg_id}
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json=payload) as r: return await r.json()
+
+
 async def tg_edit(chat_id, msg_id, text, reply_markup=None, parse_mode=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
     payload = {"chat_id": chat_id, "message_id": msg_id, "text": text, "parse_mode": parse_mode or "HTML"}
@@ -1202,11 +1209,13 @@ async def admin_sold(ref: str, request: Request):
     o = await db_get_offer(ref)
     if not o: raise HTTPException(404, "Not found")
     card, parse_mode = format_offer_card(o, sold=True)
-    empty_kb = {"inline_keyboard": []}
-    if o.get("channel_message_id"):
-        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, empty_kb, parse_mode=parse_mode)
-        if not r.get("ok"):
-            await tg_send(CHANNEL_ID, card, empty_kb, parse_mode=parse_mode)
+    # For sold offers: delete old channel post and repost without buttons
+    old_msg_id = o.get("channel_message_id")
+    if old_msg_id:
+        await tg_delete(CHANNEL_ID, old_msg_id)
+    r = await tg_send(CHANNEL_ID, card, parse_mode=parse_mode)
+    if r.get("ok"):
+        await db_update_channel_msg(o.get("id"), r["result"]["message_id"])
     await db_mark_sold(ref)
     await db_audit(uid, "sold", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
