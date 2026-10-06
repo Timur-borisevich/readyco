@@ -177,11 +177,11 @@ body{padding-bottom:0}
 .hero-popular{gap:5px}
 .hero-tag{padding:5px 10px;font-size:10px}
 .hero-cats{display:none}
-.stats{padding:20px 14px;gap:16px;display:grid;grid-template-columns:repeat(2,1fr);margin:0 12px 32px 12px;border-radius:18px}
-.stat{min-width:auto;flex-direction:column;text-align:center;gap:6px;align-items:center}
-.stat-icon{width:38px;height:38px;font-size:18px}
+.stats{padding:20px 12px;gap:12px;display:grid;grid-template-columns:repeat(2,1fr);margin:0 12px 32px 12px;border-radius:18px}
+.stat{min-width:auto;display:flex;flex-direction:column;text-align:center;gap:6px;align-items:center;justify-content:flex-start}
+.stat-icon{width:38px;height:38px;font-size:18px;margin:0 auto 6px}
 .stat-num{font-size:22px}
-.stat-label{font-size:11px;text-align:center;width:100%}
+.stat-label{font-size:11px;text-align:center;width:100%;line-height:1.3}
 .listings{padding:16px 12px 70px}
 .sh{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:20px}
 .sh h2{font-size:22px}
@@ -228,7 +228,7 @@ body{padding-bottom:0}
   <div class="hero-search listings-search">
     <span class="search-icon">⌕</span>
     <input type="text" id="heroSearch" placeholder="Search by license, jurisdiction, industry..." data-mobile-placeholder="Search..." onkeydown="if(event.key==='Enter')doSearch()">
-    <button class="hero-search-btn" onclick="doSearch()"><span class="btn-text">Search</span><span class="btn-icon">⌕</span></button>
+    <button class="hero-search-btn" onclick="doSearch()"><span class="btn-text">Search</span></button>
   </div>
   <div id="lgrid" class="lgrid"></div>
 </main>
