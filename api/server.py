@@ -1202,11 +1202,11 @@ async def admin_sold(ref: str, request: Request):
     o = await db_get_offer(ref)
     if not o: raise HTTPException(404, "Not found")
     card, parse_mode = format_offer_card(o, sold=True)
-    kb = inquiry_keyboard(ref)
+    empty_kb = {"inline_keyboard": []}
     if o.get("channel_message_id"):
-        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, kb)
+        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, empty_kb, parse_mode=parse_mode)
         if not r.get("ok"):
-            await tg_send(CHANNEL_ID, f"✅ SOLD\n\n{card}", kb, parse_mode=parse_mode)
+            await tg_send(CHANNEL_ID, card, empty_kb, parse_mode=parse_mode)
     await db_mark_sold(ref)
     await db_audit(uid, "sold", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
