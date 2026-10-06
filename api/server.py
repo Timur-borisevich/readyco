@@ -277,48 +277,37 @@ def format_offer_card(offer, sold=False):
     desc = offer.get('short_description', '')
     hashtags = offer.get('hashtags', '')
     
-    if sold:
-        # SOLD — everything struck through (HTML <s> tag)
-        lines = ["✅ SOLD", ""]
-        lines.append(f"<s>{flag} {jurisdiction}</s>")
-        if company_type: lines.append(f"<s>{company_type}</s>")
-        if license_type: lines.append(f"<s>{lic_emoji} {license_type}</s>")
-        if price: lines.append(f"<s>💰 {price}</s>")
+    def st(s): return f"<s>{s}</s>" if sold else s
+    
+    lines = []
+    lines.append(st("🔴 FOR SALE" if not sold else "🔴 SOLD"))
+    lines.append(st("━━━━━━━━━━━━━━━━━"))
+    lines.append("")
+    lines.append(st(f"{flag} {jurisdiction}"))
+    if company_type: lines.append(st(f"📦 {company_type}"))
+    if year: lines.append(st(f"📅 Established: {year}"))
+    if license_type: lines.append(st(f"{lic_emoji} License: {license_type}"))
+    if license_status: lines.append(st(f"   Status: {license_status}"))
+    if regulator: lines.append(st(f"🏛️ Regulator: {regulator}"))
+    lines.append("")
+    if bank: lines.append(st(f"🏦 Bank/EMI: {bank}"))
+    if vat: lines.append(st(f"📋 VAT: {vat}"))
+    if turnover: lines.append(st(f"📊 Turnover: {turnover}"))
+    if employees: lines.append(st(f"👤 Employees: {employees}"))
+    if transfer: lines.append(st(f"⏱️ Transfer: {transfer}"))
+    lines.append("")
+    lines.append(st(f"💰 Price: {price}"))
+    lines.append(st("━━━━━━━━━━━━━━━━━"))
+    if desc:
+        lines.append(st(desc))
+        lines.append(st("━━━━━━━━━━━━━━━━━"))
+    if hashtags:
         lines.append("")
-        lines.append(f"<s>Ref: {ref}</s>")
-        lines.append("")
-        lines.append("Contact: @ReadyCoAdminBot")
-        return ("\n".join(lines), "HTML")
-    else:
-        # Active offer — structured layout
-        lines = []
-        lines.append("🔴 FOR SALE")
-        lines.append("━━━━━━━━━━━━━━━━━")
-        lines.append("")
-        lines.append(f"{flag} {jurisdiction}")
-        if company_type: lines.append(f"📦 {company_type}")
-        if year: lines.append(f"📅 Established: {year}")
-        if license_type: lines.append(f"{lic_emoji} License: {license_type}")
-        if license_status: lines.append(f"   Status: {license_status}")
-        if regulator: lines.append(f"🏛️ Regulator: {regulator}")
-        lines.append("")
-        if bank: lines.append(f"🏦 Bank/EMI: {bank}")
-        if vat: lines.append(f"📋 VAT: {vat}")
-        if turnover: lines.append(f"📊 Turnover: {turnover}")
-        if employees: lines.append(f"👤 Employees: {employees}")
-        if transfer: lines.append(f"⏱️ Transfer: {transfer}")
-        lines.append("")
-        lines.append(f"💰 Price: {price}")
-        if desc:
-            lines.append("━━━━━━━━━━━━━━━━━")
-            lines.append(desc)
-        if hashtags:
-            lines.append("")
-            lines.append(hashtags)
-        lines.append("━━━━━━━━━━━━━━━━━")
-        lines.append(f"Ref: {ref}")
-        lines.append("💬 @ReadyCoAdminBot")
-        return ("\n".join(lines), None)
+        lines.append(st(hashtags))
+        lines.append(st("━━━━━━━━━━━━━━━━━"))
+    lines.append(f"<s>Ref: {ref}</s>" if sold else f"Ref: {ref}")
+    lines.append("Contact: @ReadyCoAdminBot" if sold else "💬 @ReadyCoAdminBot")
+    return ("\n".join(lines), "HTML" if sold else None)
 
 def format_announcement(text): return f"📢 {text}"
 
@@ -1211,6 +1200,12 @@ async def admin_live(ref: str, request: Request):
     uid = await verify_admin(request)
     o = await db_get_offer(ref)
     if not o: raise HTTPException(404, "Not found")
+    card, parse_mode = format_offer_card(o, sold=False)
+    kb = inquiry_keyboard(ref)
+    if o.get("channel_message_id"):
+        r = await tg_edit(CHANNEL_ID, o["channel_message_id"], card, kb)
+        if not r.get("ok"):
+            await tg_send(CHANNEL_ID, card, kb, parse_mode=parse_mode)
     await db_set_live(ref)
     await db_audit(uid, "live", "offer", o.get("id"), {"ref": ref})
     return {"ok": True}
