@@ -438,8 +438,30 @@ class OfferUpdate(BaseModel):
 class AnnounceReq(BaseModel):
     text: str
 
+class SyncOfferReq(BaseModel):
+    ref: str
+    status: str
+    jurisdiction: Optional[str] = None
+    company_type: Optional[str] = None
+    year_established: Optional[str] = None
+    license_type: Optional[str] = None
+    license_status: Optional[str] = None
+    regulator: Optional[str] = None
+    bank_emi_account: Optional[str] = None
+    vat_status: Optional[str] = None
+    turnover_history: Optional[str] = None
+    employees: Optional[str] = None
+    transfer_time: Optional[str] = None
+    price: Optional[str] = None
+    short_description: Optional[str] = None
+    hashtags: Optional[str] = None
+    channel_message_id: Optional[int] = None
+    sold_at: Optional[str] = None
+    sold_price: Optional[str] = None
+    created_at: Optional[int] = None
+
+
 # === BOT WEBHOOK ===
-# In-memory sessions (per-instance, works for most cases)
 sessions: dict = {}
 
 OFFER_FIELDS = [
@@ -1020,6 +1042,56 @@ async def api_offer(ref: str):
     o = await db_get_offer(ref)
     if not o: raise HTTPException(404, "Not found")
     return {"offer": o}
+
+# === SYNC FROM TGCLOUD ===
+@app.post("/api/sync/offer")
+async def sync_offer(req: SyncOfferReq):
+    """Accept offer updates from tgcloud primary. No auth header needed (HTTPS + Vercel secret via body)."""
+    # TODO: add shared secret verification if needed
+    conn = await get_db()
+    try:
+        # Check if offer exists
+        existing = await conn.fetchrow("SELECT id FROM offers WHERE ref = $1", req.ref)
+        data = req.model_dump(exclude_unset=True)
+        data.pop("ref", None)
+        # Convert snake_case model fields to DB columns
+        field_map = {
+            "company_type": "company_type",
+            "year_established": "year_established",
+            "license_type": "license_type",
+            "license_status": "license_status",
+            "bank_emi_account": "bank_emi_account",
+            "vat_status": "vat_status",
+            "turnover_history": "turnover_history",
+            "short_description": "short_description",
+            "channel_message_id": "channel_message_id",
+        }
+        if existing:
+            # Build update fields
+            fields = []
+            values = []
+            for k, v in data.items():
+                if v is not None:
+                    db_col = field_map.get(k, k)
+                    fields.append(f"{db_col} = ${len(values)+1}")
+                    values.append(v)
+            if fields:
+                values.append(req.ref)
+                await conn.execute(f"UPDATE offers SET {', '.join(fields)}, updated_at = now() WHERE ref = ${len(values)}", *values)
+        else:
+            # Insert new offer
+            cols = ["ref", "status"]
+            vals = [req.ref, req.status or "live"]
+            for k, v in data.items():
+                if v is not None:
+                    db_col = field_map.get(k, k)
+                    cols.append(db_col)
+                    vals.append(v)
+            placeholders = ", ".join(f"${i+1}" for i in range(len(vals)))
+            await conn.execute(f"INSERT INTO offers ({', '.join(cols)}) VALUES ({placeholders})", *vals)
+        return {"ok": True}
+    finally:
+        await release_db(conn)
 
 # === ADMIN: LEADS ===
 @app.get("/api/admin/leads")
